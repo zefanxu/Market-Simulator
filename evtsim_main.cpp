@@ -74,6 +74,7 @@ main(int argc, char** argv) {
     boost::asio::ip::tcp::acceptor acceptor(io_service, endpoint);
     boost::asio::ip::tcp::socket socket(io_service);
     boost::system::error_code error;
+    acceptor.accept(socket);
     size_t len = socket.read_some(boost::asio::buffer(buf), error);
     std::cout.write(&buf[0], len);
   }
