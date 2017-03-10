@@ -33,7 +33,7 @@ main(int argc, char** argv) {
     ("help,h", "produce help message")
     ("config,c", bpo::value<string>(), "specify configuration file")
     ("version", "show version")
-    ("port,p", bpo::value<string>(), "simulator port number")
+    ("port,p", bpo::value<int>(), "simulator port number")
     ;
 
   bpo::variables_map vm;
