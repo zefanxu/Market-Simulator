@@ -49,8 +49,8 @@ clean:
 evtsim: $(OBJECTS) evtsim_main.o
 	$(CXX) -fPIC $(OBJECTS) $(LDFLAGS) -o $@
 
-regtest: $(REGTEST_OBJECTS)
-	$(CXX) -fPIC $(REGTEST_OBJECTS) $(LDFLAGS) $(RPATH_ADD) -o $@ -lpthread
+# regtest: $(REGTEST_OBJECTS)
+# 	$(CXX) -fPIC $(REGTEST_OBJECTS) $(LDFLAGS) $(RPATH_ADD) -o $@ -lpthread
 
 install:
 	for elem in include bin lib build; do install -d -m 0755 $(INSTALL_DIR)/$$elem; done

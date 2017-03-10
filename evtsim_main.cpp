@@ -33,6 +33,7 @@ main(int argc, char** argv) {
     ("help,h", "produce help message")
     ("config,c", bpo::value<string>(), "specify configuration file")
     ("version", "show version")
+    ("port,p", bpo::value<string>(), "simulator port number")
     ;
 
   bpo::variables_map vm;
@@ -55,10 +56,17 @@ main(int argc, char** argv) {
     return 1;
   }
 
-  if(!vm.count("config")) {
-    cout << opts << endl;
+  // if(!vm.count("config")) {
+  //   cout << opts << endl;
+  //   return 2;
+  // }
+  if (!vm.count("port")){
+    cout << "missing port number" << endl;
     return 2;
   }
+
+  int port_num = vm["port"];
+  cout << port_num << endl;
 
   return 0;
 }
