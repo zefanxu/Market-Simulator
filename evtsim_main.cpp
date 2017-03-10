@@ -9,6 +9,7 @@
 
 #include <evt_server.h>
 #include <evt_util.h>
+#include "../evts/sessions/ouch/messages.h"
 
 using namespace std;
 using namespace evt;
@@ -76,7 +77,8 @@ main(int argc, char** argv) {
     boost::system::error_code error;
     acceptor.accept(socket);
     size_t len = socket.read_some(boost::asio::buffer(buf), error);
-    std::cout.write(&buf[0], len);
+    string ret = parse_packet(buf.c_array(), len);
+    boost::asio::write(socket, boost::asio::buffer(ret), boost::asio::transfer_all(), ignored_error);
   }
   catch (std::exception& e){
     std::cerr << "Exception: " << e.what() <<endl;
