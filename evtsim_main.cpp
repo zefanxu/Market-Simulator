@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/asio.hpp>
 
 #include <iostream>
 #include <string>
@@ -66,7 +67,18 @@ main(int argc, char** argv) {
   }
 
   int port_num = vm["port"].as<int>();
-  cout << port_num << endl;
-
+  try{
+    boost::array<char, 128> buf;
+    boost::asio::io_service io_service;
+    boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), port_num);
+    boost::asio::ip::tcp::acceptor acceptor(io_service, endpoint);
+    boost::asio::ip::tcp::socket socket(io_service);
+    boost::system::error_code error;
+    size_t len = socket.read_some(boost::asio::buffer(buf), error);
+    std::cout.write(&buf[0], len);
+  }
+  catch (std::exception& e){
+    std::cerr << "Exception: " << e.what() <<endl;
+  }
   return 0;
 }
