@@ -65,7 +65,7 @@ main(int argc, char** argv) {
     return 2;
   }
 
-  int port_num = vm["port"];
+  int port_num = vm["port"].as<int>();
   cout << port_num << endl;
 
   return 0;
