@@ -1,0 +1,16 @@
+*.d
+*.o
+*.so
+*.log
+*.csv
+regtest
+cta_utp_ticker
+.install
+.gdb_history
+evts
+
+# emacs
+*~
+logs/
+var/
+bugs/
