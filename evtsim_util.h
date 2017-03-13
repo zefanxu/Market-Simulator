@@ -21,8 +21,6 @@ using namespace evt::ouch;
 using boost::endian::big_to_native;
 using boost::endian::native_to_big;
 
-string parse_packet(char * packet, size_t len);
-string parse_login_request(MsgHeader * packet, size_t len);
 const std::string inbound_to_string(const MsgHeader* m);
 const std::string outbound_to_string(const MsgHeader* m);
 

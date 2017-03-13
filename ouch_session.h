@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _OUCH_SESSION_H
+#define _OUCH_SESSION_H
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -7,14 +8,14 @@
 #include "evtsim_messages.h"
 
 namespace ouch_state{
-  char not_logged_in = 'N';
-  char logged_in = 'L';
+  constexpr char not_logged_in = 'N';
+  constexpr char logged_in = 'L';
 }
 
 class ouch_session{
 public:
-  ouch_session();
   void init();
+  ouch_session();
   string parse_packet(char * packet, size_t len);
 private:
   string handle_login_request(MsgHeader * packet, size_t len);
@@ -24,3 +25,5 @@ private:
   vector<string> session_id;
   char state;
 };
+
+#endif

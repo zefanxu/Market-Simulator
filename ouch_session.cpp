@@ -30,7 +30,6 @@ string ouch_session::handle_login_request(MsgHeader * packet, size_t len){
 }
 
 string ouch_session::handle_logout_request(MsgHeader * packet, size_t len){
-  LogoutRequest * r = reinterpret_cast<LogoutRequest*>(packet);
   state = ouch_state::not_logged_in;
   return string();
 }
@@ -46,6 +45,10 @@ bool ouch_session::login(LoginRequest * req){
   }
 }
 
-void init(){
+ouch_session::ouch_session(){
+  init();
+}
 
+void ouch_session::init(){
+  state = ouch_state::not_logged_in;
 }

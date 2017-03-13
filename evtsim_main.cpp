@@ -77,16 +77,15 @@ main(int argc, char** argv) {
     boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), port_num);
     boost::asio::ip::tcp::acceptor acceptor(io_service, endpoint);
     boost::asio::ip::tcp::socket socket(io_service);
-    boost::system::error_code error;
+    boost::system::error_code ec;
     acceptor.accept(socket);
     while (true){
-      size_t len = socket.read_some(boost::asio::buffer(buf), error);
+      size_t len = socket.read_some(boost::asio::buffer(buf), ec);
       if (ec == boost::asio::error::eof){
         cout << "Connection closed" << endl;
         break;
       }
       string ret = s.parse_packet(buf.c_array(), len);
-      boost::system::error_code ec;
       if (ret.size())
         boost::asio::write(socket, boost::asio::buffer(ret), boost::asio::transfer_all(), ec);
     }
