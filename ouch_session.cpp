@@ -2,13 +2,12 @@
 
 string ouch_session::parse_packet(char * packet, size_t len){
   MsgHeader * msg_h = reinterpret_cast<MsgHeader*>(packet);
-  cout << outbound_to_string(msg_h) << endl;
   switch (msg_h->packet_type){
-    case(PacketType::LoginRequest):
+    case(static_cast<char>(PacketType::LoginRequest)):
       return handle_login_request(msg_h, len);
-    case(PacketType::LogoutRequest):
+    case(static_cast<char>(PacketType::LogoutRequest)):
       return handle_logout_request(msg_h, len);
-    case(PacketType::ClientHeartbeat):
+    case(static_cast<char>(PacketType::ClientHeartbeat)):
       return handle_client_heartbeat(msg_h, len);
     default:
       return string();
@@ -58,16 +57,16 @@ ouch_session::ouch_session(){
 
 void ouch_session::init(){
   state = ouch_state::not_logged_in;
-  auto curr_time = clock();
+  time_t curr_time = time(NULL);
   last_send_heartbeat = curr_time;
   last_recv_heartbeat = curr_time;
 }
 
 string ouch_session::heartbeat(){
-  clock_t curr_time = clock();
+  double second = difftime(time(NULL), last_send_heartbeat);
   if (state == ouch_state::not_logged_in) return string();
-  if (curr_time - last_send_heartbeat >= CLOCKS_PER_SEC){
-    last_send_heartbeat = curr_time;
+  if (second >= 1){
+    last_send_heartbeat = time(NULL);
     ServerHeartbeat h;
     return string(reinterpret_cast<const char*>(&h), sizeof(h));
   }

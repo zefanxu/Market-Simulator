@@ -20,16 +20,17 @@ public:
   void init();
   ouch_session();
   string parse_packet(char * packet, size_t len);
+  string heartbeat();
 private:
   string handle_login_request(MsgHeader * packet, size_t len);
   string handle_logout_request(MsgHeader * packet, size_t len);
   string handle_client_heartbeat(MsgHeader * packet, size_t len);
-  string heartbeat();
+  
   bool login(LoginRequest * req);
   unordered_map<string, vector<unsigned int>> messages;
   vector<string> session_id;
-  clock_t last_send_heartbeat;
-  clock_t last_recv_heartbeat;
+  time_t last_send_heartbeat;
+  time_t last_recv_heartbeat;
   char state;
 };
 

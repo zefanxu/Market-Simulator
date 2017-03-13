@@ -92,11 +92,11 @@ main(int argc, char** argv) {
         cout << "Connection closed" << endl;
         break;
       }
-      cout << inbound_to_string(reinterpret_cast<MsgHeader*>(buf.c_array())) << endl;
+      cout << "RECV: " << outbound_to_string(reinterpret_cast<const MsgHeader*>(buf.c_array())) << endl;
       ret = s.parse_packet(buf.c_array(), len);
     send_packet:
       if (ret.size()){
-        cout << inbound_to_string(reinterpret_cast<MsgHeader*>(ret.c_str())) << endl;
+        cout << "SEND: " << inbound_to_string(reinterpret_cast<const MsgHeader*>(ret.c_str())) << endl;
         boost::asio::write(socket, boost::asio::buffer(ret), boost::asio::transfer_all(), ec);
       }
     }
