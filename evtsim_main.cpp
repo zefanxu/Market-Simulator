@@ -9,7 +9,8 @@
 
 #include <evt_server.h>
 #include <evt_util.h>
-#include "../evts/sessions/ouch/messages.h"
+#include "evtsim_util.h"
+#include "evtsim_messages.h"
 
 using namespace std;
 using namespace evt;
@@ -78,7 +79,8 @@ main(int argc, char** argv) {
     acceptor.accept(socket);
     size_t len = socket.read_some(boost::asio::buffer(buf), error);
     string ret = parse_packet(buf.c_array(), len);
-    boost::asio::write(socket, boost::asio::buffer(ret), boost::asio::transfer_all(), ignored_error);
+    boost::system::error_code ec;
+    boost::asio::write(socket, boost::asio::buffer(ret), boost::asio::transfer_all(), ec);
   }
   catch (std::exception& e){
     std::cerr << "Exception: " << e.what() <<endl;

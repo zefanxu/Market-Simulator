@@ -3,9 +3,9 @@
 
 #include <signal.h>
 #include <stdlib.h>
-#include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/asio.hpp>
+#include <boost/endian/conversion.hpp>
 
 #include <iostream>
 #include <string>
@@ -13,13 +13,18 @@
 
 #include <evt_server.h>
 #include <evt_util.h>
-#include "../evts/sessions/ouch/messages.h"
+#include "evtsim_messages.h"
 
 using namespace std;
 using namespace evt;
+using namespace evt::ouch;
+using boost::endian::big_to_native;
+using boost::endian::native_to_big;
 
 string parse_packet(char * packet, size_t len);
-string parse_login_request(char * packet, size_t len);
+string parse_login_request(MsgHeader * packet, size_t len);
+const std::string inbound_to_string(const MsgHeader* m);
+const std::string outbound_to_string(const MsgHeader* m);
 
 
 
