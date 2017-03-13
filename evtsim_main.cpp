@@ -66,6 +66,7 @@ main(int argc, char** argv) {
   // }
   if (!vm.count("port")){
     cout << "missing port number" << endl;
+    cout << opt << endl;
     return 2;
   }
 
@@ -79,8 +80,11 @@ main(int argc, char** argv) {
     boost::asio::ip::tcp::socket socket(io_service);
     boost::system::error_code ec;
     acceptor.accept(socket);
+    size_t len;
     while (true){
-      size_t len = socket.read_some(boost::asio::buffer(buf), ec);
+      do {
+         len = socket.read_some(boost::asio::buffer(buf), ec);
+      } while(ec != boost::asio::error::would_block);
       if (ec == boost::asio::error::eof){
         cout << "Connection closed" << endl;
         break;
