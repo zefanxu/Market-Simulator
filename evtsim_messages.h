@@ -310,16 +310,19 @@ namespace ouch {
   // ******************************************************************
 
   struct LoginAccepted : public MsgHeader {
+    LoginAccepted(): length(native_to_big(LoginAccepted)), type(PacketType::LoginAccepted){}
     char session[10]; // left-padded with spaces
     char seq_num[20]; // left-padded with spaces
   } __attribute__((packed));
 
 
   struct LoginRejected : public MsgHeader {
+    LoginRejected(): length(native_to_big(LoginRejected)), type(PacketType::LoginRejected){}
     char reason;
   } __attribute__((packed));
 
   struct ServerHeartbeat : public MsgHeader {
+    ServerHeartbeat(): length(native_to_big(ServerHeartbeat)), type(PacketType::ServerHeartbeat){}
   } __attribute__((packed));
 
   struct EndOfSession : public MsgHeader {
@@ -330,6 +333,7 @@ namespace ouch {
   // ******************************************************************
 
   struct LoginRequest : public MsgHeader {
+    LoginRequest(): length(native_to_big(LoginRequest)), type(PacketType::LoginRequest){}
     char username[6]; // right-padded with spaces
     char password[10]; // right-padded with spaces
     char requested_session[10]; // left-padded with spaces
@@ -338,10 +342,12 @@ namespace ouch {
 
 
   struct ClientHeartbeat : public MsgHeader {
+    ClientHeartbeat(): length(native_to_big(ClientHeartbeat)), type(PacketType::ClientHeartbeat){}
   } __attribute__((packed));
 
 
   struct LogoutRequest : public MsgHeader {
+    LogoutRequest(): length(native_to_big(LogoutRequest)), type(PacketType::LogoutRequest){}
   } __attribute__((packed));
 
 
