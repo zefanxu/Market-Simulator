@@ -1,3 +1,5 @@
+#include "ouch_session.h"
+
 string ouch_session::parse_packet(char * packet, size_t len){
   MsgHeader * msg_h = reinterpret_cast<MsgHeader*>(packet);
   cout << outbound_to_string(msg_h) << endl;
@@ -42,4 +44,8 @@ bool ouch_session::login(LoginRequest * req){
   else{
     return false;
   }
+}
+
+void init(){
+
 }

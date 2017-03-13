@@ -87,7 +87,7 @@ main(int argc, char** argv) {
       }
       string ret = s.parse_packet(buf.c_array(), len);
       boost::system::error_code ec;
-      if (string.size())
+      if (ret.size())
         boost::asio::write(socket, boost::asio::buffer(ret), boost::asio::transfer_all(), ec);
     }
   }
