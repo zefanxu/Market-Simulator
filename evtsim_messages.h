@@ -1,8 +1,9 @@
 #pragma once
 #include <cstdint>
 #include <string>
-#include "../evts/evts_types.h"
 #include <boost/enum.hpp>
+#include <boost/endian/conversion.hpp>
+#include "../evts/evts_types.h"
 #include "../evts/order.h"
 
 using boost::endian::big_to_native;
