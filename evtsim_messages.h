@@ -316,7 +316,7 @@ namespace ouch {
   // ******************************************************************
 
   struct LoginAccepted{
-    LoginAccepted(): length(native_to_big(sizeof(LoginAccepted))), packet_type(static_cast<char>(PacketType::LoginAccepted)){}
+    LoginAccepted(): length(native_to_big(static_cast<uint16_t>(sizeof(LoginAccepted)))), packet_type(static_cast<char>(PacketType::LoginAccepted)){}
     MSG_HEADER
     char session[10]; // left-padded with spaces
     char seq_num[20]; // left-padded with spaces
