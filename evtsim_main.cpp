@@ -11,6 +11,7 @@
 #include <evt_util.h>
 #include "evtsim_util.h"
 #include "evtsim_messages.h"
+#include "ouch_session.h"
 
 using namespace std;
 using namespace evt;
@@ -69,6 +70,7 @@ main(int argc, char** argv) {
   }
 
   int port_num = vm["port"].as<int>();
+  ouch_session s;
   try{
     boost::array<char, 128> buf;
     boost::asio::io_service io_service;
@@ -77,10 +79,17 @@ main(int argc, char** argv) {
     boost::asio::ip::tcp::socket socket(io_service);
     boost::system::error_code error;
     acceptor.accept(socket);
-    size_t len = socket.read_some(boost::asio::buffer(buf), error);
-    string ret = parse_packet(buf.c_array(), len);
-    boost::system::error_code ec;
-    boost::asio::write(socket, boost::asio::buffer(ret), boost::asio::transfer_all(), ec);
+    while (true){
+      size_t len = socket.read_some(boost::asio::buffer(buf), error);
+      if (ec == boost::asio::error::eof){
+        cout << "Connection closed" << endl;
+        break;
+      }
+      string ret = s.parse_packet(buf.c_array(), len);
+      boost::system::error_code ec;
+      if (string.size())
+        boost::asio::write(socket, boost::asio::buffer(ret), boost::asio::transfer_all(), ec);
+    }
   }
   catch (std::exception& e){
     std::cerr << "Exception: " << e.what() <<endl;

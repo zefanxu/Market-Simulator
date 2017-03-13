@@ -316,7 +316,7 @@ namespace ouch {
   // ******************************************************************
 
   struct LoginAccepted{
-    LoginAccepted(): length(native_to_big(static_cast<uint16_t>(sizeof(LoginAccepted)))), packet_type(static_cast<char>(PacketType::LoginAccepted)){}
+    LoginAccepted(): length(native_to_big(static_cast<uint16_t>(sizeof(LoginAccepted)-2))), packet_type(static_cast<char>(PacketType::LoginAccepted)){}
     MSG_HEADER
     char session[10]; // left-padded with spaces
     char seq_num[20]; // left-padded with spaces
@@ -324,17 +324,18 @@ namespace ouch {
 
 
   struct LoginRejected{
-    LoginRejected(): length(native_to_big(sizeof(LoginRejected))), packet_type(static_cast<char>(PacketType::LoginRejected)){}
+    LoginRejected(): length(native_to_big(static_cast<uint16_t>(sizeof(LoginRejected)-2))), packet_type(static_cast<char>(PacketType::LoginRejected)){}
     MSG_HEADER
     char reason;
   } __attribute__((packed));
 
   struct ServerHeartbeat{
-    ServerHeartbeat(): length(native_to_big(sizeof(ServerHeartbeat))), packet_type(static_cast<char>(PacketType::ServerHeartbeat)){}
+    ServerHeartbeat(): length(native_to_big(static_cast<uint16_t>(sizeof(ServerHeartbeat)-2))), packet_type(static_cast<char>(PacketType::ServerHeartbeat)){}
     MSG_HEADER
   } __attribute__((packed));
 
   struct EndOfSession{
+    EndOfSession(): length(native_to_big(static_cast<uint16_t>(sizeof(EndOfSession)-2))), packet_type(static_cast<char>(PacketType::EndOfSession)){}
     MSG_HEADER
   } __attribute__((packed));
 
@@ -343,7 +344,7 @@ namespace ouch {
   // ******************************************************************
 
   struct LoginRequest{
-    LoginRequest(): length(native_to_big(sizeof(LoginRequest))), packet_type(static_cast<char>(PacketType::LoginRequest)){}
+    LoginRequest(): length(native_to_big(static_cast<uint16_t>(sizeof(LoginRequest)-2))), packet_type(static_cast<char>(PacketType::LoginRequest)){}
     MSG_HEADER
     char username[6]; // right-padded with spaces
     char password[10]; // right-padded with spaces
@@ -353,13 +354,13 @@ namespace ouch {
 
 
   struct ClientHeartbeat{
-    ClientHeartbeat(): length(native_to_big(sizeof(ClientHeartbeat))), packet_type(static_cast<char>(PacketType::ClientHeartbeat)){}
+    ClientHeartbeat(): length(native_to_big(static_cast<uint16_t>(sizeof(ClientHeartbeat)-2))), packet_type(static_cast<char>(PacketType::ClientHeartbeat)){}
     MSG_HEADER
   } __attribute__((packed));
 
 
   struct LogoutRequest{
-    LogoutRequest(): length(native_to_big(sizeof(LogoutRequest))), packet_type(static_cast<char>(PacketType::LogoutRequest)){}
+    LogoutRequest(): length(native_to_big(static_cast<uint16_t>(sizeof(LogoutRequest)-2))), packet_type(static_cast<char>(PacketType::LogoutRequest)){}
     MSG_HEADER
   } __attribute__((packed));
 

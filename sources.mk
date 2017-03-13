@@ -1,7 +1,7 @@
 TARGETS := evtsim #regtest
 
-INCLUDES := 
+INCLUDES :=
 
-SOURCES := evtsim_main.cpp evtsim_util.cpp messages.cpp
+SOURCES := evtsim_main.cpp evtsim_util.cpp messages.cpp ouch_session.cpp
 
 REGTEST_SOURCES=$(filter-out evtsim_main.cpp, $(SOURCES)) regtest.cpp

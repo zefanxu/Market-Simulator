@@ -1,34 +1,5 @@
 #include "evtsim_util.h"
 
-string parse_packet(char * packet, size_t len){
-  MsgHeader * msg_h = reinterpret_cast<MsgHeader*>(packet);
-  cout << outbound_to_string(msg_h) << endl;
-  switch (msg_h->packet_type){
-    case('L'):
-      return parse_login_request(msg_h, len);
-    default:
-      return string();
-  }
-}
-
-string parse_login_request(MsgHeader * packet, size_t len){
-  LoginRequest * r = reinterpret_cast<LoginRequest*>(packet);
-  char username[] = "S155T1";
-  char password[] = "testonly  ";
-  if (strncmp(r->username, username, sizeof(username)) and strncmp(r->password, password, sizeof(password))){
-    LoginAccepted la;
-    strncpy(la.session, "         0", sizeof(la.session));
-    strncpy(la.seq_num, "                   0", sizeof(la.seq_num));
-    cout << inbound_to_string(reinterpret_cast<MsgHeader*>(&la)) << endl;
-    return string(reinterpret_cast<const char*>(&la), sizeof(la));
-  }else{
-    LoginRejected lj;
-    lj.reason = 'A';
-    cout << inbound_to_string(reinterpret_cast<MsgHeader*>(&lj)) << endl;
-    return string(reinterpret_cast<const char*>(&lj), sizeof(lj));
-  }
-}
-
 int to_string(const LoginRequest& m, char* buf, size_t len) {
   return std::snprintf(buf, len, "LoginRequest(length=%hu,packet_type=%c,username=%s,password=%s,requested_session=%s,requested_seq_num=%s)",
                 big_to_native(m.length), m.packet_type,
