@@ -18,6 +18,7 @@ string ouch_session::handle_login_request(MsgHeader * packet, size_t len){
   LoginRequest * r = reinterpret_cast<LoginRequest*>(packet);
   if (login(r)){
     LoginAccepted la;
+    //TODO: session and seq num assignment logic
     strncpy(la.session, "         0", sizeof(la.session));
     strncpy(la.seq_num, "                   0", sizeof(la.seq_num));
     return string(reinterpret_cast<const char*>(&la), sizeof(la));
