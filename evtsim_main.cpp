@@ -80,29 +80,30 @@ main(int argc, char** argv) {
     boost::asio::ip::tcp::socket socket(io_service);
     boost::system::error_code ec;
     acceptor.accept(socket);
-    size_t len;
-    string ret;
-    while (true){
-      do {
-         ret = s.heartbeat();
-         if (ret.size()) goto send_packet;
-         len = socket.read_some(boost::asio::buffer(buf), ec);
-      } while(ec == boost::asio::error::would_block);
-      if (ec == boost::asio::error::eof){
-        cout << "Connection closed" << endl;
-        break;
-      }
-      cout << "RECV: " << outbound_to_string(reinterpret_cast<const MsgHeader*>(buf.c_array())) << endl;
-      ret = s.parse_packet(buf.c_array(), len);
-    send_packet:
-      if (ret.size()){
-        cout << "SEND: " << inbound_to_string(reinterpret_cast<const MsgHeader*>(ret.c_str())) << endl;
-        boost::asio::write(socket, boost::asio::buffer(ret), boost::asio::transfer_all(), ec);
-      }
-    }
   }
   catch (std::exception& e){
     std::cerr << "Exception: " << e.what() <<endl;
+    return 2;
+  }
+  size_t len;
+  string ret;
+  while (true){
+    do {
+       ret = s.heartbeat();
+       if (ret.size()) goto send_packet;
+       len = socket.read_some(boost::asio::buffer(buf), ec);
+    } while(ec == boost::asio::error::would_block);
+    if (ec == boost::asio::error::eof){
+      cout << "Connection closed" << endl;
+      break;
+    }
+    cout << "RECV: " << outbound_to_string(reinterpret_cast<const MsgHeader*>(buf.c_array())) << endl;
+    ret = s.parse_packet(buf.c_array(), len);
+  send_packet:
+    if (ret.size()){
+      cout << "SEND: " << inbound_to_string(reinterpret_cast<const MsgHeader*>(ret.c_str())) << endl;
+      boost::asio::write(socket, boost::asio::buffer(ret), boost::asio::transfer_all(), ec);
+    }
   }
   return 0;
 }
