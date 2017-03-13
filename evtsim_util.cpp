@@ -81,7 +81,7 @@ int to_string(const LoginRejected& m, char* buf, size_t len) {
   return std::snprintf(buf, len, "LoginRejected(length=%hu,packet_type=%c,reason=%c)",
                 big_to_native(m.length), m.packet_type, m.reason);
 }
-nt to_string(const OrderAccepted& m, char* buf, size_t len) {
+int to_string(const OrderAccepted& m, char* buf, size_t len) {
   return std::snprintf(buf, len,
               "OrderAccepted(length=%hu,packet_type=%c,msg_type=%c,timestamp=%lu,clordid=%s,side=%c,qty=%u,symbol=%s,price=%d,time_in_force=%u,firm=%s,display=%c,order_reference_number=%lu,capacity=%c,intermarket_sweep_eligibility=%c,min_qty=%u,cross_type=%c,order_state=%c,bbo_weight_indicator=%c)",
                 big_to_native(m.length), m.packet_type, m.msg_type, big_to_native(m.timestamp),
@@ -103,7 +103,7 @@ int to_string(const ServerHeartbeat& m, char* buf, size_t len) {
   return std::snprintf(buf, len, "ServertHeartbeat(length=%hu,packet_type=%c)", big_to_native(m.length),
                 m.packet_type);
 }
-nt to_string(const EndOfSession& m, char* buf, size_t len) {
+int to_string(const EndOfSession& m, char* buf, size_t len) {
   return std::snprintf(buf, len, "EndOfSession(length=%hu,packet_type=%c)", big_to_native(m.length),
               m.packet_type);
 }
