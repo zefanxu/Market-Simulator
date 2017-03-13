@@ -5,6 +5,9 @@
 #include <boost/enum.hpp>
 #include "../evts/order.h"
 
+using boost::endian::big_to_native;
+using boost::endian::native_to_big;
+
 namespace evt {
 namespace ouch {
 
@@ -312,7 +315,7 @@ namespace ouch {
   // ******************************************************************
 
   struct LoginAccepted{
-    LoginAccepted(): length(native_to_big(LoginAccepted)), packet_type(PacketType::LoginAccepted){}
+    LoginAccepted(): length(native_to_big(sizeof(LoginAccepted))), packet_type(static_cast<char>(PacketType::LoginAccepted)){}
     MSG_HEADER
     char session[10]; // left-padded with spaces
     char seq_num[20]; // left-padded with spaces
@@ -320,13 +323,13 @@ namespace ouch {
 
 
   struct LoginRejected{
-    LoginRejected(): length(native_to_big(LoginRejected)), packet_type(PacketType::LoginRejected){}
+    LoginRejected(): length(native_to_big(sizeof(LoginRejected))), packet_type(static_cast<char>(PacketType::LoginRejected)){}
     MSG_HEADER
     char reason;
   } __attribute__((packed));
 
   struct ServerHeartbeat{
-    ServerHeartbeat(): length(native_to_big(ServerHeartbeat)), packet_type(PacketType::ServerHeartbeat){}
+    ServerHeartbeat(): length(native_to_big(sizeof(ServerHeartbeat))), packet_type(static_cast<char>(PacketType::ServerHeartbeat)){}
     MSG_HEADER
   } __attribute__((packed));
 
@@ -339,7 +342,7 @@ namespace ouch {
   // ******************************************************************
 
   struct LoginRequest{
-    LoginRequest(): length(native_to_big(LoginRequest)), packet_type(PacketType::LoginRequest){}
+    LoginRequest(): length(native_to_big(sizeof(LoginRequest))), packet_type(static_cast<char>(PacketType::LoginRequest)){}
     MSG_HEADER
     char username[6]; // right-padded with spaces
     char password[10]; // right-padded with spaces
@@ -349,13 +352,13 @@ namespace ouch {
 
 
   struct ClientHeartbeat{
-    ClientHeartbeat(): length(native_to_big(ClientHeartbeat)), packet_type(PacketType::ClientHeartbeat){}
+    ClientHeartbeat(): length(native_to_big(sizeof(ClientHeartbeat))), packet_type(static_cast<char>(PacketType::ClientHeartbeat)){}
     MSG_HEADER
   } __attribute__((packed));
 
 
   struct LogoutRequest{
-    LogoutRequest(): length(native_to_big(LogoutRequest)), packet_type(PacketType::LogoutRequest){}
+    LogoutRequest(): length(native_to_big(sizeof(LogoutRequest))), packet_type(static_cast<char>(PacketType::LogoutRequest)){}
     MSG_HEADER
   } __attribute__((packed));
 
