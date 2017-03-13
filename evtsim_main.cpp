@@ -72,13 +72,13 @@ main(int argc, char** argv) {
 
   int port_num = vm["port"].as<int>();
   ouch_session s;
-    boost::array<char, 128> buf;
-    boost::asio::io_service io_service;
-    boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), port_num);
-    boost::system::error_code ec;
-    try{
-    boost::asio::ip::tcp::acceptor acceptor(io_service, endpoint);
-    boost::asio::ip::tcp::socket socket(io_service);
+  boost::array<char, 128> buf;
+  boost::asio::io_service io_service;
+  boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), port_num);
+  boost::system::error_code ec;
+  boost::asio::ip::tcp::acceptor acceptor(io_service, endpoint);
+  boost::asio::ip::tcp::socket socket(io_service);
+  try{
     acceptor.accept(socket);
   }
   catch (std::exception& e){
