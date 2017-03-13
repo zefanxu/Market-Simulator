@@ -299,41 +299,48 @@ namespace ouch {
 
 
   // SoupBinTCP
-  struct MsgHeader {
-    uint16_t length;
-    char packet_type; ///< \see ouch::PacketType
-  } __attribute__((packed));
+  #define MSG_HEADER\
+    uint16_t length;\
+    char packet_type;
 
+  struct MsgHeader{
+    MSG_HEADER
+  };
 
   // Session-level (SoupbinTCP) messages
   // Inbound (ouch to client)
   // ******************************************************************
 
-  struct LoginAccepted : public MsgHeader {
+  struct LoginAccepted{
     LoginAccepted(): length(native_to_big(LoginAccepted)), packet_type(PacketType::LoginAccepted){}
+    MSG_HEADER
     char session[10]; // left-padded with spaces
     char seq_num[20]; // left-padded with spaces
   } __attribute__((packed));
 
 
-  struct LoginRejected : public MsgHeader {
+  struct LoginRejected{
     LoginRejected(): length(native_to_big(LoginRejected)), packet_type(PacketType::LoginRejected){}
+    MSG_HEADER
     char reason;
   } __attribute__((packed));
 
-  struct ServerHeartbeat : public MsgHeader {
+  struct ServerHeartbeat{
     ServerHeartbeat(): length(native_to_big(ServerHeartbeat)), packet_type(PacketType::ServerHeartbeat){}
+    MSG_HEADER
   } __attribute__((packed));
 
-  struct EndOfSession : public MsgHeader {
+  struct EndOfSession{
+    MSG_HEADER
   } __attribute__((packed));
 
 
   // Outbound (client to ouch)
   // ******************************************************************
 
-  struct LoginRequest : public MsgHeader {
+  struct LoginRequest{
     LoginRequest(): length(native_to_big(LoginRequest)), packet_type(PacketType::LoginRequest){}
+    MSG_HEADER
     char username[6]; // right-padded with spaces
     char password[10]; // right-padded with spaces
     char requested_session[10]; // left-padded with spaces
@@ -341,13 +348,15 @@ namespace ouch {
   } __attribute__((packed));
 
 
-  struct ClientHeartbeat : public MsgHeader {
+  struct ClientHeartbeat{
     ClientHeartbeat(): length(native_to_big(ClientHeartbeat)), packet_type(PacketType::ClientHeartbeat){}
+    MSG_HEADER
   } __attribute__((packed));
 
 
-  struct LogoutRequest : public MsgHeader {
+  struct LogoutRequest{
     LogoutRequest(): length(native_to_big(LogoutRequest)), packet_type(PacketType::LogoutRequest){}
+    MSG_HEADER
   } __attribute__((packed));
 
 
@@ -355,7 +364,8 @@ namespace ouch {
   // Outbound (client to ouch)
   // ******************************************************************
 
-  struct EnterOrder : public MsgHeader {
+  struct EnterOrder{
+    MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
     Clordid clordid;
     char side; ///< \see ouch::Side
@@ -373,7 +383,8 @@ namespace ouch {
   } __attribute__((packed));
 
 
-  struct ReplaceOrder : public MsgHeader {
+  struct ReplaceOrder{
+    MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
     Clordid existing_clordid;
     Clordid clordid;
@@ -386,14 +397,16 @@ namespace ouch {
   } __attribute__((packed));
 
 
-  struct CancelOrder : public MsgHeader {
+  struct CancelOrder{
+    MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
     Clordid clordid;
     uint32_t qty; // 0 <= qty <= 1,000,000
   } __attribute__((packed));
 
 
-  struct ModifyOrder : public MsgHeader {
+  struct ModifyOrder{
+    MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
     Clordid clordid;
     char side; ///< \see ouch::Side
@@ -404,14 +417,16 @@ namespace ouch {
   // Inbound (ouch to client)
   // ******************************************************************
 
-  struct SystemEvent : public MsgHeader {
+  struct SystemEvent{
+    MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp; // nsecs past midnight
     char event_code; ///< \see ouch::EventCode
   } __attribute__((packed));
 
 
-  struct OrderAccepted : public MsgHeader {
+  struct OrderAccepted{
+    MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp; // nsecs past midnight
     Clordid clordid;
@@ -432,7 +447,8 @@ namespace ouch {
   } __attribute__((packed));
 
 
-  struct OrderCanceled : public MsgHeader {
+  struct OrderCanceled{
+    MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Clordid clordid;
@@ -441,7 +457,8 @@ namespace ouch {
   } __attribute__((packed));
 
 
-  struct OrderModified : public MsgHeader {
+  struct OrderModified{
+    MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Clordid clordid;
@@ -450,7 +467,8 @@ namespace ouch {
   } __attribute__((packed));
 
 
-  struct OrderRejected : public MsgHeader {
+  struct OrderRejected{
+    MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Clordid clordid;
@@ -458,7 +476,8 @@ namespace ouch {
   } __attribute__((packed));
 
 
-  struct OrderReplaced : public MsgHeader {
+  struct OrderReplaced{
+    MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Clordid clordid; ///< called Replacement Token in specs
@@ -480,7 +499,8 @@ namespace ouch {
   } __attribute__((packed));
 
 
-  struct Executed : public MsgHeader {
+  struct Executed{
+    MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Clordid clordid;
@@ -498,7 +518,8 @@ namespace ouch {
   } __attribute__((packed));
 
 
-  struct BrokenTrade : public MsgHeader {
+  struct BrokenTrade{
+    MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Clordid clordid;
@@ -507,21 +528,24 @@ namespace ouch {
   } __attribute__((packed));
 
 
-  struct CancelPending : public MsgHeader {
+  struct CancelPending{
+    MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Clordid clordid;
   } __attribute__((packed));
 
 
-  struct CancelReject : public MsgHeader {
+  struct CancelReject{
+    MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Clordid clordid;
   } __attribute__((packed));
 
 
-  struct AiqCanceled : public MsgHeader {
+  struct AiqCanceled{
+    MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Clordid clordid;
@@ -533,7 +557,8 @@ namespace ouch {
   } __attribute__((packed));
 
 
-  struct PriorityUpdate : public MsgHeader {
+  struct PriorityUpdate{
+    MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Clordid clordid;
@@ -543,7 +568,8 @@ namespace ouch {
   } __attribute__((packed));
 
 
-  struct TradeCorrection : public MsgHeader {
+  struct TradeCorrection{
+    MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Clordid clordid;
@@ -555,7 +581,8 @@ namespace ouch {
   } __attribute__((packed));
 
 
-  struct TradeNow : public MsgHeader {
+  struct TradeNow{
+    MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Clordid clordid;
