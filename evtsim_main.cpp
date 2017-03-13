@@ -37,7 +37,7 @@ main(int argc, char** argv) {
     ("help,h", "produce help message")
     ("config,c", bpo::value<string>(), "specify configuration file")
     ("version", "show version")
-    ("port,p", bpo::value<int>(), "simulator port number")
+    ("port,p", bpo::value<int>(), "simulator server listen port number")
     ;
 
   bpo::variables_map vm;
@@ -66,7 +66,7 @@ main(int argc, char** argv) {
   // }
   if (!vm.count("port")){
     cout << "missing port number" << endl;
-    cout << opt << endl;
+    cout << opts << endl;
     return 2;
   }
 
@@ -81,17 +81,24 @@ main(int argc, char** argv) {
     boost::system::error_code ec;
     acceptor.accept(socket);
     size_t len;
+    string ret;
     while (true){
       do {
+         ret = s.heartbeat();
+         if (ret.size()) goto send_packet;
          len = socket.read_some(boost::asio::buffer(buf), ec);
-      } while(ec != boost::asio::error::would_block);
+      } while(ec == boost::asio::error::would_block);
       if (ec == boost::asio::error::eof){
         cout << "Connection closed" << endl;
         break;
       }
-      string ret = s.parse_packet(buf.c_array(), len);
-      if (ret.size())
+      cout << inbound_to_string(reinterpret_cast<MsgHeader*>(buf.c_array())) << endl;
+      ret = s.parse_packet(buf.c_array(), len);
+    send_packet:
+      if (ret.size()){
+        cout << inbound_to_string(reinterpret_cast<MsgHeader*>(ret.c_str())) << endl;
         boost::asio::write(socket, boost::asio::buffer(ret), boost::asio::transfer_all(), ec);
+      }
     }
   }
   catch (std::exception& e){
