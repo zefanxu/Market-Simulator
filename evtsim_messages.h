@@ -454,7 +454,7 @@ namespace ouch {
     OrderAccepted(): length(native_to_big(static_cast<uint16_t>(sizeof(OrderAccepted)-2))),
         packet_type(static_cast<char>(PacketType::UnsequencedData)),
         msg_type(static_cast<char>(InboundMsgType::OrderAccepted)){}
-    format(){
+    void format(){
       timestamp = native_to_big(timestamp);
       price = native_to_big(price);
       qty = native_to_big(qty);

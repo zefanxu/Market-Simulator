@@ -32,31 +32,43 @@ string ouch_session::parse_message(MsgHeader * packet, size_t len){
   }
 }
 
+string ouch_session::replaceOrder(Ouch_MsgHeader * msg, size_t len){
+  return string();
+}
+
+string ouch_session::cancelOrder(Ouch_MsgHeader * msg, size_t len){
+  return string();
+}
+
+string ouch_session::modifyOrder(Ouch_MsgHeader * msg, size_t len){
+  return string();
+}
+
 string ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
   EnterOrder * eo = reinterpret_cast<EnterOrder*>(msg);
   OrderAccepted oa;
   oa.timestamp = get_timestamp();
-  oa.clordid = eo.clordid;
-  oa.side = eo.side;
-  strncpy(oa.symbol, eo.symbol, sizeof(oa.symbol));
-  oa.price = eo.price;
-  oa.time_in_force = eo.time_in_force;
-  strncpy(oa.firm, eo.firm, sizeof(oa.firm));
-  oa.display = eo.display;
-  oa.capacity = eo.capacity;
-  oa.intermarket_sweep_eligibility = eo.intermarket_sweep_eligibility;
-  oa.min_qty = eo.min_qty;
-  oa.cross_type = eo.cross_type;
+  oa.clordid = eo->clordid;
+  oa.side = eo->side;
+  strncpy(oa.symbol, eo->symbol, sizeof(oa.symbol));
+  oa.price = eo->price;
+  oa.time_in_force = eo->time_in_force;
+  strncpy(oa.firm, eo->firm, sizeof(oa.firm));
+  oa.display = eo->display;
+  oa.capacity = eo->capacity;
+  oa.intermarket_sweep_eligibility = eo->intermarket_sweep_eligibility;
+  oa.min_qty = eo->min_qty;
+  oa.cross_type = eo->cross_type;
   //TODO: hardcoded BBO weight indicator
   oa.bbo_weight_indicator = '2';
-  oa.order_state = static_cast<char>(OrderState::Live);
+  oa.order_state = static_cast<char>(ouch::OrderState::Live);
   //TODO: order_reference_number
   oa.order_reference_number = 1;
   oa.format();
   return string(reinterpret_cast<const char*>(&oa), sizeof(oa));
 }
 
-uint64_t get_timestamp(){
+uint64_t ouch_session::get_timestamp(){
   auto curr_time = chrono::high_resolution_clock::now();
   chrono::duration<uint64_t, std::nano> diff = curr_time - start_of_day;
   return diff.count();
@@ -117,7 +129,7 @@ void ouch_session::init(){
   tms.tm_min = 0;
   tms.tm_sec = 0;
   t1 = mktime(&tms);
-  start_of_day = chrono::system_clock::front_time_t(t1);
+  start_of_day = chrono::system_clock::from_time_t(t1);
 }
 
 string ouch_session::heartbeat(){
