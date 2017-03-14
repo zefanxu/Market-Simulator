@@ -1,6 +1,6 @@
 #include "ouch_session.h"
 
-string ouch_session::parse_packet(char * packet, size_t len){
+vector<char> ouch_session::parse_packet(char * packet, size_t len){
   MsgHeader * msg_h = reinterpret_cast<MsgHeader*>(packet);
   switch (msg_h->packet_type){
     case(static_cast<char>(PacketType::LoginRequest)):
@@ -12,11 +12,11 @@ string ouch_session::parse_packet(char * packet, size_t len){
     case(static_cast<char>(PacketType::UnsequencedData)):
       return parse_message(msg_h, len);
     default:
-      return string();
+      return vector<char>();
   }
 }
 
-string ouch_session::parse_message(MsgHeader * packet, size_t len){
+vector<char> ouch_session::parse_message(MsgHeader * packet, size_t len){
   Ouch_MsgHeader * ouch_msg_h = reinterpret_cast<Ouch_MsgHeader*>(packet);
   switch (ouch_msg_h->msg_type) {
     case(static_cast<char>(OutboundMsgType::EnterOrder)):
@@ -28,23 +28,23 @@ string ouch_session::parse_message(MsgHeader * packet, size_t len){
     case(static_cast<char>(OutboundMsgType::ModifyOrder)):
       return modifyOrder(ouch_msg_h, len);
     default:
-      return string();
+      return vector<char>();
   }
 }
 
-string ouch_session::replaceOrder(Ouch_MsgHeader * msg, size_t len){
-  return string();
+vector<char> ouch_session::replaceOrder(Ouch_MsgHeader * msg, size_t len){
+  return vector<char>();
 }
 
-string ouch_session::cancelOrder(Ouch_MsgHeader * msg, size_t len){
-  return string();
+vector<char> ouch_session::cancelOrder(Ouch_MsgHeader * msg, size_t len){
+  return vector<char>();
 }
 
-string ouch_session::modifyOrder(Ouch_MsgHeader * msg, size_t len){
-  return string();
+vector<char> ouch_session::modifyOrder(Ouch_MsgHeader * msg, size_t len){
+  return vector<char>();
 }
 
-string ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
+vector<char> ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
   EnterOrder * eo = reinterpret_cast<EnterOrder*>(msg);
   OrderAccepted oa;
   oa.timestamp = get_timestamp();
@@ -65,7 +65,7 @@ string ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
   //TODO: order_reference_number
   oa.order_reference_number = 1;
   oa.format();
-  return string(reinterpret_cast<const char*>(&oa), sizeof(oa));
+  return vector<char>(reinterpret_cast<const char*>(&oa), reinterpret_cast<const char*>(&oa) + sizeof(oa));
 }
 
 uint64_t ouch_session::get_timestamp(){
@@ -74,31 +74,31 @@ uint64_t ouch_session::get_timestamp(){
   return diff.count();
 }
 
-string ouch_session::handle_login_request(MsgHeader * packet, size_t len){
+vector<char> ouch_session::handle_login_request(MsgHeader * packet, size_t len){
   LoginRequest * r = reinterpret_cast<LoginRequest*>(packet);
   if (login(r)){
     LoginAccepted la;
     //TODO: session and seq num assignment logic
     strncpy(la.session, "         0", sizeof(la.session));
     strncpy(la.seq_num, "                   0", sizeof(la.seq_num));
-    return string(reinterpret_cast<const char*>(&la), sizeof(la));
+    return vector<char>(reinterpret_cast<const char*>(&la), reinterpret_cast<const char*>(&la) + sizeof(la));
   }else{
     LoginRejected lj;
     lj.reason = 'A';
-    return string(reinterpret_cast<const char*>(&lj), sizeof(lj));
+    return vector<char>(reinterpret_cast<const char*>(&lj), reinterpret_cast<const char*>(&lj) + sizeof(lj));
   }
 }
 
-string ouch_session::handle_logout_request(MsgHeader * packet, size_t len){
+vector<char> ouch_session::handle_logout_request(MsgHeader * packet, size_t len){
   state = ouch_state::not_logged_in;
-  return string();
+  return vector<char>();
 }
 
-string ouch_session::handle_client_heartbeat(MsgHeader * packet, size_t len){
+vector<char> ouch_session::handle_client_heartbeat(MsgHeader * packet, size_t len){
   last_recv_heartbeat = clock();
   if (state != ouch_state::not_logged_in)
     state = ouch_state::losing_heartbeat;
-  return string();
+  return vector<char>();
 }
 
 bool ouch_session::login(LoginRequest * req){
@@ -132,13 +132,13 @@ void ouch_session::init(){
   start_of_day = chrono::system_clock::from_time_t(t1);
 }
 
-string ouch_session::heartbeat(){
+vector<char> ouch_session::heartbeat(){
   double second = difftime(time(NULL), last_send_heartbeat);
-  if (state == ouch_state::not_logged_in) return string();
+  if (state == ouch_state::not_logged_in) return vector<char>();
   if (second >= 1){
     last_send_heartbeat = time(NULL);
     ServerHeartbeat h;
-    return string(reinterpret_cast<const char*>(&h), sizeof(h));
+    return vector<char>(reinterpret_cast<const char*>(&h), reinterpret_cast<const char*>(&h) + sizeof(h));
   }
-  return string();
+  return vector<char>();
 }

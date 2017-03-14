@@ -20,18 +20,18 @@ class ouch_session{
 public:
   void init();
   ouch_session();
-  string parse_packet(char * packet, size_t len);
-  string parse_message(MsgHeader* packet, size_t len);
-  string heartbeat();
+  vector<char> parse_packet(char * packet, size_t len);
+  vector<char> parse_message(MsgHeader* packet, size_t len);
+  vector<char> heartbeat();
 private:
-  string handle_login_request(MsgHeader * packet, size_t len);
-  string handle_logout_request(MsgHeader * packet, size_t len);
-  string handle_client_heartbeat(MsgHeader * packet, size_t len);
+  vector<char> handle_login_request(MsgHeader * packet, size_t len);
+  vector<char> handle_logout_request(MsgHeader * packet, size_t len);
+  vector<char> handle_client_heartbeat(MsgHeader * packet, size_t len);
 
-  string enterOrder(Ouch_MsgHeader * msg, size_t len);
-  string cancelOrder(Ouch_MsgHeader * msg, size_t len);
-  string modifyOrder(Ouch_MsgHeader * msg, size_t len);
-  string replaceOrder(Ouch_MsgHeader * msg, size_t len);
+  vector<char> enterOrder(Ouch_MsgHeader * msg, size_t len);
+  vector<char> cancelOrder(Ouch_MsgHeader * msg, size_t len);
+  vector<char> modifyOrder(Ouch_MsgHeader * msg, size_t len);
+  vector<char> replaceOrder(Ouch_MsgHeader * msg, size_t len);
 
   bool login(LoginRequest * req);
 
