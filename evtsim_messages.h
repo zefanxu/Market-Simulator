@@ -378,6 +378,12 @@ namespace ouch {
     EnterOrder(): length(native_to_big(static_cast<uint16_t>(sizeof(EnterOrder)-2))),
         packet_type(static_cast<char>(PacketType::UnsequencedData)),
         msg_type(static_cast<char>(OutboundMsgType::EnterOrder)){}
+    void from_network(){
+      qty = big_to_native(qty);
+      price = big_to_native(price);
+      time_in_force = big_to_native(time_in_force);
+      min_qty = big_to_native(min_qty);
+    }
     MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
     Clordid clordid;
@@ -454,7 +460,7 @@ namespace ouch {
     OrderAccepted(): length(native_to_big(static_cast<uint16_t>(sizeof(OrderAccepted)-2))),
         packet_type(static_cast<char>(PacketType::SequencedData)),
         msg_type(static_cast<char>(InboundMsgType::OrderAccepted)){}
-    void format(){
+    void to_network(){
       timestamp = native_to_big(timestamp);
       price = native_to_big(price);
       qty = native_to_big(qty);
