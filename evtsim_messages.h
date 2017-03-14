@@ -309,7 +309,12 @@ namespace ouch {
 
   struct MsgHeader{
     MSG_HEADER
-  };
+  }__attribute__((packed));
+
+  struct Ouch_MsgHeader{
+    MSG_HEADER
+    char msg_type;
+  }__attribute__((packed));
 
   // Session-level (SoupbinTCP) messages
   // Inbound (ouch to client)
@@ -370,6 +375,9 @@ namespace ouch {
   // ******************************************************************
 
   struct EnterOrder{
+    EnterOrder(): length(native_to_big(static_cast<uint16_t>(sizeof(EnterOrder)-2))),
+        packet_type(static_cast<char>(PacketType::UnsequencedData)),
+        msg_type(static_cast<char>(OutboundMsgType::EnterOrder)){}
     MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
     Clordid clordid;
@@ -389,6 +397,9 @@ namespace ouch {
 
 
   struct ReplaceOrder{
+    ReplaceOrder(): length(native_to_big(static_cast<uint16_t>(sizeof(ReplaceOrder)-2))),
+        packet_type(static_cast<char>(PacketType::UnsequencedData)),
+        msg_type(static_cast<char>(OutboundMsgType::ReplaceOrder)){}
     MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
     Clordid existing_clordid;
@@ -403,6 +414,9 @@ namespace ouch {
 
 
   struct CancelOrder{
+    CancelOrder(): length(native_to_big(static_cast<uint16_t>(sizeof(CancelOrder)-2))),
+        packet_type(static_cast<char>(PacketType::UnsequencedData)),
+        msg_type(static_cast<char>(OutboundMsgType::CancelOrder)){}
     MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
     Clordid clordid;
@@ -411,6 +425,9 @@ namespace ouch {
 
 
   struct ModifyOrder{
+    ModifyOrder(): length(native_to_big(static_cast<uint16_t>(sizeof(ModifyOrder)-2))),
+        packet_type(static_cast<char>(PacketType::UnsequencedData)),
+        msg_type(static_cast<char>(OutboundMsgType::ModifyOrder)){}
     MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
     Clordid clordid;
@@ -423,6 +440,9 @@ namespace ouch {
   // ******************************************************************
 
   struct SystemEvent{
+    SystemEvent(): length(native_to_big(static_cast<uint16_t>(sizeof(SystemEvent)-2))),
+        packet_type(static_cast<char>(PacketType::UnsequencedData)),
+        msg_type(static_cast<char>(InboundMsgType::SystemEvent)){}
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp; // nsecs past midnight
@@ -431,6 +451,17 @@ namespace ouch {
 
 
   struct OrderAccepted{
+    OrderAccepted(): length(native_to_big(static_cast<uint16_t>(sizeof(OrderAccepted)-2))),
+        packet_type(static_cast<char>(PacketType::UnsequencedData)),
+        msg_type(static_cast<char>(InboundMsgType::OrderAccepted)){}
+    format(){
+      timestamp = native_to_big(timestamp);
+      price = native_to_big(price);
+      qty = native_to_big(qty);
+      time_in_force = native_to_big(time_in_force);
+      order_reference_number = native_to_big(order_reference_number);
+      min_qty = native_to_big(min_qty);
+    }
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp; // nsecs past midnight
@@ -453,6 +484,9 @@ namespace ouch {
 
 
   struct OrderCanceled{
+    OrderCanceled(): length(native_to_big(static_cast<uint16_t>(sizeof(OrderCanceled)-2))),
+        packet_type(static_cast<char>(PacketType::UnsequencedData)),
+        msg_type(static_cast<char>(InboundMsgType::OrderCanceled)){}
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -463,6 +497,9 @@ namespace ouch {
 
 
   struct OrderModified{
+    OrderModified(): length(native_to_big(static_cast<uint16_t>(sizeof(OrderModified)-2))),
+        packet_type(static_cast<char>(PacketType::UnsequencedData)),
+        msg_type(static_cast<char>(InboundMsgType::OrderModified)){}
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -473,6 +510,9 @@ namespace ouch {
 
 
   struct OrderRejected{
+    OrderRejected(): length(native_to_big(static_cast<uint16_t>(sizeof(OrderRejected)-2))),
+        packet_type(static_cast<char>(PacketType::UnsequencedData)),
+        msg_type(static_cast<char>(InboundMsgType::OrderRejected)){}
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -482,6 +522,9 @@ namespace ouch {
 
 
   struct OrderReplaced{
+    OrderReplaced(): length(native_to_big(static_cast<uint16_t>(sizeof(OrderReplaced)-2))),
+        packet_type(static_cast<char>(PacketType::UnsequencedData)),
+        msg_type(static_cast<char>(InboundMsgType::OrderReplaced)){}
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -505,6 +548,9 @@ namespace ouch {
 
 
   struct Executed{
+    Executed(): length(native_to_big(static_cast<uint16_t>(sizeof(Executed)-2))),
+        packet_type(static_cast<char>(PacketType::UnsequencedData)),
+        msg_type(static_cast<char>(InboundMsgType::Executed)){}
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -517,13 +563,27 @@ namespace ouch {
 
 
   /// Same as Executed, but with an additional ref price
-  struct ExecutedWithRefPrice : public Executed {
+  struct ExecutedWithRefPrice{
+    ExecutedWithRefPrice(): length(native_to_big(static_cast<uint16_t>(sizeof(ExecutedWithRefPrice)-2))),
+        packet_type(static_cast<char>(PacketType::UnsequencedData)),
+        msg_type(static_cast<char>(InboundMsgType::ExecutedWithRefPrice)){}
+    MSG_HEADER
+    char msg_type; ///< \see ouch::InboundMsgType
+    uint64_t timestamp;
+    Clordid clordid;
+    uint32_t executed_qty;
+    int32_t execution_price;
+    char liquidity_flag; ///< \see ouch::LiquidityFlag
+    uint64_t match_number;
     uint32_t reference_price;
     char reference_price_type;
   } __attribute__((packed));
 
 
   struct BrokenTrade{
+    BrokenTrade(): length(native_to_big(static_cast<uint16_t>(sizeof(BrokenTrade)-2))),
+        packet_type(static_cast<char>(PacketType::UnsequencedData)),
+        msg_type(static_cast<char>(InboundMsgType::BrokenTrade)){}
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -534,6 +594,9 @@ namespace ouch {
 
 
   struct CancelPending{
+    CancelPending(): length(native_to_big(static_cast<uint16_t>(sizeof(CancelPending)-2))),
+        packet_type(static_cast<char>(PacketType::UnsequencedData)),
+        msg_type(static_cast<char>(InboundMsgType::CancelPending)){}
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -542,6 +605,9 @@ namespace ouch {
 
 
   struct CancelReject{
+    CancelReject(): length(native_to_big(static_cast<uint16_t>(sizeof(CancelReject)-2))),
+        packet_type(static_cast<char>(PacketType::UnsequencedData)),
+        msg_type(static_cast<char>(InboundMsgType::CancelReject)){}
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -550,6 +616,9 @@ namespace ouch {
 
 
   struct AiqCanceled{
+    AiqCanceled(): length(native_to_big(static_cast<uint16_t>(sizeof(AiqCanceled)-2))),
+        packet_type(static_cast<char>(PacketType::UnsequencedData)),
+        msg_type(static_cast<char>(InboundMsgType::AiqCanceled)){}
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -563,6 +632,9 @@ namespace ouch {
 
 
   struct PriorityUpdate{
+    PriorityUpdate(): length(native_to_big(static_cast<uint16_t>(sizeof(PriorityUpdate)-2))),
+        packet_type(static_cast<char>(PacketType::UnsequencedData)),
+        msg_type(static_cast<char>(InboundMsgType::PriorityUpdate)){}
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -574,6 +646,9 @@ namespace ouch {
 
 
   struct TradeCorrection{
+    TradeCorrection(): length(native_to_big(static_cast<uint16_t>(sizeof(TradeCorrection)-2))),
+        packet_type(static_cast<char>(PacketType::UnsequencedData)),
+        msg_type(static_cast<char>(InboundMsgType::TradeCorrection)){}
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -587,6 +662,9 @@ namespace ouch {
 
 
   struct TradeNow{
+    TradeNow(): length(native_to_big(static_cast<uint16_t>(sizeof(TradeNow)-2))),
+        packet_type(static_cast<char>(PacketType::UnsequencedData)),
+        msg_type(static_cast<char>(InboundMsgType::TradeNow)){}
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
