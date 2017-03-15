@@ -75,7 +75,7 @@ vector<char> ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
   eo->from_network();
 
   //TODO: randomly reject orders
-  if ((time(NULL) % 2) or (state != ouch_state::logged_in)){
+  if (!(rand() % 5) or (state != ouch_state::logged_in)){
     return constructOrderRejected(eo);
   }
   if ((LiveOrders.find(string(eo->token.val)) != LiveOrders.end()) or
