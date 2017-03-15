@@ -60,7 +60,7 @@ vector<char> ouch_session::execute_logic(){
       ex.executed_qty = exe_qty;
       ex.execution_price = each_order.price;
       ex.liquidity_flag = 'R';
-      ex.match_number = each_order.orderID;
+      ex.match_number = get_timestamp();
       order_pair.second.qty -= exe_qty;
       ex.to_network();
       return vector<char>(reinterpret_cast<const char*>(&ex), reinterpret_cast<const char*>(&ex) + sizeof(ex));
