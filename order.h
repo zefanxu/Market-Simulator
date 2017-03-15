@@ -6,17 +6,8 @@ typedef uint64_t OrderID;
 constexpr OrderID INVALID_ORDERID = 0;
 constexpr OrderID INITIAL_ORDERID = 9100;
 
-BOOST_ENUM(OrderState,
-     (INITIAL)
-     (NEW)
-     (OPEN)
-     (PENDING_CANCEL)
-     (CANCELED)
-     (FILLED)
-     (PENDING_REPLACE)
-     (REJECTED)
-     (IREJECTED)
-     );
+namespace evt{
+namespace ouch{
 
 BOOST_ENUM(OrderType,
      (Limit)
@@ -61,3 +52,14 @@ BOOST_ENUM_VALUES(LiquidityCode, char,
       (AddMidpoint)('m')
       (TakeMidpoint)('M')
       );
+
+BOOST_ENUM_VALUES(OrderSide,char,
+		    (Invalid)('U')
+		    (Buy)('B')
+		    (Sell)('S')
+		    (Short)('T')
+		    );
+
+OrderSide verb_to_side(const std::string& s);
+
+}}

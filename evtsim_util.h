@@ -11,7 +11,7 @@
 #include <string>
 #include <cstring>
 
-#include <evt_server.h>
+
 #include <evt_util.h>
 #include "evtsim_messages.h"
 

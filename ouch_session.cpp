@@ -52,6 +52,7 @@ vector<char> ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
   oa.timestamp = get_timestamp();
   oa.clordid = eo->clordid;
   oa.side = eo->side;
+  oa.qty = eo->qty;
   strncpy(oa.symbol, eo->symbol, sizeof(oa.symbol));
   oa.price = eo->price;
   oa.time_in_force = eo->time_in_force;

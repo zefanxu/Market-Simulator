@@ -591,7 +591,7 @@ namespace ouch {
         msg_type(static_cast<char>(InboundMsgType::Executed)){}
     void to_network(){
       timestamp = native_to_big(timestamp);
-      executed_price = native_to_big(executed_price);
+      execution_price = native_to_big(execution_price);
       executed_qty = native_to_big(executed_qty);
       match_number = native_to_big(match_number);
     }
@@ -613,7 +613,7 @@ namespace ouch {
         msg_type(static_cast<char>(InboundMsgType::ExecutedWithRefPrice)){}
     void to_network(){
       timestamp = native_to_big(timestamp);
-      executed_price = native_to_big(executed_price);
+      execution_price = native_to_big(execution_price);
       executed_qty = native_to_big(executed_qty);
       reference_price = native_to_big(reference_price);
       match_number = native_to_big(match_number);

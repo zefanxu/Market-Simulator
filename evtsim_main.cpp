@@ -101,7 +101,7 @@ main(int argc, char** argv) {
     ret = s.parse_packet(buf.c_array(), len);
   send_packet:
     if (ret.size()){
-      cout << "SEND: " << inbound_to_string(reinterpret_cast<const MsgHeader*>(&ret[0]) << endl;
+      cout << "SEND: " << inbound_to_string(reinterpret_cast<const MsgHeader*>(&ret[0])) << endl;
       boost::asio::write(socket, boost::asio::buffer(&ret[0], ret.size()), boost::asio::transfer_all(), ec);
     }
   }
