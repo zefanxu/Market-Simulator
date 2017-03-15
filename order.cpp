@@ -5,12 +5,12 @@ using namespace evt::ouch;
 
 order::order(){
   recv_order_time = time(NULL);
-  orderID = get_timestamp();
+  orderID = rand() * rand();
 }
 
 order::order(EnterOrder & eo){
   recv_order_time = time(NULL);
-  orderID = get_timestamp();
+  orderID = rand() * rand();
   parse_order(eo);
 }
 

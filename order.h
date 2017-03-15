@@ -1,6 +1,7 @@
 #pragma once
 #include <boost/enum.hpp>
 #include <time.h>
+#include <stdlib.h>
 #include "evtsim_messages.h"
 
 constexpr uint32_t IOC_time = 0;
