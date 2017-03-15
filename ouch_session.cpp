@@ -78,8 +78,9 @@ vector<char> ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
   if (!(rand() % 5) or (state != ouch_state::logged_in)){
     return constructOrderRejected(eo);
   }
-  if ((LiveOrders.find(string(eo->token.val)) != LiveOrders.end()) or
-      (DoneOrders.find(string(eo->token.val)) != DoneOrders.end())){
+  //this order never seen
+  if ((LiveOrders.find(string(eo->token.val)) == LiveOrders.end()) and
+      (DoneOrders.find(string(eo->token.val)) == DoneOrders.end())){
     order new_order = order(*eo);
     LiveOrders[string(eo->token.val)] = new_order;
     return constructOrderAccpeted(eo, new_order);
