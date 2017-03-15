@@ -432,7 +432,7 @@ namespace ouch {
     }
     MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
-    Token existing_t;
+    Token existing_token;
     Token token;
     uint32_t qty; // 0 <= qty <= 1,000,000
     int32_t price;
@@ -599,7 +599,7 @@ namespace ouch {
     uint32_t min_qty;
     char cross_type; ///< \see ouch::CrossType
     char order_state; ///< \see ouch::OrderState
-    Token orig_t; ///< called Previous Token in specs
+    Token orig_token; ///< called Previous Token in specs
     char bbo_weight_indicator;
   } __attribute__((packed));
 

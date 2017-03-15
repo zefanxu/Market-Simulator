@@ -37,7 +37,7 @@ return std::snprintf(buf, len, "ModifyOrder(length=%hu,packet_type=%c,msg_type=%
 int to_string(const ReplaceOrder& m, char* buf, size_t len) {
 return std::snprintf(buf, len, "ReplaceOrder(length=%hu,packet_type=%c,msg_type=%c,existing_clordid=%s,clordid=%s,qty=%u,price=%d,time_in_force=%u,display=%c,intermarket_sweep_eligibility=%c,min_qty=%u)",
                 big_to_native(m.length), m.packet_type, m.msg_type,
-                m.existing_clordid.str().c_str(), m.token.val, big_to_native(m.qty),
+                m.existing_token.val, m.token.val, big_to_native(m.qty),
                 big_to_native(m.price), big_to_native(m.time_in_force), m.display,
                 m.intermarket_sweep_eligibility, m.min_qty);
 }
@@ -133,7 +133,7 @@ int to_string(const OrderReplaced& m, char* buf, size_t len) {
                 big_to_native(m.time_in_force), std::string(m.firm, sizeof(m.firm)).c_str(),
                   m.display, big_to_native(m.order_reference_number), m.capacity,
                   m.intermarket_sweep_eligibility, big_to_native(m.min_qty), m.cross_type,
-                  m.order_state, m.orig_clordid.str().c_str(), m.bbo_weight_indicator);
+                  m.order_state, m.orig_token.val, m.bbo_weight_indicator);
   }
 
 int to_string(const SystemEvent& m, char* buf, size_t len) {
