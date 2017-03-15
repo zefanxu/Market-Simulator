@@ -47,8 +47,8 @@ vector<char> ouch_session::modifyOrder(Ouch_MsgHeader * msg, size_t len){
 vector<char> ouch_session::execute_logic(){
   auto ret = heartbeat();
   if (ret.size()) return ret;
-  for (auto & it : LiveOrders){
-    order & each_order = it.second;
+  for (auto & order_pair : LiveOrders){
+    order each_order = order_pair.second;
     if (each_order.still_live()){
       //NOTE: something hardcoded for testing
       uint32_t exe_qty = min(each_order.qty, 200);
@@ -59,13 +59,13 @@ vector<char> ouch_session::execute_logic(){
       ex.execution_price = each_order.price;
       ex.liquidity_flag = 'R';
       ex.match_number = each_order.orderID;
-      each_order.qty -= exe_qty;
+      order_pair.second.qty -= exe_qty;
       ex.to_network();
       return vector<char>(reinterpret_cast<const char*>(&ex), reinterpret_cast<const char*>(&ex) + sizeof(ex));
     }
     else{
-      DoneOrders[string(it.first)] = it.second;
-      LiveOrders.erase(it.first);
+      DoneOrders[string(order_pair.first)] = order_pair.second;
+      LiveOrders.erase(order_pair.first);
     }
   }
   return std::vector<char>();
