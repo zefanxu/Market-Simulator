@@ -266,38 +266,8 @@ namespace ouch {
   }
 
 
-// - Integers are unsigned big-endian
-// - Alpha fields are left-justified, padded on the right with spaces
-// - Clordids are alphanumeric and case-sensitive and must be day-unique
-// - Prices are fixed-point integers with 6 whole number places and 4
-//    decimal digits. The maximum price is $199,999.9900 (0x7735939c)
-//    and market orders have special price $214,748.3647 (0x7fffffff).
-// - Time in force fields are integers
-
-
-  // NOTE: In order to stay consistent with the other sessions in evts,
-  // I'm calling the Ouch Token a 'Clordid'. The fields serve the same
-  // purpose, so it shouldn't be too confusing. Just mentally think:
-  // s/token/clordid/g.
-  struct Clordid {
-    char hpr_marker;
-    char prefix[5];
-    char oid[6];
-    char generation[2];
-
-    // helper methods
-    /// Overwrites entire Clordid with string (assumes 14 chars)
-    void set(const char*);
-    /// Sets the prefix (5 chars) and pads to the right if necessary
-    bool set_prefix(const std::string&, char padding_char);
-    /// Sets oid field to the base36 conversion of the OrderID
-    bool set_oid(OrderID);
-    /// Adds 1 to the base36 generation
-    int increment_generation();
-
-    const std::string str() const;
-    int get_generation() const;
-    OrderID get_oid() const;
+  struct Token {
+    char val[14];
   } __attribute__((packed));
 
 
@@ -385,7 +355,7 @@ namespace ouch {
     }
     MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
-    Clordid clordid;
+    Token token;
     char side; ///< \see ouch::Side
     uint32_t qty; // 0 <= qty <= 1,000,000
     char symbol[8];
@@ -413,8 +383,8 @@ namespace ouch {
     }
     MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
-    Clordid existing_clordid;
-    Clordid clordid;
+    Token existing_t;
+    Token token;
     uint32_t qty; // 0 <= qty <= 1,000,000
     int32_t price;
     uint32_t time_in_force; ///< \see ouch::TimeInForce
@@ -433,7 +403,7 @@ namespace ouch {
     }
     MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
-    Clordid clordid;
+    Token token;
     uint32_t qty; // 0 <= qty <= 1,000,000
   } __attribute__((packed));
 
@@ -447,7 +417,7 @@ namespace ouch {
     }
     MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
-    Clordid clordid;
+    Token token;
     char side; ///< \see ouch::Side
     uint32_t qty; // 0 <= qty <= 1,000,000
   } __attribute__((packed));
@@ -485,7 +455,7 @@ namespace ouch {
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp; // nsecs past midnight
-    Clordid clordid;
+    Token token;
     char side; ///< \see ouch::Side
     uint32_t qty; // 0 <= qty <= 1,000,000
     char symbol[8];
@@ -514,7 +484,7 @@ namespace ouch {
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
-    Clordid clordid;
+    Token token;
     uint32_t decrement_qty;
     char reason;
   } __attribute__((packed));
@@ -531,7 +501,7 @@ namespace ouch {
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
-    Clordid clordid;
+    Token token;
     char side; ///< \see ouch::Side
     uint32_t shares; // 0 <= shares <= 1,000,000
   } __attribute__((packed));
@@ -547,7 +517,7 @@ namespace ouch {
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
-    Clordid clordid;
+    Token token;
     char reason; ///< \see ouch::RejectedReason
   } __attribute__((packed));
 
@@ -566,7 +536,7 @@ namespace ouch {
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
-    Clordid clordid; ///< called Replacement Token in specs
+    Token token; ///< called Replacement Token in specs
     char side; ///< \see ouch::Side
     uint32_t qty; // 0 <= qty <= 1,000,000
     char symbol[8];
@@ -580,7 +550,7 @@ namespace ouch {
     uint32_t min_qty;
     char cross_type; ///< \see ouch::CrossType
     char order_state; ///< \see ouch::OrderState
-    Clordid orig_clordid; ///< called Previous Token in specs
+    Token orig_t; ///< called Previous Token in specs
     char bbo_weight_indicator;
   } __attribute__((packed));
 
@@ -598,7 +568,7 @@ namespace ouch {
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
-    Clordid clordid;
+    Token token;
     uint32_t executed_qty;
     int32_t execution_price;
     char liquidity_flag; ///< \see ouch::LiquidityFlag
@@ -621,7 +591,7 @@ namespace ouch {
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
-    Clordid clordid;
+    Token token;
     uint32_t executed_qty;
     int32_t execution_price;
     char liquidity_flag; ///< \see ouch::LiquidityFlag
@@ -642,7 +612,7 @@ namespace ouch {
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
-    Clordid clordid;
+    Token token;
     uint64_t match_number;
     char reason; ///< \see ouch::BrokenTradeReason
   } __attribute__((packed));
@@ -658,7 +628,7 @@ namespace ouch {
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
-    Clordid clordid;
+    Token token;
   } __attribute__((packed));
 
 
@@ -672,7 +642,7 @@ namespace ouch {
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
-    Clordid clordid;
+    Token token;
   } __attribute__((packed));
 
 
@@ -689,7 +659,7 @@ namespace ouch {
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
-    Clordid clordid;
+    Token token;
     uint32_t decrement_qty;
     char reason;
     uint32_t qty_prevented_from_trading;
@@ -710,7 +680,7 @@ namespace ouch {
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
-    Clordid clordid;
+    Token token;
     int32_t price;
     char display;
     uint64_t order_reference_number;
@@ -730,7 +700,7 @@ namespace ouch {
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
-    Clordid clordid;
+    Token token;
     uint32_t executed_shares;
     int32_t execution_price;
     char liquidity_flag;
@@ -749,7 +719,7 @@ namespace ouch {
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
-    Clordid clordid;
+    Token token;
   } __attribute__((packed));
 } // namespace ouch
 } // namespace evt

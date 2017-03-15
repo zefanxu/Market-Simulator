@@ -44,13 +44,38 @@ vector<char> ouch_session::modifyOrder(Ouch_MsgHeader * msg, size_t len){
   return vector<char>();
 }
 
+vector<char> ouch_session::execute_logic(){
+  auto ret = heartbeat();
+  if (ret.size()) return ret;
+  for (auto & it : LiveOrders){
+    order & each_order = it -> second;
+    if (each_order.still_live()){
+      uint32_t exe_qty = min(each_order.min_qty, each_order.qty);
+      Executed ex;
+      ex.timestamp = get_timestamp();
+      ex.token = each_order.token;
+      ex.executed_qty = exe_qty;
+      ex.execution_price = each_order.price;
+      ex.liquidity_flag = 'R';
+      ex.match_number = 1;
+      each_order.qty -= exe_qty;
+      return vector<char>(reinterpret_cast<const char*>(&ex), reinterpret_cast<const char*>(&ex) + sizeof(ex));
+    }
+    else{
+      DoneOrders[it->first] = it->second;
+      LiveOrders.erase(it);
+    }
+  }
+  return std::vector<char>();
+}
+
 vector<char> ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
   EnterOrder * eo = reinterpret_cast<EnterOrder*>(msg);
   eo->from_network();
 
   OrderAccepted oa;
   oa.timestamp = get_timestamp();
-  oa.clordid = eo->clordid;
+  oa.token = eo->token;
   oa.side = eo->side;
   oa.qty = eo->qty;
   strncpy(oa.symbol, eo->symbol, sizeof(oa.symbol));
@@ -67,6 +92,9 @@ vector<char> ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
   oa.order_state = static_cast<char>(ouch::OrderState::Live);
   //TODO: order_reference_number
   oa.order_reference_number = 1;
+
+  order new_order = order(*eo);
+  LiveOrders[eo->token] = new_order;
 
   oa.to_network();
   return vector<char>(reinterpret_cast<const char*>(&oa), reinterpret_cast<const char*>(&oa) + sizeof(oa));

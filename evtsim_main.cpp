@@ -89,7 +89,7 @@ main(int argc, char** argv) {
   vector<char> ret;
   while (true){
     do {
-       ret = s.heartbeat();
+       ret = s.execute_logic();
        if (ret.size()) goto send_packet;
        len = socket.read_some(boost::asio::buffer(buf), ec);
     } while(ec == boost::asio::error::would_block);
