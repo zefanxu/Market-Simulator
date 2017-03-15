@@ -31,7 +31,7 @@ public:
   char symbol[8];
   Token token;
   OrderState state;
-  Side side;
+  char side;
 };
 
 }}
