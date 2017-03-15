@@ -5,10 +5,12 @@ using namespace evt::ouch;
 
 order::order(){
   recv_order_time = time(NULL);
+  orderID = get_timestamp();
 }
 
 order::order(EnterOrder & eo){
   recv_order_time = time(NULL);
+  orderID = get_timestamp();
   parse_order(eo);
 }
 

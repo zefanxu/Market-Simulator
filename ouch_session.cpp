@@ -57,7 +57,7 @@ vector<char> ouch_session::execute_logic(){
       ex.executed_qty = exe_qty;
       ex.execution_price = each_order.price;
       ex.liquidity_flag = 'R';
-      ex.match_number = 1;
+      ex.match_number = each_order.orderID;
       each_order.qty -= exe_qty;
       ex.to_network();
       return vector<char>(reinterpret_cast<const char*>(&ex), reinterpret_cast<const char*>(&ex) + sizeof(ex));
@@ -74,31 +74,16 @@ vector<char> ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
   EnterOrder * eo = reinterpret_cast<EnterOrder*>(msg);
   eo->from_network();
 
-  OrderAccepted oa;
-  oa.timestamp = get_timestamp();
-  oa.token = eo->token;
-  oa.side = eo->side;
-  oa.qty = eo->qty;
-  strncpy(oa.symbol, eo->symbol, sizeof(oa.symbol));
-  oa.price = eo->price;
-  oa.time_in_force = eo->time_in_force;
-  strncpy(oa.firm, eo->firm, sizeof(oa.firm));
-  oa.display = eo->display;
-  oa.capacity = eo->capacity;
-  oa.intermarket_sweep_eligibility = eo->intermarket_sweep_eligibility;
-  oa.min_qty = eo->min_qty;
-  oa.cross_type = eo->cross_type;
-  //TODO: hardcoded BBO weight indicator
-  oa.bbo_weight_indicator = '2';
-  oa.order_state = static_cast<char>(ouch::OrderState::Live);
-  //TODO: order_reference_number
-  oa.order_reference_number = 1;
-
-  order new_order = order(*eo);
-  LiveOrders[string((eo->token).val)] = new_order;
-
-  oa.to_network();
-  return vector<char>(reinterpret_cast<const char*>(&oa), reinterpret_cast<const char*>(&oa) + sizeof(oa));
+  //TODO: randomly reject orders
+  if ((time(NULL) % 2) or (state != ouch_state::logged_in)){
+    return constructOrderRejected(eo);
+  }
+  if ((LiveOrders.find(string(eo->token.val)) != LiveOrders.end()) or
+      (DoneOrders.find(string(eo->token.val)) != DoneOrders.end())){
+    order new_order = order(*eo);
+    LiveOrders[string(eo->token.val)] = new_order;
+    return constructOrderAccpeted(eo, new_order);
+  }
 }
 
 uint64_t ouch_session::get_timestamp(){
@@ -151,6 +136,7 @@ ouch_session::ouch_session(){
 
 void ouch_session::init(){
   state = ouch_state::not_logged_in;
+
   time_t curr_time = time(NULL);
   last_send_heartbeat = curr_time;
   last_recv_heartbeat = curr_time;
@@ -174,4 +160,37 @@ vector<char> ouch_session::heartbeat(){
     return vector<char>(reinterpret_cast<const char*>(&h), reinterpret_cast<const char*>(&h) + sizeof(h));
   }
   return vector<char>();
+}
+
+vector<char> ouch_session::constructOrderAccpeted(EnterOrder * eo, const order & o){
+  OrderAccepted oa;
+  oa.timestamp = get_timestamp();
+  oa.token = eo->token;
+  oa.side = eo->side;
+  oa.qty = eo->qty;
+  strncpy(oa.symbol, eo->symbol, sizeof(oa.symbol));
+  oa.price = eo->price;
+  oa.time_in_force = eo->time_in_force;
+  strncpy(oa.firm, eo->firm, sizeof(oa.firm));
+  oa.display = eo->display;
+  oa.capacity = eo->capacity;
+  oa.intermarket_sweep_eligibility = eo->intermarket_sweep_eligibility;
+  oa.min_qty = eo->min_qty;
+  oa.cross_type = eo->cross_type;
+  //TODO: hardcoded BBO weight indicator
+  oa.bbo_weight_indicator = '2';
+  oa.order_state = static_cast<char>(ouch::OrderState::Live);
+  //TODO: order_reference_number
+  oa.order_reference_number = o.orderID;
+  oa.to_network();
+  return vector<char>(reinterpret_cast<const char*>(&oa), reinterpret_cast<const char*>(&oa) + sizeof(oa));
+}
+
+vector<char> ouch_session::constructOrderRejected(EnterOrder* eo){
+  OrderRejected oj;
+  oj.token = eo->token;
+  oj.timestamp = get_timestamp();
+  oj.reason = 'O'; //reject reason: Other
+  oj.to_network();
+  return vector<char>(reinterpret_cast<const char*>(&oj), reinterpret_cast<const char*>(&oj) + sizeof(oj));
 }
