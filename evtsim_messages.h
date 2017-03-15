@@ -3,7 +3,6 @@
 #include <string>
 #include <boost/enum.hpp>
 #include <boost/endian/conversion.hpp>
-#include "order.h"
 
 using boost::endian::big_to_native;
 using boost::endian::native_to_big;
@@ -110,6 +109,61 @@ namespace ouch {
     Market = 99998, // until market close
     System = 99999, // until end of trading day
   };
+  BOOST_ENUM_VALUES(EventCode, char,
+    (StartOfDay)('S')
+    (EndOfDay)('E')
+  );
+
+  BOOST_ENUM(OrderType,
+    (Limit)
+    (Market)
+    (Algo)
+    (PegToMid)
+    (PegToBid)
+    (PegToAsk)
+    (OnOpen)
+    (OnClose)
+    (ISO)
+  );
+
+  BOOST_ENUM(InventoryFlag,
+    (Init)
+    (Cover)
+  );
+
+  BOOST_ENUM(OrderTIF,
+    (Day)
+    (IOC)
+    (FillOrKill)
+    (PostOnly)
+  );
+
+  BOOST_ENUM(OrderDisplay,
+    (Normal)
+    (Hidden)
+  );
+
+  BOOST_ENUM(OrderCapacity,
+    (Agent)
+    (Principal)
+  );
+
+  BOOST_ENUM_VALUES(LiquidityCode, char,
+    (Unknown)('U')
+    (AddLit)('A')
+    (RemoveLit)('R')
+    (AddDark)('a')
+    (RemoveDark)('r')
+    (AddMidpoint)('m')
+    (TakeMidpoint)('M')
+  );
+
+  BOOST_ENUM_VALUES(OrderSide,char,
+    (Invalid)('U')
+    (Buy)('B')
+    (Sell)('S')
+    (Short)('T')
+  );
   inline bool
   convert_from_evt_tif(const OrderTIF& in, ouch::TimeInForce& out) {
     switch(in.index()) {
@@ -208,11 +262,6 @@ namespace ouch {
     return true;
   }
 
-
-  BOOST_ENUM_VALUES(EventCode, char,
-    (StartOfDay)('S')
-    (EndOfDay)('E')
-  );
 
 
   enum OrderState : char {
