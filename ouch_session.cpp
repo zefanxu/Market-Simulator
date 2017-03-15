@@ -84,6 +84,8 @@ vector<char> ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
     LiveOrders[string(eo->token.val)] = new_order;
     return constructOrderAccpeted(eo, new_order);
   }
+  //ignore enter order
+  return vector<char>();
 }
 
 uint64_t ouch_session::get_timestamp(){
