@@ -26,7 +26,7 @@ public:
   vector<char> parse_packet(char * packet, size_t len);
   vector<char> parse_message(MsgHeader* packet, size_t len);
   vector<char> heartbeat();
-  
+
 private:
   vector<char> handle_login_request(MsgHeader * packet, size_t len);
   vector<char> handle_logout_request(MsgHeader * packet, size_t len);
@@ -46,8 +46,8 @@ private:
   chrono::system_clock::time_point start_of_day;
   char state;
 
-  unordered_map<Token, order> LiveOrders;
-  unordered_map<Token, order> DoneOrders;
+  unordered_map<string, order> LiveOrders;
+  unordered_map<string, order> DoneOrders;
 
 };
 

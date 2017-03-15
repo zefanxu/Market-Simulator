@@ -62,7 +62,7 @@ vector<char> ouch_session::execute_logic(){
       return vector<char>(reinterpret_cast<const char*>(&ex), reinterpret_cast<const char*>(&ex) + sizeof(ex));
     }
     else{
-      DoneOrders[it->first] = it->second;
+      DoneOrders[string(it->first)] = it->second;
       LiveOrders.erase(it);
     }
   }
@@ -94,7 +94,7 @@ vector<char> ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
   oa.order_reference_number = 1;
 
   order new_order = order(*eo);
-  LiveOrders[eo->token] = new_order;
+  LiveOrders[string(eo->token)] = new_order;
 
   oa.to_network();
   return vector<char>(reinterpret_cast<const char*>(&oa), reinterpret_cast<const char*>(&oa) + sizeof(oa));
