@@ -52,8 +52,9 @@ vector<char> ouch_session::execute_logic(){
   for (auto & order_pair : LiveOrders){
     order each_order = order_pair.second;
     if (each_order.still_live()){
-      //NOTE: something hardcoded for testing
-      uint32_t exe_qty = min(each_order.qty, (unsigned int)200);
+      //NOTE: random execution qty for testing
+      uint32_t exe_qty = (2 + rand() % 10) * 100;
+      exe_qty = min(exe_qty, each_order.qty);
       Executed ex;
       ex.timestamp = get_timestamp();
       ex.token = each_order.token;
