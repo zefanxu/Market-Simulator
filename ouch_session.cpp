@@ -49,8 +49,9 @@ vector<char> ouch_session::execute_logic(){
   if (ret.size()) return ret;
   for (auto & it : LiveOrders){
     order & each_order = it.second;
-    if (each_order.still_live() and (each_order.qty > each_order.min_qty)){
-      uint32_t exe_qty = each_order.qty;
+    if (each_order.still_live()){
+      //NOTE: something hardcoded for testing
+      uint32_t exe_qty = min(each_order.qty, 200);
       Executed ex;
       ex.timestamp = get_timestamp();
       ex.token = each_order.token;
