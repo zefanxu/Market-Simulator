@@ -37,8 +37,6 @@ private:
 
   uint64_t get_timestamp();
 
-  unordered_map<string, vector<unsigned int>> messages;
-  vector<string> session_id;
   time_t last_send_heartbeat;
   time_t last_recv_heartbeat;
   chrono::system_clock::time_point start_of_day;

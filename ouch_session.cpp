@@ -47,6 +47,7 @@ vector<char> ouch_session::modifyOrder(Ouch_MsgHeader * msg, size_t len){
 vector<char> ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
   EnterOrder * eo = reinterpret_cast<EnterOrder*>(msg);
   eo->from_network();
+
   OrderAccepted oa;
   oa.timestamp = get_timestamp();
   oa.clordid = eo->clordid;
@@ -65,6 +66,7 @@ vector<char> ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
   oa.order_state = static_cast<char>(ouch::OrderState::Live);
   //TODO: order_reference_number
   oa.order_reference_number = 1;
+
   oa.to_network();
   return vector<char>(reinterpret_cast<const char*>(&oa), reinterpret_cast<const char*>(&oa) + sizeof(oa));
 }

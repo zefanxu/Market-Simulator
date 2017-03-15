@@ -3,8 +3,7 @@
 #include <string>
 #include <boost/enum.hpp>
 #include <boost/endian/conversion.hpp>
-#include "../evts/evts_types.h"
-#include "../evts/order.h"
+#include "order.h"
 
 using boost::endian::big_to_native;
 using boost::endian::native_to_big;
@@ -112,20 +111,20 @@ namespace ouch {
     System = 99999, // until end of trading day
   };
   inline bool
-  convert_from_evt_tif(const evt::OrderTIF& in, ouch::TimeInForce& out) {
+  convert_from_evt_tif(const OrderTIF& in, ouch::TimeInForce& out) {
     switch(in.index()) {
-    case evt::OrderTIF::Day: out = ouch::TimeInForce::Market; break;
-    case evt::OrderTIF::IOC: out = ouch::TimeInForce::Ioc; break;
-    case evt::OrderTIF::FillOrKill: out = ouch::TimeInForce::Ioc; break;
+    case OrderTIF::Day: out = ouch::TimeInForce::Market; break;
+    case OrderTIF::IOC: out = ouch::TimeInForce::Ioc; break;
+    case OrderTIF::FillOrKill: out = ouch::TimeInForce::Ioc; break;
     default: return false;
     }
     return true;
   }
   inline bool
-  convert_to_evt_tif(ouch::TimeInForce in, evt::OrderTIF& out) {
+  convert_to_evt_tif(ouch::TimeInForce in, OrderTIF& out) {
     switch(in) {
-    case ouch::TimeInForce::Market: out = evt::OrderTIF::Day; break;
-    case ouch::TimeInForce::Ioc: out = evt::OrderTIF::IOC; break;
+    case ouch::TimeInForce::Market: out = OrderTIF::Day; break;
+    case ouch::TimeInForce::Ioc: out = OrderTIF::IOC; break;
     default: return false;
     }
     return true;
@@ -139,7 +138,7 @@ namespace ouch {
     (SellShortExempt)('E')
   );
   inline bool
-  convert_from_evt_side(const evt::OrderSide& in, ouch::Side& out) {
+  convert_from_evt_side(const OrderSide& in, ouch::Side& out) {
     switch(in.index()) {
     case OrderSide::Buy:    out = Side::Buy; break;
     case OrderSide::Sell:   out = Side::Sell; break;
@@ -164,7 +163,7 @@ namespace ouch {
     (RetailPriceImprovement)('Q')
   );
   inline bool
-  convert_from_evt_display(const evt::OrderDisplay& in, ouch::Display& out) {
+  convert_from_evt_display(const OrderDisplay& in, ouch::Display& out) {
     switch(in.index()) {
     case OrderDisplay::Normal:  out = Display::AttributablePriceToDisplay; break;
     case OrderDisplay::Hidden:  out = Display::NonDisplay; break;
@@ -181,7 +180,7 @@ namespace ouch {
     (Other)('O')
   );
   inline bool
-  convert_from_evt_capacity(const evt::OrderCapacity& in, ouch::Capacity& out) {
+  convert_from_evt_capacity(const OrderCapacity& in, ouch::Capacity& out) {
     switch(in.index()) {
     case OrderCapacity::Agent:      out = Capacity::Agency; break;
     case OrderCapacity::Principal:  out = Capacity::Principal; break;
@@ -200,7 +199,7 @@ namespace ouch {
     (Retail)('R')
   );
   inline bool
-  convert_from_evt_ordertype(const evt::OrderType& in, ouch::CrossType& out) {
+  convert_from_evt_ordertype(const OrderType& in, ouch::CrossType& out) {
     switch(in.index()) {
     case OrderType::OnOpen: out = CrossType::OpeningCross; break;
     case OrderType::OnClose: out = CrossType::ClosingCross; break;
@@ -256,13 +255,13 @@ namespace ouch {
 
 
   inline
-  evt::LiquidityCode to_evt_liquidity_code(char in) {
+  LiquidityCode to_evt_liquidity_code(char in) {
     switch(in) {
-    case 'A': return evt::LiquidityCode::AddLit;
-    case 'R': return evt::LiquidityCode::RemoveLit;
-    case 'k': return evt::LiquidityCode::AddMidpoint;
-    case 'm': return evt::LiquidityCode::TakeMidpoint;
-    default:  return evt::LiquidityCode::Unknown;
+    case 'A': return LiquidityCode::AddLit;
+    case 'R': return LiquidityCode::RemoveLit;
+    case 'k': return LiquidityCode::AddMidpoint;
+    case 'm': return LiquidityCode::TakeMidpoint;
+    default:  return LiquidityCode::Unknown;
     }
   }
 
@@ -371,7 +370,7 @@ namespace ouch {
 
 
   // Application-level (Ouch) messages
-  // Outbound (client to ouch)
+  // Inbound (client to ouch)
   // ******************************************************************
 
   struct EnterOrder{
@@ -406,6 +405,12 @@ namespace ouch {
     ReplaceOrder(): length(native_to_big(static_cast<uint16_t>(sizeof(ReplaceOrder)-2))),
         packet_type(static_cast<char>(PacketType::UnsequencedData)),
         msg_type(static_cast<char>(OutboundMsgType::ReplaceOrder)){}
+    void from_network(){
+      qty = big_to_native(qty);
+      price = big_to_native(price);
+      time_in_force = big_to_native(time_in_force);
+      min_qty = big_to_native(min_qty);
+    }
     MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
     Clordid existing_clordid;
@@ -423,6 +428,9 @@ namespace ouch {
     CancelOrder(): length(native_to_big(static_cast<uint16_t>(sizeof(CancelOrder)-2))),
         packet_type(static_cast<char>(PacketType::UnsequencedData)),
         msg_type(static_cast<char>(OutboundMsgType::CancelOrder)){}
+    void from_network(){
+      qty = big_to_native(qty);
+    }
     MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
     Clordid clordid;
@@ -434,6 +442,9 @@ namespace ouch {
     ModifyOrder(): length(native_to_big(static_cast<uint16_t>(sizeof(ModifyOrder)-2))),
         packet_type(static_cast<char>(PacketType::UnsequencedData)),
         msg_type(static_cast<char>(OutboundMsgType::ModifyOrder)){}
+    void from_network(){
+      qty = big_to_native(qty);
+    }
     MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
     Clordid clordid;
@@ -449,6 +460,9 @@ namespace ouch {
     SystemEvent(): length(native_to_big(static_cast<uint16_t>(sizeof(SystemEvent)-2))),
         packet_type(static_cast<char>(PacketType::SequencedData)),
         msg_type(static_cast<char>(InboundMsgType::SystemEvent)){}
+    void to_network(){
+      timestamp = native_to_big(timestamp);
+    }
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp; // nsecs past midnight
@@ -493,6 +507,10 @@ namespace ouch {
     OrderCanceled(): length(native_to_big(static_cast<uint16_t>(sizeof(OrderCanceled)-2))),
         packet_type(static_cast<char>(PacketType::SequencedData)),
         msg_type(static_cast<char>(InboundMsgType::OrderCanceled)){}
+    void to_network(){
+      timestamp = native_to_big(timestamp);
+      decrement_qty = native_to_big(decrement_qty);
+    }
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -506,6 +524,10 @@ namespace ouch {
     OrderModified(): length(native_to_big(static_cast<uint16_t>(sizeof(OrderModified)-2))),
         packet_type(static_cast<char>(PacketType::SequencedData)),
         msg_type(static_cast<char>(InboundMsgType::OrderModified)){}
+    void to_network(){
+      timestamp = native_to_big(timestamp);
+      shares = native_to_big(shares);
+    }
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -519,6 +541,9 @@ namespace ouch {
     OrderRejected(): length(native_to_big(static_cast<uint16_t>(sizeof(OrderRejected)-2))),
         packet_type(static_cast<char>(PacketType::SequencedData)),
         msg_type(static_cast<char>(InboundMsgType::OrderRejected)){}
+    void to_network(){
+      timestamp = native_to_big(timestamp);
+    }
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -531,6 +556,13 @@ namespace ouch {
     OrderReplaced(): length(native_to_big(static_cast<uint16_t>(sizeof(OrderReplaced)-2))),
         packet_type(static_cast<char>(PacketType::SequencedData)),
         msg_type(static_cast<char>(InboundMsgType::OrderReplaced)){}
+    void to_network(){
+      timestamp = native_to_big(timestamp);
+      price = native_to_big(price);
+      qty = native_to_big(qty);
+      time_in_force = native_to_big(time_in_force);
+      min_qty = native_to_big(min_qty);
+    }
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -557,6 +589,12 @@ namespace ouch {
     Executed(): length(native_to_big(static_cast<uint16_t>(sizeof(Executed)-2))),
         packet_type(static_cast<char>(PacketType::SequencedData)),
         msg_type(static_cast<char>(InboundMsgType::Executed)){}
+    void to_network(){
+      timestamp = native_to_big(timestamp);
+      executed_price = native_to_big(executed_price);
+      executed_qty = native_to_big(executed_qty);
+      match_number = native_to_big(match_number);
+    }
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -573,6 +611,13 @@ namespace ouch {
     ExecutedWithRefPrice(): length(native_to_big(static_cast<uint16_t>(sizeof(ExecutedWithRefPrice)-2))),
         packet_type(static_cast<char>(PacketType::SequencedData)),
         msg_type(static_cast<char>(InboundMsgType::ExecutedWithRefPrice)){}
+    void to_network(){
+      timestamp = native_to_big(timestamp);
+      executed_price = native_to_big(executed_price);
+      executed_qty = native_to_big(executed_qty);
+      reference_price = native_to_big(reference_price);
+      match_number = native_to_big(match_number);
+    }
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -590,6 +635,10 @@ namespace ouch {
     BrokenTrade(): length(native_to_big(static_cast<uint16_t>(sizeof(BrokenTrade)-2))),
         packet_type(static_cast<char>(PacketType::SequencedData)),
         msg_type(static_cast<char>(InboundMsgType::BrokenTrade)){}
+    void to_network(){
+      timestamp = native_to_big(timestamp);
+      match_number = native_to_big(match_number);
+    }
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -603,6 +652,9 @@ namespace ouch {
     CancelPending(): length(native_to_big(static_cast<uint16_t>(sizeof(CancelPending)-2))),
         packet_type(static_cast<char>(PacketType::SequencedData)),
         msg_type(static_cast<char>(InboundMsgType::CancelPending)){}
+    void to_network(){
+      timestamp = native_to_big(timestamp);
+    }
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -614,6 +666,9 @@ namespace ouch {
     CancelReject(): length(native_to_big(static_cast<uint16_t>(sizeof(CancelReject)-2))),
         packet_type(static_cast<char>(PacketType::SequencedData)),
         msg_type(static_cast<char>(InboundMsgType::CancelReject)){}
+    void to_network(){
+      timestamp = native_to_big(timestamp);
+    }
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -625,6 +680,12 @@ namespace ouch {
     AiqCanceled(): length(native_to_big(static_cast<uint16_t>(sizeof(AiqCanceled)-2))),
         packet_type(static_cast<char>(PacketType::SequencedData)),
         msg_type(static_cast<char>(InboundMsgType::AiqCanceled)){}
+    void to_network(){
+      timestamp = native_to_big(timestamp);
+      decrement_qty = native_to_big(decrement_qty);
+      qty_prevented_from_trading = native_to_big(qty_prevented_from_trading);
+      execution_price = native_to_big(execution_price);
+    }
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -641,6 +702,11 @@ namespace ouch {
     PriorityUpdate(): length(native_to_big(static_cast<uint16_t>(sizeof(PriorityUpdate)-2))),
         packet_type(static_cast<char>(PacketType::SequencedData)),
         msg_type(static_cast<char>(InboundMsgType::PriorityUpdate)){}
+    void to_network(){
+      timestamp = native_to_big(timestamp);
+      order_reference_number = native_to_big(order_reference_number);
+      price = native_to_big(price);
+    }
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -655,6 +721,12 @@ namespace ouch {
     TradeCorrection(): length(native_to_big(static_cast<uint16_t>(sizeof(TradeCorrection)-2))),
         packet_type(static_cast<char>(PacketType::SequencedData)),
         msg_type(static_cast<char>(InboundMsgType::TradeCorrection)){}
+    void to_network(){
+      timestamp = native_to_big(timestamp);
+      executed_shares = native_to_big(executed_shares);
+      execution_price = native_to_big(execution_price);
+      match_number = native_to_big(match_number);
+    }
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
@@ -671,6 +743,9 @@ namespace ouch {
     TradeNow(): length(native_to_big(static_cast<uint16_t>(sizeof(TradeNow)-2))),
         packet_type(static_cast<char>(PacketType::SequencedData)),
         msg_type(static_cast<char>(InboundMsgType::TradeNow)){}
+    void to_network(){
+      timestamp = native_to_big(timestamp);
+    }
     MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
