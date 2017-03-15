@@ -116,8 +116,6 @@ vector<char> ouch_session::handle_logout_request(MsgHeader * packet, size_t len)
 
 vector<char> ouch_session::handle_client_heartbeat(MsgHeader * packet, size_t len){
   last_recv_heartbeat = clock();
-  if (state != ouch_state::not_logged_in)
-    state = ouch_state::losing_heartbeat;
   return vector<char>();
 }
 
