@@ -38,7 +38,7 @@ private:
   vector<char> replaceOrder(Ouch_MsgHeader * msg, size_t len);
 
   vector<char> constructOrderAccpeted(EnterOrder * eo, const order & o);
-  vector<char> constructOrderRejected(EnterOrder * eo, const order & new_order);
+  vector<char> constructOrderRejected(EnterOrder * eo);
 
   bool login(LoginRequest * req);
 

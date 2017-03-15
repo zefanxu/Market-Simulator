@@ -1,9 +1,9 @@
 #include <signal.h>
 #include <stdlib.h>
+#include <time.h>
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/asio.hpp>
-
 #include <iostream>
 #include <string>
 
@@ -32,6 +32,7 @@ get_evtsim_version() {
 
 int
 main(int argc, char** argv) {
+  srand(time(NULL));
   bpo::options_description opts("Available options");
   opts.add_options()
     ("help,h", "produce help message")
