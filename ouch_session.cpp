@@ -53,7 +53,7 @@ vector<char> ouch_session::execute_logic(){
     order each_order = order_pair.second;
     if (each_order.still_live()){
       //NOTE: something hardcoded for testing
-      uint32_t exe_qty = min(each_order.qty, 200);
+      uint32_t exe_qty = min(each_order.qty, (unsigned int)200);
       Executed ex;
       ex.timestamp = get_timestamp();
       ex.token = each_order.token;
