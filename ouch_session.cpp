@@ -47,6 +47,8 @@ vector<char> ouch_session::modifyOrder(Ouch_MsgHeader * msg, size_t len){
 vector<char> ouch_session::execute_logic(){
   auto ret = heartbeat();
   if (ret.size()) return ret;
+  //randomly mess up execution
+  if (rand() % 2) return vector<char>();
   for (auto & order_pair : LiveOrders){
     order each_order = order_pair.second;
     if (each_order.still_live()){
