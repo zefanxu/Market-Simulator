@@ -47,12 +47,12 @@ void ouch_session::replaceOrder(Ouch_MsgHeader * msg, size_t len){
 void ouch_session::cancelOrder(Ouch_MsgHeader * msg, size_t len){
   CancelOrder * co = reinterpret_cast<CancelOrder*>(msg);
   co->from_network();
-  if (LiveOrders.find(string(co->token)) == LiveOrders.end())
+  if (LiveOrders.find(string(co->token.val)) == LiveOrders.end())
     return;
-  if (PendingCancel.find(string(co->token)) != PendingCancel.end())
+  if (PendingCancel.find(string(co->token.val)) != PendingCancel.end())
     return;
   cancel_order cancel_req = cancel_order(co);
-  PendingCancel[string(co->token)] = cancel_req;
+  PendingCancel[string(co->token.val)] = cancel_req;
 }
 
 void ouch_session::modifyOrder(Ouch_MsgHeader * msg, size_t len){
@@ -63,16 +63,16 @@ void ouch_session::cancel_logic(){
   vector<string> done_tokens;
   for (const auto & cancel_order_pair : PendingCancel){
       const cancel_order & co = cancel_order_pair.second;
-      if (LiveOrders.find(string(co.token)) == LiveOrders.end())
+      if (LiveOrders.find(string(co.token.val)) == LiveOrders.end())
         continue;
-      uint32_t curr_qty = LiveOrders[string(co.token)].qty;
+      uint32_t curr_qty = LiveOrders[string(co.token.val)].qty;
       uint32_t dec_qty = curr_qty;
       if (!co.qty)
-        done_tokens.push_back(co.token);
+        done_tokens.push_back(string(co.token.val));
       else{
         if (co.qty >= curr_qty) continue;
         dec_qty = curr_qty - co.qty;
-        LiveOrders[string(co.token)].qty = co.qty;
+        LiveOrders[string(co.token.val)].qty = co.qty;
       }
       constructOrderCanceled(dec_qty, 'U', co.token);
   }
@@ -207,7 +207,7 @@ void ouch_session::init(){
   start_of_day = chrono::system_clock::from_time_t(t1);
 }
 
-void ouch_session::heartbeat(){
+void ouch_session::heartbeat_logic(){
   double second = difftime(time(NULL), last_send_heartbeat);
   if (state == ouch_state::not_logged_in) return;
   if (second >= 1){

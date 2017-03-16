@@ -10,7 +10,7 @@ cancel_order::cancel_order(CancelOrder* co){
   parse_cancel_order(co);
 }
 
-void cancel_order::parse_cancel_order(cancel_order * co){
+void cancel_order::parse_cancel_order(CancelOrder * co){
   token = co->token;
   qty = co->qty;
 }

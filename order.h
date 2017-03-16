@@ -41,7 +41,7 @@ public:
 
   Token token;
   uint32_t qty;
-}
+};
 
   }
 }
