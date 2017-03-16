@@ -99,11 +99,11 @@ main(int argc, char** argv) {
       cout << "Connection closed" << endl;
       break;
     }
-    for (const auto & msg : pending_out_messages){
+    for (const auto & msg : s.pending_out_messages){
       cout << "SEND: " << inbound_to_string(reinterpret_cast<const MsgHeader*>(&msg[0])) << endl;
       asio::write(socket, asio::buffer(&msg[0], msg.size()), asio::transfer_all(), ec);
     }
-    pending_out_messages.clear();
+    s.pending_out_messages.clear();
   }
   return 0;
 }

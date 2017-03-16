@@ -27,6 +27,8 @@ public:
   void handle_message(MsgHeader* packet, size_t len);
   void heartbeat();
 
+  vector<vector<char>> pending_out_messages;
+
 private:
   void handle_login_request(MsgHeader * packet, size_t len);
   void handle_logout_request(MsgHeader * packet, size_t len);
@@ -49,8 +51,6 @@ private:
   time_t last_recv_heartbeat;
   chrono::system_clock::time_point start_of_day;
   char state;
-
-  vector<vector<char>> pending_out_messages;
 
   unordered_map<string, order> LiveOrders;
   unordered_map<string, order> DoneOrders;
