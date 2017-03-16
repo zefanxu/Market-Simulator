@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <string>
+#include <string>
 #include <boost/enum.hpp>
 #include <boost/endian/conversion.hpp>
 
