@@ -45,21 +45,48 @@ void ouch_session::replaceOrder(Ouch_MsgHeader * msg, size_t len){
 }
 
 void ouch_session::cancelOrder(Ouch_MsgHeader * msg, size_t len){
-  return;
+  CancelOrder * co = reinterpret_cast<CancelOrder*>(msg);
+  co->from_network();
+  if (LiveOrders.find(string(co->token)) == LiveOrders.end())
+    return;
+  if (PendingCancel.find(string(co->token)) != PendingCancel.end())
+    return;
+  cancel_order cancel_req = cancel_order(co);
+  PendingCancel[string(co->token)] = cancel_req;
 }
 
 void ouch_session::modifyOrder(Ouch_MsgHeader * msg, size_t len){
   return;
 }
 
-void ouch_session::market_logic(){
-  heartbeat();
+void ouch_session::cancel_logic(){
+  vector<string> done_tokens;
+  for (const auto & cancel_order_pair : PendingCancel){
+      const cancel_order & co = cancel_order_pair.second;
+      if (LiveOrders.find(string(co.token)) == LiveOrders.end())
+        continue;
+      uint32_t curr_qty = LiveOrders[string(co.token)].qty;
+      uint32_t dec_qty = curr_qty;
+      if (!co.qty)
+        done_tokens.push_back(co.token);
+      else{
+        if (co.qty >= curr_qty) continue;
+        dec_qty = curr_qty - co.qty;
+        LiveOrders[string(co.token)].qty = co.qty;
+      }
+      constructOrderCanceled(dec_qty, 'U', co.token);
+  }
+  PendingCancel.clear();
+  for (const auto & each_token : done_tokens)
+    LiveOrders.erase(each_token);
+}
+
+void ouch_session::execution_logic(){
   vector<string> done_tokens;
   for (auto & order_pair : LiveOrders){
     order & each_order = order_pair.second;
     const string & each_token = order_pair.first;
     if (each_order.still_live()){
-      //randomly mess up execution
       if (rand() % 2) continue;
       execute_order(each_order);
     }
@@ -70,6 +97,12 @@ void ouch_session::market_logic(){
   }
   for (const auto & each_token : done_tokens)
     LiveOrders.erase(each_token);
+}
+
+void ouch_session::market_logic(){
+  heartbeat_logic();
+  cancel_logic();
+  execution_logic();
 }
 
 void ouch_session::execute_order(order & o){
@@ -217,5 +250,16 @@ void ouch_session::constructOrderRejected(EnterOrder* eo){
   oj.reason = 'O'; //reject reason: Other
   oj.to_network();
   auto packet = vector<char>(reinterpret_cast<const char*>(&oj), reinterpret_cast<const char*>(&oj) + sizeof(oj));
+  pending_out_messages.push_back(packet);
+}
+
+void ouch_session::constructOrderCanceled(uint32_t dec_qty, char reason, Token t){
+  OrderCanceled oc;
+  oc.timestamp = get_timestamp();
+  oc.token = t;
+  oc.decrement_qty = dec_qty;
+  oc.reason = reason;
+  oc.to_network();
+  auto packet = vector<char>(reinterpret_cast<const char*>(&oc), reinterpret_cast<const char*>(&oc) + sizeof(oc));
   pending_out_messages.push_back(packet);
 }

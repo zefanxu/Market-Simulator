@@ -33,4 +33,15 @@ public:
   uint64_t orderID;
 };
 
-}}
+class cancel_order{
+public:
+  cancel_order();
+  cancel_order(CancelOrder* co);
+  void parse_cancel_order(CancelOrder* co);
+
+  Token token;
+  uint32_t qty;
+}
+
+  }
+}

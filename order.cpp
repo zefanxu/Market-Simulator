@@ -3,6 +3,18 @@
 
 using namespace evt::ouch;
 
+cancel_order::cancel_order(){
+}
+
+cancel_order::cancel_order(CancelOrder* co){
+  parse_cancel_order(co);
+}
+
+void cancel_order::parse_cancel_order(cancel_order * co){
+  token = co->token;
+  qty = co->qty;
+}
+
 order::order(){
   recv_order_time = time(NULL);
   orderID = rand() * rand();

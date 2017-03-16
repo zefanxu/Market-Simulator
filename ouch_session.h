@@ -24,8 +24,6 @@ public:
   ouch_session();
   void market_logic();
   void handle_packet(char * packet, size_t len);
-  void handle_message(MsgHeader* packet, size_t len);
-  void heartbeat();
 
   vector<vector<char>> pending_out_messages;
 
@@ -33,18 +31,23 @@ private:
   void handle_login_request(MsgHeader * packet, size_t len);
   void handle_logout_request(MsgHeader * packet, size_t len);
   void handle_client_heartbeat(MsgHeader * packet, size_t len);
+  void handle_message(MsgHeader* packet, size_t len);
 
   void enterOrder(Ouch_MsgHeader * msg, size_t len);
   void cancelOrder(Ouch_MsgHeader * msg, size_t len);
   void modifyOrder(Ouch_MsgHeader * msg, size_t len);
   void replaceOrder(Ouch_MsgHeader * msg, size_t len);
 
+  void heartbeat_logic();
+  void cancel_logic();
+  void execution_logic();
+
   void constructOrderAccpeted(EnterOrder * eo, const order & o);
   void constructOrderRejected(EnterOrder * eo);
+  void constructOrderCanceled(uint32_t dec_qty, char reason, Token t);
 
   bool login(LoginRequest * req);
   void execute_order(order & o);
-
   uint64_t get_timestamp();
 
   time_t last_send_heartbeat;
@@ -54,7 +57,7 @@ private:
 
   unordered_map<string, order> LiveOrders;
   unordered_map<string, order> DoneOrders;
-
+  unordered_map<string, cancel_order> PendingCancel;
 };
 
 #endif
