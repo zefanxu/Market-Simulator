@@ -16,6 +16,7 @@
 using namespace std;
 using namespace evt;
 namespace bpo = boost::program_options;
+namespace asio = boost::asio;
 
 void
 signal_handler(int signum) {
@@ -74,11 +75,11 @@ main(int argc, char** argv) {
   int port_num = vm["port"].as<int>();
   ouch_session s;
   boost::array<char, 128> buf;
-  boost::asio::io_service io_service;
-  boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), port_num);
+  asio::io_service io_service;
+  asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), port_num);
   boost::system::error_code ec;
-  boost::asio::ip::tcp::acceptor acceptor(io_service, endpoint);
-  boost::asio::ip::tcp::socket socket(io_service);
+  asio::ip::tcp::acceptor acceptor(io_service, endpoint);
+  asio::ip::tcp::socket socket(io_service);
   try{
     acceptor.accept(socket);
   }
@@ -87,24 +88,22 @@ main(int argc, char** argv) {
     return 2;
   }
   size_t len;
-  vector<char> ret;
   while (true){
-    do {
-       ret = s.execute_logic();
-       if (ret.size()) goto send_packet;
-       len = socket.read_some(boost::asio::buffer(buf), ec);
-    } while(ec == boost::asio::error::would_block);
-    if (ec == boost::asio::error::eof){
+    s.market_logic();
+    len = socket.read_some(asio::buffer(buf), ec);
+    if (ec != asio::error::would_block){
+      cout << "RECV: " << outbound_to_string(reinterpret_cast<const MsgHeader*>(buf.c_array())) << endl;
+      s.handle_packet(buf.c_array(), len);
+    }
+    if (ec == asio::error::eof){
       cout << "Connection closed" << endl;
       break;
     }
-    cout << "RECV: " << outbound_to_string(reinterpret_cast<const MsgHeader*>(buf.c_array())) << endl;
-    ret = s.parse_packet(buf.c_array(), len);
-  send_packet:
-    if (ret.size()){
-      cout << "SEND: " << inbound_to_string(reinterpret_cast<const MsgHeader*>(&ret[0])) << endl;
-      boost::asio::write(socket, boost::asio::buffer(&ret[0], ret.size()), boost::asio::transfer_all(), ec);
+    for (const auto & msg : pending_out_messages){
+      cout << "SEND: " << inbound_to_string(reinterpret_cast<const MsgHeader*>(&msg[0])) << endl;
+      asio::write(socket, asio::buffer(&msg[0], msg.size()), asio::transfer_all(), ec);
     }
+    pending_out_messages.clear();
   }
   return 0;
 }

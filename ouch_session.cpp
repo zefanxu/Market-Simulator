@@ -1,96 +1,112 @@
 #include "ouch_session.h"
 
-vector<char> ouch_session::parse_packet(char * packet, size_t len){
+void ouch_session::handle_packet(char * packet, size_t len){
   MsgHeader * msg_h = reinterpret_cast<MsgHeader*>(packet);
   switch (msg_h->packet_type){
     case(static_cast<char>(PacketType::LoginRequest)):
-      return handle_login_request(msg_h, len);
+      handle_login_request(msg_h, len);
+      break;
     case(static_cast<char>(PacketType::LogoutRequest)):
-      return handle_logout_request(msg_h, len);
+      handle_logout_request(msg_h, len);
+      break;
     case(static_cast<char>(PacketType::ClientHeartbeat)):
-      return handle_client_heartbeat(msg_h, len);
+      handle_client_heartbeat(msg_h, len);
+      break;
     case(static_cast<char>(PacketType::UnsequencedData)):
-      return parse_message(msg_h, len);
+      handle_message(msg_h, len);
+      break;
     default:
-      return vector<char>();
+      return;
   }
 }
 
-vector<char> ouch_session::parse_message(MsgHeader * packet, size_t len){
+void ouch_session::handle_message(MsgHeader * packet, size_t len){
   Ouch_MsgHeader * ouch_msg_h = reinterpret_cast<Ouch_MsgHeader*>(packet);
   switch (ouch_msg_h->msg_type) {
     case(static_cast<char>(OutboundMsgType::EnterOrder)):
-      return enterOrder(ouch_msg_h, len);
+      enterOrder(ouch_msg_h, len);
+      break;
     case(static_cast<char>(OutboundMsgType::ReplaceOrder)):
-      return replaceOrder(ouch_msg_h, len);
+      replaceOrder(ouch_msg_h, len);
+      break;
     case(static_cast<char>(OutboundMsgType::CancelOrder)):
-      return cancelOrder(ouch_msg_h, len);
+      cancelOrder(ouch_msg_h, len);
+      break;
     case(static_cast<char>(OutboundMsgType::ModifyOrder)):
-      return modifyOrder(ouch_msg_h, len);
+      modifyOrder(ouch_msg_h, len);
+      break;
     default:
-      return vector<char>();
+      return;
   }
 }
 
-vector<char> ouch_session::replaceOrder(Ouch_MsgHeader * msg, size_t len){
-  return vector<char>();
+void ouch_session::replaceOrder(Ouch_MsgHeader * msg, size_t len){
+  return;
 }
 
-vector<char> ouch_session::cancelOrder(Ouch_MsgHeader * msg, size_t len){
-  return vector<char>();
+void ouch_session::cancelOrder(Ouch_MsgHeader * msg, size_t len){
+  return;
 }
 
-vector<char> ouch_session::modifyOrder(Ouch_MsgHeader * msg, size_t len){
-  return vector<char>();
+void ouch_session::modifyOrder(Ouch_MsgHeader * msg, size_t len){
+  return;
 }
 
-vector<char> ouch_session::execute_logic(){
-  auto ret = heartbeat();
-  if (ret.size()) return ret;
-  //randomly mess up execution
-  if (rand() % 2) return vector<char>();
+void ouch_session::market_logic(){
+  heartbeat();
+  vector<string> done_tokens;
   for (auto & order_pair : LiveOrders){
-    order each_order = order_pair.second;
+    order & each_order = order_pair.second;
+    const string & each_token = order_pair.first;
     if (each_order.still_live()){
-      //NOTE: random execution qty for testing
-      uint32_t exe_qty = (2 + rand() % 10) * 100;
-      exe_qty = min(exe_qty, each_order.qty);
-      Executed ex;
-      ex.timestamp = get_timestamp();
-      ex.token = each_order.token;
-      ex.executed_qty = exe_qty;
-      ex.execution_price = each_order.price;
-      ex.liquidity_flag = 'R';
-      ex.match_number = get_timestamp();
-      order_pair.second.qty -= exe_qty;
-      ex.to_network();
-      return vector<char>(reinterpret_cast<const char*>(&ex), reinterpret_cast<const char*>(&ex) + sizeof(ex));
+      //randomly mess up execution
+      if (rand() % 2) continue;
+      execute_order(each_order);
     }
     else{
-      DoneOrders[string(order_pair.first)] = order_pair.second;
-      LiveOrders.erase(order_pair.first);
+      DoneOrders[each_token] = each_order;
+      done_tokens.push_back(each_token);
     }
   }
-  return std::vector<char>();
+  for (const auto & each_token : done_tokens)
+    LiveOrders.erase(each_token);
 }
 
-vector<char> ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
+void ouch_session::execute_order(order & o){
+  uint32_t exe_qty = (2 + rand() % 10) * 100;
+  exe_qty = min(exe_qty, o.qty);
+  Executed ex;
+  ex.timestamp = get_timestamp();
+  ex.token = o.token;
+  ex.executed_qty = exe_qty;
+  ex.execution_price = o.price;
+  ex.liquidity_flag = 'R';
+  ex.match_number = get_timestamp();
+  o.qty -= exe_qty;
+  ex.to_network();
+  auto packet = vector<char>(reinterpret_cast<const char*>(&ex), reinterpret_cast<const char*>(&ex) + sizeof(ex));
+  pending_out_messages.push_back(packet);
+}
+
+void ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
   EnterOrder * eo = reinterpret_cast<EnterOrder*>(msg);
   eo->from_network();
 
   //TODO: randomly reject orders
   if (!(rand() % 5) or (state != ouch_state::logged_in)){
-    return constructOrderRejected(eo);
+    constructOrderRejected(eo);
+    return;
   }
   //this order never seen
   if ((LiveOrders.find(string(eo->token.val)) == LiveOrders.end()) and
       (DoneOrders.find(string(eo->token.val)) == DoneOrders.end())){
     order new_order = order(*eo);
     LiveOrders[string(eo->token.val)] = new_order;
-    return constructOrderAccpeted(eo, new_order);
+    constructOrderAccpeted(eo, new_order);
+    return;
   }
   //ignore enter order
-  return vector<char>();
+  return;
 }
 
 uint64_t ouch_session::get_timestamp(){
@@ -99,29 +115,31 @@ uint64_t ouch_session::get_timestamp(){
   return diff.count();
 }
 
-vector<char> ouch_session::handle_login_request(MsgHeader * packet, size_t len){
+void ouch_session::handle_login_request(MsgHeader * packet, size_t len){
   LoginRequest * r = reinterpret_cast<LoginRequest*>(packet);
   if (login(r)){
     LoginAccepted la;
     //TODO: session and seq num assignment logic
     strncpy(la.session, "         0", sizeof(la.session));
     strncpy(la.seq_num, "                   0", sizeof(la.seq_num));
-    return vector<char>(reinterpret_cast<const char*>(&la), reinterpret_cast<const char*>(&la) + sizeof(la));
+    auto packet = vector<char>(reinterpret_cast<const char*>(&la), reinterpret_cast<const char*>(&la) + sizeof(la));
+    pending_out_messages.push_back(packet);
   }else{
     LoginRejected lj;
     lj.reason = 'A';
-    return vector<char>(reinterpret_cast<const char*>(&lj), reinterpret_cast<const char*>(&lj) + sizeof(lj));
+    auto packet =  vector<char>(reinterpret_cast<const char*>(&lj), reinterpret_cast<const char*>(&lj) + sizeof(lj));
+    pending_out_messages.push_back(packet);
   }
 }
 
-vector<char> ouch_session::handle_logout_request(MsgHeader * packet, size_t len){
+void ouch_session::handle_logout_request(MsgHeader * packet, size_t len){
   state = ouch_state::not_logged_in;
-  return vector<char>();
+  return;
 }
 
-vector<char> ouch_session::handle_client_heartbeat(MsgHeader * packet, size_t len){
+void ouch_session::handle_client_heartbeat(MsgHeader * packet, size_t len){
   last_recv_heartbeat = clock();
-  return vector<char>();
+  return;
 }
 
 bool ouch_session::login(LoginRequest * req){
@@ -156,18 +174,18 @@ void ouch_session::init(){
   start_of_day = chrono::system_clock::from_time_t(t1);
 }
 
-vector<char> ouch_session::heartbeat(){
+void ouch_session::heartbeat(){
   double second = difftime(time(NULL), last_send_heartbeat);
-  if (state == ouch_state::not_logged_in) return vector<char>();
+  if (state == ouch_state::not_logged_in) return;
   if (second >= 1){
     last_send_heartbeat = time(NULL);
     ServerHeartbeat h;
-    return vector<char>(reinterpret_cast<const char*>(&h), reinterpret_cast<const char*>(&h) + sizeof(h));
+    auto packet = vector<char>(reinterpret_cast<const char*>(&h), reinterpret_cast<const char*>(&h) + sizeof(h));
+    pending_out_messages.push_back(packet);
   }
-  return vector<char>();
 }
 
-vector<char> ouch_session::constructOrderAccpeted(EnterOrder * eo, const order & o){
+void ouch_session::constructOrderAccpeted(EnterOrder * eo, const order & o){
   OrderAccepted oa;
   oa.timestamp = get_timestamp();
   oa.token = eo->token;
@@ -188,14 +206,16 @@ vector<char> ouch_session::constructOrderAccpeted(EnterOrder * eo, const order &
   //TODO: order_reference_number
   oa.order_reference_number = o.orderID;
   oa.to_network();
-  return vector<char>(reinterpret_cast<const char*>(&oa), reinterpret_cast<const char*>(&oa) + sizeof(oa));
+  auto packet = vector<char>(reinterpret_cast<const char*>(&oa), reinterpret_cast<const char*>(&oa) + sizeof(oa));
+  pending_out_messages.push_back(packet);
 }
 
-vector<char> ouch_session::constructOrderRejected(EnterOrder* eo){
+void ouch_session::constructOrderRejected(EnterOrder* eo){
   OrderRejected oj;
   oj.token = eo->token;
   oj.timestamp = get_timestamp();
   oj.reason = 'O'; //reject reason: Other
   oj.to_network();
-  return vector<char>(reinterpret_cast<const char*>(&oj), reinterpret_cast<const char*>(&oj) + sizeof(oj));
+  auto packet = vector<char>(reinterpret_cast<const char*>(&oj), reinterpret_cast<const char*>(&oj) + sizeof(oj));
+  pending_out_messages.push_back(packet);
 }
