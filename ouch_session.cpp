@@ -47,12 +47,12 @@ void ouch_session::replaceOrder(Ouch_MsgHeader * msg, size_t len){
 void ouch_session::cancelOrder(Ouch_MsgHeader * msg, size_t len){
   CancelOrder * co = reinterpret_cast<CancelOrder*>(msg);
   co->from_network();
-  if (LiveOrders.find(string(co->token.val)) == LiveOrders.end())
+  if (LiveOrders.find(co->token._str_()) == LiveOrders.end())
     return;
-  if (PendingCancel.find(string(co->token.val)) != PendingCancel.end())
+  if (PendingCancel.find(co->token._str_()) != PendingCancel.end())
     return;
   cancel_order cancel_req = cancel_order(co);
-  PendingCancel[string(co->token.val)] = cancel_req;
+  PendingCancel[co->token._str_()] = cancel_req;
 }
 
 void ouch_session::modifyOrder(Ouch_MsgHeader * msg, size_t len){
@@ -63,16 +63,16 @@ void ouch_session::cancel_logic(){
   vector<string> done_tokens;
   for (const auto & cancel_order_pair : PendingCancel){
       const cancel_order & co = cancel_order_pair.second;
-      if (LiveOrders.find(string(co.token.val)) == LiveOrders.end())
+      if (LiveOrders.find(co.token._str_()) == LiveOrders.end())
         continue;
-      uint32_t curr_qty = LiveOrders[string(co.token.val)].qty;
+      uint32_t curr_qty = LiveOrders[co.token._str_()].qty;
       uint32_t dec_qty = curr_qty;
       if (!co.qty)
-        done_tokens.push_back(string(co.token.val));
+        done_tokens.push_back(co.token._str_());
       else{
         if (co.qty >= curr_qty) continue;
         dec_qty = curr_qty - co.qty;
-        LiveOrders[string(co.token.val)].qty = co.qty;
+        LiveOrders[co.token._str_()].qty = co.qty;
       }
       constructOrderCanceled(dec_qty, 'U', co.token);
   }
@@ -131,10 +131,10 @@ void ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
     return;
   }
   //this order never seen
-  if ((LiveOrders.find(string(eo->token.val)) == LiveOrders.end()) and
-      (DoneOrders.find(string(eo->token.val)) == DoneOrders.end())){
+  if ((LiveOrders.find(eo->token._str_()) == LiveOrders.end()) and
+      (DoneOrders.find(eo->token._str_()) == DoneOrders.end())){
     order new_order = order(*eo);
-    LiveOrders[string(eo->token.val)] = new_order;
+    LiveOrders[eo->token._str_()] = new_order;
     constructOrderAccpeted(eo, new_order);
     return;
   }

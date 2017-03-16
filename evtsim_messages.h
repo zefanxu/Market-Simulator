@@ -316,6 +316,9 @@ namespace ouch {
 
 
   struct Token {
+    string _str_(){
+      return string(val, 14);
+    }
     char val[14];
   } __attribute__((packed));
 
