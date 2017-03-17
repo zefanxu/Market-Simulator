@@ -44,7 +44,7 @@ bool order::still_live(){
     auto curr_time = time(NULL);
     remain_time_in_force = time_in_force - (curr_time - recv_order_time);
   }
-  if ((qty <= 0) or (remain_time_in_force <= 0) or (state == OrderState::Dead)){
+  if ((remaining_qty <= 0) or (remain_time_in_force <= 0) or (state == OrderState::Dead)){
     state = OrderState::Dead;
     return false;
   }

@@ -107,7 +107,7 @@ void ouch_session::market_logic(){
 
 void ouch_session::execute_order(order & o){
   uint32_t exe_qty = (2 + rand() % 10) * 100;
-  exe_qty = min(exe_qty, o.qty);
+  exe_qty = min(exe_qty, o.remaining_qty);
   Executed ex;
   ex.timestamp = get_timestamp();
   ex.token = o.token;
