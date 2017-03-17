@@ -41,13 +41,15 @@ private:
   void heartbeat_logic();
   void cancel_logic();
   void execution_logic();
+  void modify_logic();
 
   void constructOrderAccpeted(EnterOrder * eo, const order & o);
   void constructOrderRejected(EnterOrder * eo);
   void constructOrderCanceled(uint32_t dec_qty, char reason, Token t);
+  void constructOrderModified(uint32_t remaining_qty, const modify_order & mo);
+  void constructOrderExecuted(order & o);
 
   bool login(LoginRequest * req);
-  void execute_order(order & o);
   uint64_t get_timestamp();
 
   time_t last_send_heartbeat;
@@ -58,6 +60,7 @@ private:
   unordered_map<string, order> LiveOrders;
   unordered_map<string, order> DoneOrders;
   unordered_map<string, cancel_order> PendingCancel;
+  unordered_map<string, modify_order> PendingModify;
 };
 
 #endif

@@ -15,8 +15,8 @@ namespace ouch{
 class order{
 public:
   order();
-  order(EnterOrder & eo);
-  void parse_order(EnterOrder & eo);
+  order(EnterOrder* eo);
+  void parse_order(EnterOrder* eo);
   bool still_live();
 
   time_t recv_order_time;
@@ -49,6 +49,10 @@ public:
   modify_order();
   modify_order(ModifyOrder* mo);
   void parse_modify_order(ModifyOrder* mo);
+
+  Token token;
+  uint32_t req_qty;
+  char new_side;
 };
 
   }

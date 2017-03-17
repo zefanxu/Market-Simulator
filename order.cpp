@@ -20,23 +20,23 @@ order::order(){
   orderID = rand() * rand();
 }
 
-order::order(EnterOrder & eo){
+order::order(EnterOrder* eo){
   recv_order_time = time(NULL);
   orderID = rand() * rand();
   parse_order(eo);
 }
 
-void order::parse_order(EnterOrder & eo){
-  time_in_force = eo.time_in_force;
+void order::parse_order(EnterOrder* eo){
+  time_in_force = eo->time_in_force;
   remain_time_in_force = time_in_force;
-  token = eo.token;
-  remaining_qty = eo.qty;
+  token = eo->token;
+  remaining_qty = eo->qty;
   executed_qty = 0;
-  price = eo.price;
-  min_qty = eo.min_qty;
-  strncpy(symbol, eo.symbol, sizeof(symbol));
+  price = eo->price;
+  min_qty = eo->min_qty;
+  strncpy(symbol, eo->symbol, sizeof(symbol));
   state = OrderState::Live;
-  side = eo.side;
+  side = eo->side;
 }
 
 bool order::still_live(){
@@ -49,4 +49,17 @@ bool order::still_live(){
     return false;
   }
   return true;
+}
+
+modify_order::modify_order(){
+}
+
+modify_order::modify_order(ModifyOrder * mo){
+  parse_modify_order(mo);
+}
+
+void modify_order::parse_modify_order(ModifyOrder * mo){
+  token = mo -> token;
+  req_qty = mo -> qty;
+  new_side = mo -> side;
 }

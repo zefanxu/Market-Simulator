@@ -45,18 +45,56 @@ void ouch_session::replaceOrder(Ouch_MsgHeader * msg, size_t len){
 }
 
 void ouch_session::cancelOrder(Ouch_MsgHeader * msg, size_t len){
-  CancelOrder * co = reinterpret_cast<CancelOrder*>(msg);
-  co->from_network();
-  if (LiveOrders.find(co->token._str_()) == LiveOrders.end())
+  CancelOrder * co_msg = reinterpret_cast<CancelOrder*>(msg);
+  co_msg->from_network();
+  if (LiveOrders.find(co_msg->token._str_()) == LiveOrders.end())
     return;
-  if (PendingCancel.find(co->token._str_()) != PendingCancel.end())
+  if (PendingCancel.find(co_msg->token._str_()) != PendingCancel.end())
     return;
-  cancel_order cancel_req = cancel_order(co);
-  PendingCancel[co->token._str_()] = cancel_req;
+  cancel_order co = cancel_order(co_msg);
+  PendingCancel[co_msg->token._str_()] = co;
 }
 
 void ouch_session::modifyOrder(Ouch_MsgHeader * msg, size_t len){
+  ModifyOrder * mo_msg = reinterpret_cast<ModifyOrder*>(msg);
+  mo_msg -> from_network();
+  if (LiveOrders.find(mo_msg->token._str_()) == LiveOrders.end())
+    return;
+  modify_order mo = modify_order(mo_msg);
+  PendingModify[mo_msg->token._str_()] = mo;
   return;
+}
+
+void ouch_session::modify_logic(){
+  vector<string> done_tokens;
+  for (const auto & modify_order_pair : PendingModify){
+    const modify_order & mo = cancel_order_pair.second;
+    if (LiveOrders.find(mo.token._str_()) == LiveOrders.end())
+      continue;
+    auto & target_order = LiveOrders[mo.token._str_()];
+    char new_side = mo.new_side;
+    switch (target_order.side) {
+      case ('S'):
+        if (new_side != 'T' and new_side != 'E')
+          continue;
+      case ('E'):
+        if (new_side != 'T' and new_side != 'S')
+          continue;
+      case ('T'):
+        if (new_side != 'E' and new_side != 'S')
+          continue;
+    }
+    if (target_order.executed_qty >= mo.req_qty){
+      done_tokens.push_back(target_order.token);
+      constructOrderModified(0, mo);
+      continue;
+    }
+    target_order.side = mo.new_side;
+    target_order.remaining_qty = mo.req_qty - target_order.executed_qty;
+    constructOrderModified(target_order.remaining_qty, mo);
+  }
+  for (const auto & each_token : done_tokens)
+    LiveOrders.erase(each_token);
 }
 
 void ouch_session::cancel_logic(){
@@ -88,7 +126,7 @@ void ouch_session::execution_logic(){
     const string & each_token = order_pair.first;
     if (each_order.still_live()){
       if (rand() % 2) continue;
-      execute_order(each_order);
+      constructOrderExecuted(each_order);
     }
     else{
       DoneOrders[each_token] = each_order;
@@ -105,22 +143,6 @@ void ouch_session::market_logic(){
   execution_logic();
 }
 
-void ouch_session::execute_order(order & o){
-  uint32_t exe_qty = (2 + rand() % 10) * 100;
-  exe_qty = min(exe_qty, o.remaining_qty);
-  Executed ex;
-  ex.timestamp = get_timestamp();
-  ex.token = o.token;
-  ex.executed_qty = exe_qty;
-  ex.execution_price = o.price;
-  ex.liquidity_flag = 'R';
-  ex.match_number = get_timestamp();
-  o.remaining_qty -= exe_qty;
-  o.executed_qty += exe_qty;
-  ex.to_network();
-  auto packet = vector<char>(reinterpret_cast<const char*>(&ex), reinterpret_cast<const char*>(&ex) + sizeof(ex));
-  pending_out_messages.push_back(packet);
-}
 
 void ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
   EnterOrder * eo = reinterpret_cast<EnterOrder*>(msg);
@@ -134,7 +156,7 @@ void ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
   //this order never seen
   if ((LiveOrders.find(eo->token._str_()) == LiveOrders.end()) and
       (DoneOrders.find(eo->token._str_()) == DoneOrders.end())){
-    order new_order = order(*eo);
+    order new_order = order(eo);
     LiveOrders[eo->token._str_()] = new_order;
     constructOrderAccpeted(eo, new_order);
     return;
@@ -262,5 +284,33 @@ void ouch_session::constructOrderCanceled(uint32_t dec_qty, char reason, Token t
   oc.reason = reason;
   oc.to_network();
   auto packet = vector<char>(reinterpret_cast<const char*>(&oc), reinterpret_cast<const char*>(&oc) + sizeof(oc));
+  pending_out_messages.push_back(packet);
+}
+
+void ouch_session::constructOrderModified(uint32_t remaining_qty, const modify_order & mo){
+  OrderModified m;
+  m.timestamp = get_timestamp();
+  m.token = mo.token;
+  m.side = mo.new_side;
+  m.shares = remaining_qty;
+  m.to_network();
+  auto packet = vector<char>(reinterpret_cast<const char*>(&m), reinterpret_cast<const char*>(&m) + sizeof(m));
+  pending_out_messages.push_back(packet);
+}
+
+void ouch_session::constructOrderExecuted(order & o){
+  uint32_t exe_qty = (2 + rand() % 10) * 100;
+  exe_qty = min(exe_qty, o.remaining_qty);
+  Executed ex;
+  ex.timestamp = get_timestamp();
+  ex.token = o.token;
+  ex.executed_qty = exe_qty;
+  ex.execution_price = o.price;
+  ex.liquidity_flag = 'R';
+  ex.match_number = get_timestamp();
+  o.remaining_qty -= exe_qty;
+  o.executed_qty += exe_qty;
+  ex.to_network();
+  auto packet = vector<char>(reinterpret_cast<const char*>(&ex), reinterpret_cast<const char*>(&ex) + sizeof(ex));
   pending_out_messages.push_back(packet);
 }
