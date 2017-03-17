@@ -92,6 +92,7 @@ main(int argc, char** argv) {
     s.market_logic();
     len = socket.read_some(asio::buffer(buf), ec);
     if (ec != asio::error::would_block){
+      cout << "RECV: len=" << len << endl;
       cout << "RECV: " << outbound_to_string(reinterpret_cast<const MsgHeader*>(buf.c_array())) << endl;
       s.handle_packet(buf.c_array(), len);
     }

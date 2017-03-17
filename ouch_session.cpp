@@ -67,7 +67,7 @@ void ouch_session::modifyOrder(Ouch_MsgHeader * msg, size_t len){
 
 void ouch_session::modify_logic(){
   vector<string> done_tokens;
-  for (const auto & modify_order_pair : PendingModify){
+  for (const auto & cancel_order_pair : PendingModify){
     const modify_order & mo = cancel_order_pair.second;
     if (LiveOrders.find(mo.token._str_()) == LiveOrders.end())
       continue;
@@ -85,7 +85,7 @@ void ouch_session::modify_logic(){
           continue;
     }
     if (target_order.executed_qty >= mo.req_qty){
-      done_tokens.push_back(target_order.token);
+      done_tokens.push_back(target_order.token._str_());
       constructOrderModified(0, mo);
       continue;
     }
