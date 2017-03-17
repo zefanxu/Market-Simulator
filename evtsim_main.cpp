@@ -95,8 +95,9 @@ main(int argc, char** argv) {
     read_pos = buf.c_array();
     while ((ec != asio::error::would_block) and (read_pos < buf.c_array() + read_len)){
       cout << "RECV: " << outbound_to_string(reinterpret_cast<const MsgHeader*>(read_pos)) << endl;
-      s.handle_packet(read_pos, len);
-      read_pos += (reinterpret_cast<const MsgHeader*>(read_pos))->length + 2;
+      packet_len = (reinterpret_cast<const MsgHeader*>(read_pos))->length + 2;
+      s.handle_packet(read_pos, packet_len);
+      read_pos += packet_len;
     }
     if (ec == asio::error::eof){
       cout << "Connection closed" << endl;
