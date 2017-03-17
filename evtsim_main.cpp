@@ -74,7 +74,7 @@ main(int argc, char** argv) {
 
   int port_num = vm["port"].as<int>();
   ouch_session s;
-  boost::array<char, 128> buf;
+  boost::array<char, 2056> buf;
   asio::io_service io_service;
   asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), port_num);
   boost::system::error_code ec;
@@ -95,7 +95,7 @@ main(int argc, char** argv) {
     read_pos = buf.c_array();
     while ((ec != asio::error::would_block) and (read_pos < buf.c_array() + read_len)){
       cout << "RECV: " << outbound_to_string(reinterpret_cast<const MsgHeader*>(read_pos)) << endl;
-      packet_len = (reinterpret_cast<const MsgHeader*>(read_pos))->length + 2;
+      packet_len = big_to_native((reinterpret_cast<const MsgHeader*>(read_pos))->length) + 2;
       s.handle_packet(read_pos, packet_len);
       read_pos += packet_len;
     }
