@@ -87,14 +87,16 @@ main(int argc, char** argv) {
     std::cerr << "Exception: " << e.what() <<endl;
     return 2;
   }
-  size_t len;
+  size_t read_len, packet_len;
+  char * read_pos;
   while (true){
     s.market_logic();
-    len = socket.read_some(asio::buffer(buf), ec);
-    if (ec != asio::error::would_block){
-      cout << "RECV: len=" << len << endl;
-      cout << "RECV: " << outbound_to_string(reinterpret_cast<const MsgHeader*>(buf.c_array())) << endl;
-      s.handle_packet(buf.c_array(), len);
+    read_len = socket.read_some(asio::buffer(buf), ec);
+    read_pos = buf.c_array();
+    while ((ec != asio::error::would_block) and (read_pos < buf.c_array() + read_len)){
+      cout << "RECV: " << outbound_to_string(reinterpret_cast<const MsgHeader*>(read_pos)) << endl;
+      s.handle_packet(read_pos, len);
+      read_pos += (reinterpret_cast<const MsgHeader*>(read_pos))->length + 2;
     }
     if (ec == asio::error::eof){
       cout << "Connection closed" << endl;
