@@ -22,7 +22,7 @@ public:
   time_t recv_order_time;
   uint32_t time_in_force;
   int32_t remain_time_in_force;
-  uint32_t qty;
+  uint32_t remaining_qty;
   int32_t price;
   uint32_t min_qty;
   char symbol[8];
@@ -31,6 +31,7 @@ public:
   char side;
 
   uint64_t orderID;
+  uint64_t executed_qty;
 };
 
 class cancel_order{
@@ -41,6 +42,13 @@ public:
 
   Token token;
   uint32_t qty;
+};
+
+class modify_order{
+public:
+  modify_order();
+  modify_order(ModifyOrder* mo);
+  void parse_modify_order(ModifyOrder* mo);
 };
 
   }

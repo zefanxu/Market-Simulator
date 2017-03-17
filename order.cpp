@@ -30,7 +30,8 @@ void order::parse_order(EnterOrder & eo){
   time_in_force = eo.time_in_force;
   remain_time_in_force = time_in_force;
   token = eo.token;
-  qty = eo.qty;
+  remaining_qty = eo.qty;
+  executed_qty = 0;
   price = eo.price;
   min_qty = eo.min_qty;
   strncpy(symbol, eo.symbol, sizeof(symbol));

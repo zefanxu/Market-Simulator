@@ -65,14 +65,14 @@ void ouch_session::cancel_logic(){
       const cancel_order & co = cancel_order_pair.second;
       if (LiveOrders.find(co.token._str_()) == LiveOrders.end())
         continue;
-      uint32_t curr_qty = LiveOrders[co.token._str_()].qty;
+      uint32_t curr_qty = LiveOrders[co.token._str_()].remaining_qty;
       uint32_t dec_qty = curr_qty;
       if (!co.qty)
         done_tokens.push_back(co.token._str_());
       else{
         if (co.qty >= curr_qty) continue;
         dec_qty = curr_qty - co.qty;
-        LiveOrders[co.token._str_()].qty = co.qty;
+        LiveOrders[co.token._str_()].remaining_qty = co.qty;
       }
       constructOrderCanceled(dec_qty, 'U', co.token);
   }
@@ -115,7 +115,8 @@ void ouch_session::execute_order(order & o){
   ex.execution_price = o.price;
   ex.liquidity_flag = 'R';
   ex.match_number = get_timestamp();
-  o.qty -= exe_qty;
+  o.remaining_qty -= exe_qty;
+  o.executed_qty += exe_qty;
   ex.to_network();
   auto packet = vector<char>(reinterpret_cast<const char*>(&ex), reinterpret_cast<const char*>(&ex) + sizeof(ex));
   pending_out_messages.push_back(packet);
