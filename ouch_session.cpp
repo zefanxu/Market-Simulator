@@ -2,7 +2,6 @@
 
 //SoupBinTCP functions
 void ouch_session::handle_login_request(MsgHeader * packet, size_t len){
-  LoginRequest * r = reinterpret_cast<LoginRequest*>(packet);
   if (state == ouch_state::not_logged_in){
     state = ouch_state::logged_in;
     LoginAccepted la;
@@ -80,7 +79,7 @@ void ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
       (finished_orders.find(eo->token._str_()) == finished_orders.end())){
     order new_order = order(eo);
     active_orders[eo->token._str_()] = new_order;
-    constructOrderAccpeted(eo, new_order);
+    constructOrderAccpeted(new_order);
   }
 }
 
