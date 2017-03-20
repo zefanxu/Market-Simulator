@@ -71,7 +71,7 @@ main(int argc, char** argv) {
     cout << opts << endl;
     return 2;
   }
-
+  log l;
   int port_num = vm["port"].as<int>();
   ouch_session s;
   boost::array<char, 2056> buf;
@@ -94,17 +94,17 @@ main(int argc, char** argv) {
     read_len = socket.read_some(asio::buffer(buf), ec);
     read_pos = buf.c_array();
     while ((ec != asio::error::would_block) and (read_pos < buf.c_array() + read_len)){
-      cout << "RECV: " << outbound_to_string(reinterpret_cast<const MsgHeader*>(read_pos)) << endl;
+      l.write("RECV: " + outbound_to_string(reinterpret_cast<const MsgHeader*>(read_pos)));
       packet_len = big_to_native((reinterpret_cast<const MsgHeader*>(read_pos))->length) + 2;
       s.handle_packet(read_pos, packet_len);
       read_pos += packet_len;
     }
     if (ec == asio::error::eof){
-      cout << "Connection closed" << endl;
+      l.write("Connection closed");
       break;
     }
     for (const auto & msg : s.pending_out_messages){
-      cout << "SEND: " << inbound_to_string(reinterpret_cast<const MsgHeader*>(&msg[0])) << endl;
+      log("SEND: "+inbound_to_string(reinterpret_cast<const MsgHeader*>(&msg[0])));
       asio::write(socket, asio::buffer(&msg[0], msg.size()), asio::transfer_all(), ec);
     }
     s.pending_out_messages.clear();

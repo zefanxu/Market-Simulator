@@ -1,5 +1,28 @@
 #include "evtsim_util.h"
 
+string log::get_time_string(){
+  time_t t = time(nullptr);
+  tm curr_tm = *localtime(&t);
+  return put_time(&curr_tm, "%Y%m%d%H%H%S");
+}
+
+void log::log(){
+  string curr_time = get_time_string();
+  file.open(curr_time, ofstream::out);
+  also_print = true;
+}
+
+void log::write(string text){
+  string log_text = "[" + get_time_string() + "] " + text + "\n";
+  if (also_print)
+    cout << log_text;
+  file << log_text;
+}
+
+void log::~log(){
+  file.close();
+}
+
 int to_string(const LoginRequest& m, char* buf, size_t len) {
   return std::snprintf(buf, len, "LoginRequest(length=%hu,packet_type=%c,username=%s,password=%s,requested_session=%s,requested_seq_num=%s)",
                 big_to_native(m.length), m.packet_type,
