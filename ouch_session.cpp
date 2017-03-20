@@ -248,7 +248,7 @@ uint64_t ouch_session::get_timestamp(){
 }
 
 bool ouch_session::random_reject(){
-  double x = (rand()%100)/100;
+  double x = (double)(rand()%100)/(double)100;
   return (x <= random_reject_rate);
 }
 
