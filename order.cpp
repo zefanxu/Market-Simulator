@@ -37,18 +37,27 @@ void order::parse_order(EnterOrder* eo){
   strncpy(symbol, eo->symbol, sizeof(symbol));
   state = OrderState::Live;
   side = eo->side;
+  cross_type = eo->cross_type;
+  intermarket_sweep_eligibility = eo->intermarket_sweep_eligibility;
+  strncpy(firm, eo->firm, sizeof(firm));
+  display = eo->display;
+  capacity = eo->capacity;
 }
 
 bool order::still_live(){
-  if ((time_in_force != IOC_time) and (time_in_force != market_hours) and (time_in_force != system_hours)){
-    auto curr_time = time(NULL);
-    remain_time_in_force = time_in_force - (curr_time - recv_order_time);
-  }
-  if ((remaining_qty <= 0) or (remain_time_in_force <= 0) or (state == OrderState::Dead)){
+  if ((remaining_qty <= 0) or expired() or (state == OrderState::Dead)){
     state = OrderState::Dead;
     return false;
   }
   return true;
+}
+
+bool order::expired(){
+  if ((time_in_force != IOC_time) and (time_in_force != market_hours) and (time_in_force != system_hours)){
+    auto curr_time = time(NULL);
+    remain_time_in_force = time_in_force - (curr_time - recv_order_time);
+  }
+  return (remain_time_in_force <= 0);
 }
 
 modify_order::modify_order(){
@@ -62,4 +71,22 @@ void modify_order::parse_modify_order(ModifyOrder * mo){
   token = mo -> token;
   req_qty = mo -> qty;
   new_side = mo -> side;
+}
+
+replace_order::replace_order(){
+}
+
+replace_order::replace_order(ReplaceOrder * ro){
+  parse_replace_order(ro);
+}
+
+void replace_order::parse_replace_order(ModifyOrder * ro){
+  existing_token = ro -> existing_token;
+  new_token = ro -> token;
+  qty = ro -> qty;
+  price = ro -> price;
+  time_in_force = ro -> time_in_force;
+  display = ro -> display;
+  intermarket_sweep_eligibility = ro -> intermarket_sweep_eligibility;
+  min_qty = ro -> min_qty;
 }

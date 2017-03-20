@@ -29,6 +29,11 @@ public:
   Token token;
   OrderState state;
   char side;
+  char cross_type;
+  char intermarket_sweep_eligibility;
+  char firm[4];
+  char display;
+  char capacity;
 
   uint64_t orderID;
   uint64_t executed_qty;
@@ -55,5 +60,21 @@ public:
   char new_side;
 };
 
-  }
+class replace_order{
+public:
+  replace_order();
+  replace_order(ReplaceOrder* ro);
+  void parse_replace_order(ReplaceOrder* ro);
+
+  Token existing_token;
+  Token new_token;
+  uint32_t qty;
+  uint32_t price;
+  uint32_t time_in_force;
+  char display;
+  char intermarket_sweep_eligibility;
+  uint32_t min_qty;
+}
+
+}
 }

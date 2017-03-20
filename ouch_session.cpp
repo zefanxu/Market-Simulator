@@ -41,6 +41,10 @@ void ouch_session::handle_message(MsgHeader * packet, size_t len){
 }
 
 void ouch_session::replaceOrder(Ouch_MsgHeader * msg, size_t len){
+  ReplaceOrder * ro_msg = reinterpret_cast<ReplaceOrder*>(msg);
+  ro_msg->from_network();
+  replace_order ro = replace_order(ro_msg);
+  PendingReplace[ro_msg.existing_token._str_()] = replace_order;
   return;
 }
 
@@ -53,6 +57,52 @@ void ouch_session::cancelOrder(Ouch_MsgHeader * msg, size_t len){
     return;
   cancel_order co = cancel_order(co_msg);
   PendingCancel[co_msg->token._str_()] = co;
+}
+
+void ouch_session::replace_logic(){
+  vector<string> done_tokens;
+  for (const auto & replace_order_pair : PendingReplace){
+    const auto & ro = replace_order_pair.second;
+    const auto t = ro.existing_token._str_();
+    if (LiveOrders.find(t) == LiveOrders.end())
+      continue;
+    if (ro.qty > 1000000){
+      done_tokens.push_back(t);
+      constructOrderCanceled(LiveOrders[t].remaining_qty, 'Z', ro.existing_token);
+      continue;
+    }
+    auto & target_order = LiveOrders[t];
+    target_order.token = ro.new_token;
+    target_order.remaining_qty = ro.qty;
+    target_order.time_in_force = ro.time_in_force;
+    target_order.remain_time_in_force = ro.time_in_force;
+    target_order.price = ro.price;
+    target_order.intermarket_sweep_eligibility = ro.intermarket_sweep_eligibility;
+    constructOrderReplaced(ro, target_order);
+  }
+  for (const auto & each_token : done_tokens)
+    LiveOrders.erase(each_token);
+}
+
+void ouch_session::constructOrderReplaced(const replace_order & ro, const order & new_order){
+  OrderReplaced or;
+  or.timestamp = get_timestamp;
+  or.token = new_order.token;
+  or.side = new_order.side;
+  or.qty = new_order.qty;
+  or.symbol = new_order.symbol;
+  or.price = new_order.price;
+  or.time_in_force = new_order.time_in_force;
+  strncpy(or.firm, new_order.firm, sizeof(or.firm));
+  or.capacity = new_order.capacity;
+  or.order_reference_number = new_order.orderID;
+  or.bbo_weight_indicator = '2';
+  or.orig_token = ro.existing_token;
+  or.order_state = static_cast<char>(ouch::OrderState::Live);
+  or.min_qty = new_order.min_qty;
+  or.to_network();
+  auto packet = vector<char>(reinterpret_cast<const char*>(&or), reinterpret_cast<const char*>(&or)+sizeof(or));
+  pending_out_messages.push_back(packet);
 }
 
 void ouch_session::modifyOrder(Ouch_MsgHeader * msg, size_t len){
@@ -124,6 +174,11 @@ void ouch_session::execution_logic(){
   for (auto & order_pair : LiveOrders){
     order & each_order = order_pair.second;
     const string & each_token = order_pair.first;
+    if (each_order.expired()){
+      constructOrderCanceled(each_order.remaining_qty, 'T', each_order.token);
+      done_tokens.push_back(each_token);
+      continue;
+    }
     if (each_order.still_live()){
       if (rand() % 2) continue;
       constructOrderExecuted(each_order);
@@ -140,6 +195,7 @@ void ouch_session::execution_logic(){
 void ouch_session::market_logic(){
   heartbeat_logic();
   cancel_logic();
+  replace_logic();
   execution_logic();
 }
 

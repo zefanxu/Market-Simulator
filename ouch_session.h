@@ -48,6 +48,7 @@ private:
   void constructOrderCanceled(uint32_t dec_qty, char reason, Token t);
   void constructOrderModified(uint32_t remaining_qty, const modify_order & mo);
   void constructOrderExecuted(order & o);
+  void constructOrderReplaced(const replace_order & ro, const order & new_order);
 
   bool login(LoginRequest * req);
   uint64_t get_timestamp();
@@ -61,6 +62,7 @@ private:
   unordered_map<string, order> DoneOrders;
   unordered_map<string, cancel_order> PendingCancel;
   unordered_map<string, modify_order> PendingModify;
+  unordered_map<string, replace_order> PendingReplace;
 };
 
 #endif
