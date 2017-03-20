@@ -13,6 +13,7 @@
 #include <fstream>
 #include <iomanip>
 #include <ctime>
+#include <sstream>
 
 #include <evt_util.h>
 #include "evtsim_messages.h"
@@ -26,15 +27,16 @@ using boost::endian::native_to_big;
 const std::string inbound_to_string(const MsgHeader* m);
 const std::string outbound_to_string(const MsgHeader* m);
 
-class log{
+class logger{
 public:
-  log();
-  ~log();
-  write(string text);
+  logger();
+  ~logger();
+  void write(string text);
   bool also_print;
 private:
   ofstream file;
   string get_time_string();
+  string get_datetime_string();
 };
 
 

@@ -1,25 +1,35 @@
 #include "evtsim_util.h"
 
-string log::get_time_string(){
+string logger::get_datetime_string(){
   time_t t = time(nullptr);
   tm curr_tm = *localtime(&t);
-  return put_time(&curr_tm, "%Y%m%d%H%H%S");
+  stringstream ss;
+  ss << put_time(&curr_tm, "%Y%m%d%H%M%S");
+  return ss.str();
 }
 
-void log::log(){
-  string curr_time = get_time_string();
-  file.open(curr_time, ofstream::out);
+string logger::get_time_string(){
+  time_t t = time(nullptr);
+  tm curr_tm = *localtime(&t);
+  stringstream ss;
+  ss << put_time(&curr_tm, "%H:%M:%S");
+  return ss.str();
+}
+
+logger::logger(){
+  string file_name = "log_" + get_datetime_string() + ".txt";
+  file.open(file_name, ofstream::out);
   also_print = true;
 }
 
-void log::write(string text){
+void logger::write(string text){
   string log_text = "[" + get_time_string() + "] " + text + "\n";
   if (also_print)
     cout << log_text;
   file << log_text;
 }
 
-void log::~log(){
+logger::~logger(){
   file.close();
 }
 

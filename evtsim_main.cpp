@@ -71,7 +71,7 @@ main(int argc, char** argv) {
     cout << opts << endl;
     return 2;
   }
-  log l;
+  logger l;
   int port_num = vm["port"].as<int>();
   ouch_session s;
   boost::array<char, 2056> buf;
@@ -104,7 +104,7 @@ main(int argc, char** argv) {
       break;
     }
     for (const auto & msg : s.pending_out_messages){
-      log("SEND: "+inbound_to_string(reinterpret_cast<const MsgHeader*>(&msg[0])));
+      l.write("SEND: "+inbound_to_string(reinterpret_cast<const MsgHeader*>(&msg[0])));
       asio::write(socket, asio::buffer(&msg[0], msg.size()), asio::transfer_all(), ec);
     }
     s.pending_out_messages.clear();
