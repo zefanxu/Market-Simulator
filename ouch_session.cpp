@@ -185,7 +185,7 @@ void ouch_session::execution_logic(){
         constructOrderExecuted(each_order);
       }
       if (each_order.remaining_qty)
-        constructOrderCanceled(each_order.remaining_qty, 'I', each_token);
+        constructOrderCanceled(each_order.remaining_qty, 'I', each_order.token);
       done_tokens.push_back(each_token);
       continue;
     }
