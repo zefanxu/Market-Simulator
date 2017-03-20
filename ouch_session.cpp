@@ -44,7 +44,7 @@ void ouch_session::replaceOrder(Ouch_MsgHeader * msg, size_t len){
   ReplaceOrder * ro_msg = reinterpret_cast<ReplaceOrder*>(msg);
   ro_msg->from_network();
   replace_order ro = replace_order(ro_msg);
-  PendingReplace[ro_msg.existing_token._str_()] = replace_order;
+  PendingReplace[ro_msg->existing_token._str_()] = ro;
   return;
 }
 
@@ -82,26 +82,27 @@ void ouch_session::replace_logic(){
   }
   for (const auto & each_token : done_tokens)
     LiveOrders.erase(each_token);
+  PendingReplace.clear();
 }
 
 void ouch_session::constructOrderReplaced(const replace_order & ro, const order & new_order){
-  OrderReplaced or;
-  or.timestamp = get_timestamp;
-  or.token = new_order.token;
-  or.side = new_order.side;
-  or.qty = new_order.qty;
-  or.symbol = new_order.symbol;
-  or.price = new_order.price;
-  or.time_in_force = new_order.time_in_force;
-  strncpy(or.firm, new_order.firm, sizeof(or.firm));
-  or.capacity = new_order.capacity;
-  or.order_reference_number = new_order.orderID;
-  or.bbo_weight_indicator = '2';
-  or.orig_token = ro.existing_token;
-  or.order_state = static_cast<char>(ouch::OrderState::Live);
-  or.min_qty = new_order.min_qty;
-  or.to_network();
-  auto packet = vector<char>(reinterpret_cast<const char*>(&or), reinterpret_cast<const char*>(&or)+sizeof(or));
+  OrderReplaced _or;
+  _or.timestamp = get_timestamp();
+  _or.token = new_order.token;
+  _or.side = new_order.side;
+  _or.qty = new_order.remaining_qty;
+  strncpy(_or.symbol, new_order.symbol, sizeof(_or.symbol));
+  _or.price = new_order.price;
+  _or.time_in_force = new_order.time_in_force;
+  strncpy(_or.firm, new_order.firm, sizeof(_or.firm));
+  _or.capacity = new_order.capacity;
+  _or.order_reference_number = new_order.orderID;
+  _or.bbo_weight_indicator = '2';
+  _or.orig_token = ro.existing_token;
+  _or.order_state = static_cast<char>(ouch::OrderState::Live);
+  _or.min_qty = new_order.min_qty;
+  _or.to_network();
+  auto packet = vector<char>(reinterpret_cast<const char*>(&_or), reinterpret_cast<const char*>(&_or)+sizeof(_or));
   pending_out_messages.push_back(packet);
 }
 

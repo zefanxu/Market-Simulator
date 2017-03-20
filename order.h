@@ -18,6 +18,7 @@ public:
   order(EnterOrder* eo);
   void parse_order(EnterOrder* eo);
   bool still_live();
+  bool expired();
 
   time_t recv_order_time;
   uint32_t time_in_force;
@@ -74,7 +75,7 @@ public:
   char display;
   char intermarket_sweep_eligibility;
   uint32_t min_qty;
-}
+};
 
 }
 }

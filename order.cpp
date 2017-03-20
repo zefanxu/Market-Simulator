@@ -80,7 +80,7 @@ replace_order::replace_order(ReplaceOrder * ro){
   parse_replace_order(ro);
 }
 
-void replace_order::parse_replace_order(ModifyOrder * ro){
+void replace_order::parse_replace_order(ReplaceOrder * ro){
   existing_token = ro -> existing_token;
   new_token = ro -> token;
   qty = ro -> qty;

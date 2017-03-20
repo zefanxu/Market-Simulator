@@ -42,6 +42,7 @@ private:
   void cancel_logic();
   void execution_logic();
   void modify_logic();
+  void replace_logic();
 
   void constructOrderAccpeted(EnterOrder * eo, const order & o);
   void constructOrderRejected(EnterOrder * eo);
