@@ -152,7 +152,7 @@ void ouch_session::modify_logic(){
       continue;
     auto & target_order = active_orders[mo.token._str_()];
     char new_side = mo.new_side;
-    switch (reinterpret_cast<Side>(target_order.side)) {
+    switch ((target_order.side)) {
       case (Side::Sell):
         if (new_side != Side::SellShort and new_side != Side::SellShortExempt)
           continue;

@@ -11,7 +11,7 @@
 #include "evtsim_messages.h"
 #include "order.h"
 
-#define MAX_SHARES
+#define MAX_SHARES 999999
 
 using namespace evt::ouch;
 namespace ouch_state{

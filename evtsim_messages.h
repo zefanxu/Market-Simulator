@@ -151,12 +151,12 @@ namespace ouch {
     (TakeMidpoint)('M')
   );
 
-  BOOST_ENUM_VALUES(Side, char,
-    (Buy)('B')
-    (Sell)('S')
-    (SellShort)('T')
-    (SellShortExempt)('E')
-  );
+  enum Side : char {
+    Buy = 'B',
+    Sell = 'S',
+    SellShort = 'T',
+    SellShortExempt = 'E'
+  };
 
   BOOST_ENUM_VALUES(Display, char,
     (AttributablePriceToDisplay)('A')
