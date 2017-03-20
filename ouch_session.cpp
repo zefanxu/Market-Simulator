@@ -180,7 +180,16 @@ void ouch_session::execution_logic(){
       done_tokens.push_back(each_token);
       continue;
     }
-    if (each_order.still_live()){
+    if (!each_order.time_in_force){
+      if (rand() % 2){
+        constructOrderExecuted(each_order);
+      }
+      if (each_order.remaining_qty)
+        constructOrderCanceled(each_order.remaining_qty, 'I', each_token);
+      done_tokens.push_back(each_token);
+      continue;
+    }
+    else if (each_order.still_live()){
       if (rand() % 2) continue;
       constructOrderExecuted(each_order);
     }
@@ -358,6 +367,8 @@ void ouch_session::constructOrderModified(uint32_t remaining_qty, const modify_o
 void ouch_session::constructOrderExecuted(order & o){
   uint32_t exe_qty = (2 + rand() % 10) * 100;
   exe_qty = min(exe_qty, o.remaining_qty);
+  if (o.min_qty and exe_qty > o.min_qty)
+    return;
   Executed ex;
   ex.timestamp = get_timestamp();
   ex.token = o.token;
