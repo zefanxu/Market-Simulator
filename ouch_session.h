@@ -24,6 +24,7 @@ class ouch_session{
 public:
   void init();
   ouch_session();
+  ouch_session(double random_reject_rate);
   void market_logic();
   void handle_packet(char * packet, size_t len);
 
@@ -54,17 +55,19 @@ private:
   void constructOrderReplaced(const ReplaceOrderReq & ro, const order & new_order);
 
   uint64_t get_timestamp();
-
-  time_t last_send_heartbeat;
-  time_t last_recv_heartbeat;
-  chrono::system_clock::time_point start_of_day;
-  char state;
+  bool random_reject();
 
   unordered_map<string, order> active_orders;
   unordered_map<string, order> finished_orders;
   vector<CancelOrderReq> pending_cancel;
   vector<ModifyOrderReq> pending_modify;
   vector<ReplaceOrderReq> pending_replace;
+
+  double random_reject_rate; //0 <= x <= 1, default to 0.3333
+  time_t last_send_heartbeat;
+  time_t last_recv_heartbeat;
+  chrono::system_clock::time_point start_of_day;
+  char state;
 };
 
 #endif
