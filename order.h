@@ -4,10 +4,6 @@
 #include <stdlib.h>
 #include "evtsim_messages.h"
 
-constexpr uint32_t IOC_time = 0;
-constexpr uint32_t market_hours = 99998;
-constexpr uint32_t system_hours = 99999;
-
 namespace evt{
 namespace ouch{
 

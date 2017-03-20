@@ -71,10 +71,12 @@ void ouch_session::handle_message(MsgHeader * packet, size_t len){
 void ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
   EnterOrder * eo = reinterpret_cast<EnterOrder*>(msg);
   eo->from_network();
-
-  if (!(rand() % 5) or (state != ouch_state::logged_in)){
+  if (!(rand() % 5))
     constructOrderRejected('O', eo->token);
-  }
+  else if (eo->qty > MAX_SHARES)
+    constructOrderRejected('Z', eo->token);
+  else if ((state != ouch_state::logged_in))
+    constructOrderRejected('O', eo->token);
   else if((active_orders.find(eo->token._str_()) == active_orders.end()) and
       (finished_orders.find(eo->token._str_()) == finished_orders.end())){
     order new_order = order(eo);
@@ -121,16 +123,16 @@ void ouch_session::replace_logic(){
   vector<string> done_tokens;
   for (const auto & ro : pending_replace){
     const auto t = ro.existing_token._str_();
+    auto & target_order = active_orders[t];
     if (active_orders.find(t) == active_orders.end())
       continue;
-    if (ro.qty > 1000000){
+    if (ro.qty > MAX_SHARES or ro.qty <= target_order.executed_qty){
       done_tokens.push_back(t);
       constructOrderCanceled(active_orders[t].remaining_qty, 'Z', ro.existing_token);
       continue;
     }
-    auto & target_order = active_orders[t];
     target_order.token = ro.new_token;
-    target_order.remaining_qty = ro.qty;
+    target_order.remaining_qty = ro.qty - target_order.executed_qty;
     target_order.time_in_force = ro.time_in_force;
     target_order.remain_time_in_force = ro.time_in_force;
     target_order.price = ro.price;
@@ -142,27 +144,6 @@ void ouch_session::replace_logic(){
   pending_replace.clear();
 }
 
-void ouch_session::constructOrderReplaced(const ReplaceOrderReq & ro, const order & new_order){
-  OrderReplaced _or;
-  _or.timestamp = get_timestamp();
-  _or.token = new_order.token;
-  _or.side = new_order.side;
-  _or.qty = new_order.remaining_qty;
-  strncpy(_or.symbol, new_order.symbol, sizeof(_or.symbol));
-  _or.price = new_order.price;
-  _or.time_in_force = new_order.time_in_force;
-  strncpy(_or.firm, new_order.firm, sizeof(_or.firm));
-  _or.capacity = new_order.capacity;
-  _or.order_reference_number = new_order.orderID;
-  _or.bbo_weight_indicator = '2';
-  _or.orig_token = ro.existing_token;
-  _or.order_state = static_cast<char>(ouch::OrderState::Live);
-  _or.min_qty = new_order.min_qty;
-  _or.to_network();
-  auto packet = vector<char>(reinterpret_cast<const char*>(&_or), reinterpret_cast<const char*>(&_or)+sizeof(_or));
-  pending_out_messages.push_back(packet);
-}
-
 
 void ouch_session::modify_logic(){
   vector<string> done_tokens;
@@ -171,15 +152,15 @@ void ouch_session::modify_logic(){
       continue;
     auto & target_order = active_orders[mo.token._str_()];
     char new_side = mo.new_side;
-    switch (target_order.side) {
-      case ('S'):
-        if (new_side != 'T' and new_side != 'E')
+    switch (reinterpret_cast<Side>(target_order.side)) {
+      case (Side::Sell):
+        if (new_side != Side::SellShort and new_side != Side::SellShortExempt)
           continue;
-      case ('E'):
-        if (new_side != 'T' and new_side != 'S')
+      case (Side::SellShortExempt):
+        if (new_side != Side::SellShort and new_side != Side::Sell)
           continue;
-      case ('T'):
-        if (new_side != 'E' and new_side != 'S')
+      case (Side::SellShort):
+        if (new_side != Side::SellShortExempt and new_side != Side::Sell)
           continue;
     }
     if (target_order.executed_qty >= mo.req_qty){
@@ -358,5 +339,26 @@ void ouch_session::constructOrderExecuted(order & o){
   o.executed_qty += exe_qty;
   ex.to_network();
   auto packet = vector<char>(reinterpret_cast<const char*>(&ex), reinterpret_cast<const char*>(&ex) + sizeof(ex));
+  pending_out_messages.push_back(packet);
+}
+
+void ouch_session::constructOrderReplaced(const ReplaceOrderReq & ro, const order & new_order){
+  OrderReplaced _or;
+  _or.timestamp = get_timestamp();
+  _or.token = new_order.token;
+  _or.side = new_order.side;
+  _or.qty = new_order.remaining_qty;
+  strncpy(_or.symbol, new_order.symbol, sizeof(_or.symbol));
+  _or.price = new_order.price;
+  _or.time_in_force = new_order.time_in_force;
+  strncpy(_or.firm, new_order.firm, sizeof(_or.firm));
+  _or.capacity = new_order.capacity;
+  _or.order_reference_number = new_order.orderID;
+  _or.bbo_weight_indicator = '2';
+  _or.orig_token = ro.existing_token;
+  _or.order_state = static_cast<char>(ouch::OrderState::Live);
+  _or.min_qty = new_order.min_qty;
+  _or.to_network();
+  auto packet = vector<char>(reinterpret_cast<const char*>(&_or), reinterpret_cast<const char*>(&_or)+sizeof(_or));
   pending_out_messages.push_back(packet);
 }

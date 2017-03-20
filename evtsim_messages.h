@@ -131,13 +131,6 @@ namespace ouch {
     (Cover)
   );
 
-  BOOST_ENUM(OrderTIF,
-    (Day)
-    (IOC)
-    (FillOrKill)
-    (PostOnly)
-  );
-
   BOOST_ENUM(OrderDisplay,
     (Normal)
     (Hidden)
@@ -158,50 +151,12 @@ namespace ouch {
     (TakeMidpoint)('M')
   );
 
-  BOOST_ENUM_VALUES(OrderSide,char,
-    (Invalid)('U')
-    (Buy)('B')
-    (Sell)('S')
-    (Short)('T')
-  );
-  inline bool
-  convert_from_evt_tif(const OrderTIF& in, ouch::TimeInForce& out) {
-    switch(in.index()) {
-    case OrderTIF::Day: out = ouch::TimeInForce::Market; break;
-    case OrderTIF::IOC: out = ouch::TimeInForce::Ioc; break;
-    case OrderTIF::FillOrKill: out = ouch::TimeInForce::Ioc; break;
-    default: return false;
-    }
-    return true;
-  }
-  inline bool
-  convert_to_evt_tif(ouch::TimeInForce in, OrderTIF& out) {
-    switch(in) {
-    case ouch::TimeInForce::Market: out = OrderTIF::Day; break;
-    case ouch::TimeInForce::Ioc: out = OrderTIF::IOC; break;
-    default: return false;
-    }
-    return true;
-  }
-
-
   BOOST_ENUM_VALUES(Side, char,
     (Buy)('B')
     (Sell)('S')
     (SellShort)('T')
     (SellShortExempt)('E')
   );
-  inline bool
-  convert_from_evt_side(const OrderSide& in, ouch::Side& out) {
-    switch(in.index()) {
-    case OrderSide::Buy:    out = Side::Buy; break;
-    case OrderSide::Sell:   out = Side::Sell; break;
-    case OrderSide::Short:  out = Side::SellShort; break;
-    default: return false;
-    }
-    return true;
-  }
-
 
   BOOST_ENUM_VALUES(Display, char,
     (AttributablePriceToDisplay)('A')
@@ -216,16 +171,6 @@ namespace ouch {
     (RetailOrderType2)('T')
     (RetailPriceImprovement)('Q')
   );
-  inline bool
-  convert_from_evt_display(const OrderDisplay& in, ouch::Display& out) {
-    switch(in.index()) {
-    case OrderDisplay::Normal:  out = Display::AttributablePriceToDisplay; break;
-    case OrderDisplay::Hidden:  out = Display::NonDisplay; break;
-    default: return false;
-    }
-    return true;
-  }
-
 
   BOOST_ENUM_VALUES(Capacity, char,
     (Agency)('A')
@@ -233,16 +178,6 @@ namespace ouch {
     (Riskless)('R')
     (Other)('O')
   );
-  inline bool
-  convert_from_evt_capacity(const OrderCapacity& in, ouch::Capacity& out) {
-    switch(in.index()) {
-    case OrderCapacity::Agent:      out = Capacity::Agency; break;
-    case OrderCapacity::Principal:  out = Capacity::Principal; break;
-    default: return false;
-    }
-    return true;
-  }
-
 
   BOOST_ENUM_VALUES(CrossType, char,
     (NoCrossContinuousMarket)('N')
@@ -252,17 +187,6 @@ namespace ouch {
     (SupplementalOrder)('S')
     (Retail)('R')
   );
-  inline bool
-  convert_from_evt_ordertype(const OrderType& in, ouch::CrossType& out) {
-    switch(in.index()) {
-    case OrderType::OnOpen: out = CrossType::OpeningCross; break;
-    case OrderType::OnClose: out = CrossType::ClosingCross; break;
-    default: out = CrossType::NoCrossContinuousMarket; break;
-    }
-    return true;
-  }
-
-
 
   enum OrderState : char {
     Live = 'L',
@@ -301,18 +225,6 @@ namespace ouch {
     (ExceededSharesLimit)('m')
     (ExceededDollarValue)('n')
   );
-
-
-  inline
-  LiquidityCode to_evt_liquidity_code(char in) {
-    switch(in) {
-    case 'A': return LiquidityCode::AddLit;
-    case 'R': return LiquidityCode::RemoveLit;
-    case 'k': return LiquidityCode::AddMidpoint;
-    case 'm': return LiquidityCode::TakeMidpoint;
-    default:  return LiquidityCode::Unknown;
-    }
-  }
 
 
   struct Token {
