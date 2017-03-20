@@ -3,14 +3,14 @@
 
 using namespace evt::ouch;
 
-cancel_order::cancel_order(){
+CancelOrderReq::CancelOrderReq(){
 }
 
-cancel_order::cancel_order(CancelOrder* co){
+CancelOrderReq::CancelOrderReq(CancelOrder* co){
   parse_cancel_order(co);
 }
 
-void cancel_order::parse_cancel_order(CancelOrder * co){
+void CancelOrderReq::parse_cancel_order(CancelOrder * co){
   token = co->token;
   qty = co->qty;
 }
@@ -60,27 +60,27 @@ bool order::expired(){
   return (remain_time_in_force <= 0);
 }
 
-modify_order::modify_order(){
+ModifyOrderReq::ModifyOrderReq(){
 }
 
-modify_order::modify_order(ModifyOrder * mo){
+ModifyOrderReq::ModifyOrderReq(ModifyOrder * mo){
   parse_modify_order(mo);
 }
 
-void modify_order::parse_modify_order(ModifyOrder * mo){
+void ModifyOrderReq::parse_modify_order(ModifyOrder * mo){
   token = mo -> token;
   req_qty = mo -> qty;
   new_side = mo -> side;
 }
 
-replace_order::replace_order(){
+ReplaceOrderReq::ReplaceOrderReq(){
 }
 
-replace_order::replace_order(ReplaceOrder * ro){
+ReplaceOrderReq::ReplaceOrderReq(ReplaceOrder * ro){
   parse_replace_order(ro);
 }
 
-void replace_order::parse_replace_order(ReplaceOrder * ro){
+void ReplaceOrderReq::parse_replace_order(ReplaceOrder * ro){
   existing_token = ro -> existing_token;
   new_token = ro -> token;
   qty = ro -> qty;

@@ -24,6 +24,8 @@ public:
   uint32_t time_in_force;
   int32_t remain_time_in_force;
   uint32_t remaining_qty;
+  uint64_t orderID;
+  uint64_t executed_qty;
   int32_t price;
   uint32_t min_qty;
   char symbol[8];
@@ -35,25 +37,22 @@ public:
   char firm[4];
   char display;
   char capacity;
-
-  uint64_t orderID;
-  uint64_t executed_qty;
 };
 
-class cancel_order{
+class CancelOrderReq{
 public:
-  cancel_order();
-  cancel_order(CancelOrder* co);
+  CancelOrderReq();
+  CancelOrderReq(CancelOrder* co);
   void parse_cancel_order(CancelOrder* co);
 
   Token token;
   uint32_t qty;
 };
 
-class modify_order{
+class ModifyOrderReq{
 public:
-  modify_order();
-  modify_order(ModifyOrder* mo);
+  ModifyOrderReq();
+  ModifyOrderReq(ModifyOrder* mo);
   void parse_modify_order(ModifyOrder* mo);
 
   Token token;
@@ -61,10 +60,10 @@ public:
   char new_side;
 };
 
-class replace_order{
+class ReplaceOrderReq{
 public:
-  replace_order();
-  replace_order(ReplaceOrder* ro);
+  ReplaceOrderReq();
+  ReplaceOrderReq(ReplaceOrder* ro);
   void parse_replace_order(ReplaceOrder* ro);
 
   Token existing_token;

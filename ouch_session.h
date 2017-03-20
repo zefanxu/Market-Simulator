@@ -44,14 +44,13 @@ private:
   void modify_logic();
   void replace_logic();
 
-  void constructOrderAccpeted(EnterOrder * eo, const order & o);
-  void constructOrderRejected(EnterOrder * eo);
+  void constructOrderAccpeted(const order & o);
+  void constructOrderRejected(char reason, Token t);
   void constructOrderCanceled(uint32_t dec_qty, char reason, Token t);
-  void constructOrderModified(uint32_t remaining_qty, const modify_order & mo);
+  void constructOrderModified(uint32_t remaining_qty, const ModifyOrderReq & mo);
   void constructOrderExecuted(order & o);
-  void constructOrderReplaced(const replace_order & ro, const order & new_order);
+  void constructOrderReplaced(const ReplaceOrderReq & ro, const order & new_order);
 
-  bool login(LoginRequest * req);
   uint64_t get_timestamp();
 
   time_t last_send_heartbeat;
@@ -59,11 +58,11 @@ private:
   chrono::system_clock::time_point start_of_day;
   char state;
 
-  unordered_map<string, order> LiveOrders;
-  unordered_map<string, order> DoneOrders;
-  unordered_map<string, cancel_order> PendingCancel;
-  unordered_map<string, modify_order> PendingModify;
-  unordered_map<string, replace_order> PendingReplace;
+  unordered_map<string, order> active_orders;
+  unordered_map<string, order> finished_orders;
+  vector<CancelOrderReq> pending_cancel;
+  vector<ModifyOrderReq> pending_modify;
+  vector<ReplaceOrderReq> pending_replace;
 };
 
 #endif
