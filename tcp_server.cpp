@@ -13,6 +13,7 @@ TCPServer::TCPServer(unsigned int port){
   _endpoint = new asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port);
   _acceptor = new asio::ip::tcp::acceptor(io_service, *_endpoint);
   _socket = new asio::ip::tcp::socket(io_service);
+  
   alive = false;
 }
 
@@ -36,6 +37,7 @@ void TCPServer::accept(){
     l.write(e.what());
     throw e;
   }
+  _socket->non_blocking(true);
   alive = true;
 }
 

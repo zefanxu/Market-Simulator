@@ -53,7 +53,8 @@ private:
   void constructOrderReplaced(const ReplaceOrderReq & ro, const order & new_order);
 
   uint64_t get_timestamp();
-  bool random_reject();
+  bool order_random_reject();
+  bool exe_random_reject();
 
   unordered_map<string, order> active_orders;
   unordered_map<string, order> finished_orders;
