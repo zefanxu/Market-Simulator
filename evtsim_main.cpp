@@ -12,6 +12,7 @@
 #include "evtsim_util.h"
 #include "evtsim_messages.h"
 #include "ouch_session.h"
+#include "tcp_server.h"
 
 using namespace std;
 using namespace evt;
@@ -62,52 +63,23 @@ main(int argc, char** argv) {
     return 1;
   }
 
-  // if(!vm.count("config")) {
-  //   cout << opts << endl;
-  //   return 2;
-  // }
   if (!vm.count("port")){
     cout << "missing port number" << endl;
     cout << opts << endl;
     return 2;
   }
-  logger l;
   int port_num = vm["port"].as<int>();
-  ouch_session s;
-  boost::array<char, 2056> buf;
-  asio::io_service io_service;
-  asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), port_num);
-  boost::system::error_code ec;
-  asio::ip::tcp::acceptor acceptor(io_service, endpoint);
-  asio::ip::tcp::socket socket(io_service);
-  try{
-    acceptor.accept(socket);
-  }
-  catch (std::exception& e){
-    std::cerr << "Exception: " << e.what() <<endl;
-    return 2;
-  }
-  size_t read_len, packet_len;
-  char * read_pos;
-  while (true){
-    s.market_logic();
-    read_len = socket.read_some(asio::buffer(buf), ec);
-    read_pos = buf.c_array();
-    while ((ec != asio::error::would_block) and (read_pos < buf.c_array() + read_len)){
-      l.write("RECV: " + outbound_to_string(reinterpret_cast<const MsgHeader*>(read_pos)));
-      packet_len = big_to_native((reinterpret_cast<const MsgHeader*>(read_pos))->length) + 2;
-      s.handle_packet(read_pos, packet_len);
-      read_pos += packet_len;
-    }
-    if (ec == asio::error::eof){
-      l.write("Connection closed");
-      break;
-    }
-    for (const auto & msg : s.pending_out_messages){
-      l.write("SEND: "+inbound_to_string(reinterpret_cast<const MsgHeader*>(&msg[0])));
-      asio::write(socket, asio::buffer(&msg[0], msg.size()), asio::transfer_all(), ec);
-    }
-    s.pending_out_messages.clear();
+
+  ouch_session session;
+  char * buf;
+  TCPServer s = SoupBinTCPServer(port_num);
+  s.accept();
+  while (s.isAlive()){
+    size_t len = s.read(buf);
+    if (len)
+      session.handle_packet(buf, len);
+    session.market_logic();
+    s.send(session.pending_out_messages);
   }
   return 0;
 }

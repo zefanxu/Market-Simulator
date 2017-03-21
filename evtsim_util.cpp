@@ -4,7 +4,7 @@ string logger::get_datetime_string(){
   time_t t = time(nullptr);
   tm curr_tm = *localtime(&t);
   stringstream ss;
-  ss << put_time(&curr_tm, "%Y%m%d%H%M%S");
+  ss << put_time(&curr_tm, "%Y-%m-%d-%H:%M:%S");
   return ss.str();
 }
 
