@@ -21,11 +21,10 @@ public:
   ~TCPServer();
   void accept();
   bool isAlive();
-  virtual int read(char* & buf);
-  virtual void send(vector<message> & msgs);
+  virtual int read(char* & buf)=0;
+  virtual void send(vector<message> & msgs)=0;
 
 protected:
-  unsigned int port;
   bool alive;
   asio::io_service io_service;
   asio::ip::tcp::endpoint* _endpoint;
@@ -38,7 +37,7 @@ class SoupBinTCPServer: public TCPServer{
 public:
   SoupBinTCPServer();
   SoupBinTCPServer(unsigned int port);
-  virtual int read(char* & buf);
+  virtual int read(char* & outbuf);
   virtual void send(vector<message> & msgs);
 
 private:

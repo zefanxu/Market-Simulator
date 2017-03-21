@@ -4,13 +4,14 @@ TCPServer::TCPServer(){
   _endpoint = nullptr;
   _acceptor = nullptr;
   _socket = nullptr;
-  port = 0;
   alive = false;
 }
 
 TCPServer::TCPServer(unsigned int port){
+  if (port <= 0 or port > 65535)
+    throw invalid_argument("invalid port number");
   _endpoint = new asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port);
-  _acceptor = new asio::ip::tcp::acceptor(io_service, _endpoint);
+  _acceptor = new asio::ip::tcp::acceptor(io_service, *_endpoint);
   _socket = new asio::ip::tcp::socket(io_service);
   alive = false;
 }
@@ -26,8 +27,8 @@ TCPServer::~TCPServer(){
 }
 
 void TCPServer::accept(){
-  if (port <= 0 or port > 65535)
-    throw invalid_argument("invalid port number");
+  if (!_socket)
+    throw runtime_error("Invalid socket");
   try{
     _acceptor->accept(*_socket);
   }
@@ -60,7 +61,7 @@ SoupBinTCPServer::SoupBinTCPServer(unsigned int port):TCPServer(port){
   read_pos = nullptr;
 }
 
-int SoupBinTCPServer::read(char* & buf){
+int SoupBinTCPServer::read(char* & outbuf){
   boost::system::error_code ec;
   if (read_pos)
     read_pos += packet_len;
@@ -69,16 +70,16 @@ int SoupBinTCPServer::read(char* & buf){
     read_pos = buf.c_array();
   }
   if (ec == asio::error::would_block){
-    buf = nullptr;
+    outbuf = nullptr;
     return 0;
   }
   else if (ec == asio::error::eof){
     alive = false;
-    buf = nullptr;
+    outbuf = nullptr;
     return 0;
   }
   l.write("RECV: " + outbound_to_string(reinterpret_cast<const MsgHeader*>(read_pos)));
   packet_len = big_to_native((reinterpret_cast<const MsgHeader*>(read_pos))->length) + 2;
-  buf = read_pos;
+  outbuf = read_pos;
   return packet_len;
 }
