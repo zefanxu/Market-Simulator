@@ -276,6 +276,7 @@ void ouch_session::init(){
   //get the start of the day time
   time_t t1 = time(NULL);
   struct tm tms;
+  localtime_r(&t1, &tms);
   tms.tm_hour = 0;
   tms.tm_min = 0;
   tms.tm_sec = 0;

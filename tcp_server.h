@@ -18,7 +18,7 @@ class TCPServer{
 public:
   TCPServer();
   TCPServer(unsigned int port);
-  ~TCPServer();
+  virtual ~TCPServer();
   void accept();
   bool isAlive();
   virtual int read(char* & buf)=0;

@@ -72,14 +72,15 @@ main(int argc, char** argv) {
 
   ouch_session session;
   char * buf;
-  SoupBinTCPServer s(port_num);
-  s.accept();
-  while (s.isAlive()){
-    size_t len = s.read(buf);
+  TCPServer* s = new SoupBinTCPServer(port_num);
+  s->accept();
+  while (s->isAlive()){
+    size_t len = s->read(buf);
     if (len)
       session.handle_packet(buf, len);
     session.market_logic();
-    s.send(session.pending_out_messages);
+    s->send(session.pending_out_messages);
   }
+  delete s;
   return 0;
 }

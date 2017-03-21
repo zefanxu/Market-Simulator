@@ -20,7 +20,7 @@ TCPServer::TCPServer(unsigned int port){
 TCPServer::~TCPServer(){
   string text = "Conenction Closed";
   l.write(text);
-  if (alive){
+  if (_socket){
     delete _endpoint;
     delete _acceptor;
     delete _socket;
