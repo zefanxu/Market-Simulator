@@ -1,3 +1,4 @@
+#pragma once
 #include <boost/lexical_cast.hpp>
 #include <boost/asio.hpp>
 #include <stdlib.h>
@@ -20,8 +21,8 @@ public:
   ~TCPServer();
   void accept();
   bool isAlive();
-  virtual int read(char* & buf) = 0;
-  virtual void send(vector<message> & msgs) = 0;
+  virtual int read(char* & buf);
+  virtual void send(vector<message> & msgs);
 
 protected:
   unsigned int port;
@@ -44,4 +45,4 @@ private:
   unsigned int packet_len, read_len;
   char * read_pos;
   boost::array<char, 4096> buf;
-}
+};

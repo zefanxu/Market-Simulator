@@ -72,7 +72,7 @@ main(int argc, char** argv) {
 
   ouch_session session;
   char * buf;
-  TCPServer s = SoupBinTCPServer(port_num);
+  SoupBinTCPServer s(port_num);
   s.accept();
   while (s.isAlive()){
     size_t len = s.read(buf);
