@@ -28,9 +28,9 @@ protected:
   unsigned int port;
   bool alive;
   asio::io_service io_service;
-  asio::ip::tcp::endpoint _endpoint;
-  asio::ip::tcp::acceptor _acceptor;
-  asio::ip::tcp::socket _socket;
+  asio::ip::tcp::endpoint* _endpoint;
+  asio::ip::tcp::acceptor* _acceptor;
+  asio::ip::tcp::socket* _socket;
   logger l;
 };
 
