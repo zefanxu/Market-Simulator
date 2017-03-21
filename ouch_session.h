@@ -11,8 +11,6 @@
 #include "evtsim_messages.h"
 #include "order.h"
 
-#define MAX_SHARES 999999
-
 using namespace evt::ouch;
 namespace ouch_state{
   constexpr char not_logged_in = 'N';

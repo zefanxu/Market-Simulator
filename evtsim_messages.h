@@ -7,6 +7,8 @@
 using boost::endian::big_to_native;
 using boost::endian::native_to_big;
 
+#define MAX_SHARES 999999
+
 namespace evt {
 namespace ouch {
 
@@ -44,7 +46,6 @@ namespace ouch {
     return "<unknown PacketType>";
   }
 
-
   // Nasdaq outbound OUCH types (client to ouch)
   enum class OutboundMsgType : char {
     CancelOrder = 'X',
@@ -62,7 +63,6 @@ namespace ouch {
     }
     return "<unknown OutboundMsgType>";
   }
-
 
   // Nasdaq inbound OUCH types (ouch to client)
   enum class InboundMsgType : char {
@@ -226,7 +226,6 @@ namespace ouch {
     (ExceededDollarValue)('n')
   );
 
-
   struct Token {
     std::string _str_() const{
       return std::string(val, 14);
@@ -234,8 +233,6 @@ namespace ouch {
     char val[14];
   } __attribute__((packed));
 
-
-  // SoupBinTCP
   #define MSG_HEADER\
     uint16_t length;\
     char packet_type;
