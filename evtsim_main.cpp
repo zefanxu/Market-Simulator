@@ -11,7 +11,7 @@
 #include <evt_util.h>
 #include "evtsim_util.h"
 #include "evtsim_messages.h"
-#include "ouch_session.h"
+#include "session.h"
 #include "tcp_server.h"
 
 using namespace std;

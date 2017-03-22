@@ -54,7 +54,6 @@ private:
 
   uint64_t get_timestamp();
   bool order_random_reject();
-  bool exe_random_reject();
 
   unordered_map<string, order> active_orders;
   unordered_map<string, order> finished_orders;

@@ -1,4 +1,4 @@
-#include "ouch_session.h"
+#include "session.h"
 
 //SoupBinTCP functions
 void ouch_session::handle_login_request(MsgHeader * packet, size_t len){
@@ -209,7 +209,7 @@ void ouch_session::execution_logic(){
       continue;
     }
     if (!each_order.time_in_force){
-      if (!exe_random_reject()){
+      if (!order_random_reject()){
         constructOrderExecuted(each_order);
       }
       if (each_order.remaining_qty)
@@ -218,7 +218,7 @@ void ouch_session::execution_logic(){
       continue;
     }
     else if (each_order.still_live()){
-      if (exe_random_reject()) continue;
+      if (order_random_reject()) continue;
       constructOrderExecuted(each_order);
     }
     else{
@@ -245,12 +245,6 @@ uint64_t ouch_session::get_timestamp(){
   auto curr_time = chrono::high_resolution_clock::now();
   chrono::duration<uint64_t, std::nano> diff = curr_time - start_of_day;
   return diff.count();
-}
-
-bool ouch_session::exe_random_reject(){
-  // double x = (double)(rand()%1000000)/(double)1000000;
-  // return (x <= 0.999998);
-  return order_random_reject();
 }
 
 bool ouch_session::order_random_reject(){
