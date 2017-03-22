@@ -16,4 +16,5 @@ var/
 bugs/
 
 log_*
+core.*
 evtsim

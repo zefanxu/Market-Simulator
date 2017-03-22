@@ -20,6 +20,7 @@ namespace ouch_state{
 
 class session{
 public:
+  virtual ~session(){};
   virtual void market_logic()=0;
   virtual void handle_packet(char* packet, size_t len)=0;
   vector<vector<char>> pending_out_messages;
@@ -32,6 +33,7 @@ class ouch_session : public session{
 public:
   ouch_session();
   ouch_session(double random_reject_rate);
+  virtual ~ouch_session();
   virtual void market_logic();
   virtual void handle_packet(char * packet, size_t len);
 

@@ -262,6 +262,9 @@ ouch_session::ouch_session(double random_reject_rate){
   init();
 }
 
+ouch_session::~ouch_session(){
+}
+
 void ouch_session::init(){
   state = ouch_state::not_logged_in;
   time_t curr_time = time(NULL);
