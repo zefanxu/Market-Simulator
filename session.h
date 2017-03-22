@@ -11,7 +11,7 @@
 #include "ouch_messages.h"
 #include "order.h"
 
-using namespace evt::ouch;
+using namespace evt;
 namespace ouch_state{
   constexpr char not_logged_in = 'N';
   constexpr char logged_in = 'L';
@@ -39,15 +39,15 @@ public:
 
 private:
   void init();
-  void handle_login_request(MsgHeader * packet, size_t len);
-  void handle_logout_request(MsgHeader * packet, size_t len);
-  void handle_client_heartbeat(MsgHeader * packet, size_t len);
-  void handle_message(MsgHeader* packet, size_t len);
+  void handle_login_request(ouch::MsgHeader * packet, size_t len);
+  void handle_logout_request(ouch::MsgHeader * packet, size_t len);
+  void handle_client_heartbeat(ouch::MsgHeader * packet, size_t len);
+  void handle_message(ouch::MsgHeader* packet, size_t len);
 
-  void enterOrder(Ouch_MsgHeader * msg, size_t len);
-  void cancelOrder(Ouch_MsgHeader * msg, size_t len);
-  void modifyOrder(Ouch_MsgHeader * msg, size_t len);
-  void replaceOrder(Ouch_MsgHeader * msg, size_t len);
+  void enterOrder(ouch::Ouch_MsgHeader * msg, size_t len);
+  void cancelOrder(ouch::Ouch_MsgHeader * msg, size_t len);
+  void modifyOrder(ouch::Ouch_MsgHeader * msg, size_t len);
+  void replaceOrder(ouch::Ouch_MsgHeader * msg, size_t len);
 
   void heartbeat_logic();
   void cancel_logic();

@@ -1,5 +1,5 @@
 #include "session.h"
-
+using namespace evt::ouch;
 //SoupBinTCP functions
 void ouch_session::handle_login_request(MsgHeader * packet, size_t len){
   if (state == ouch_state::not_logged_in){

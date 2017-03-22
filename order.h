@@ -4,15 +4,13 @@
 #include <stdlib.h>
 #include "ouch_messages.h"
 
-namespace evt{
-namespace ouch{
-
+using namespace evt;
 
 class order{
 public:
   order();
-  order(EnterOrder* eo);
-  void parse_order(EnterOrder* eo);
+  order(ouch::EnterOrder* eo);
+  void parse_order(ouch::EnterOrder* eo);
   bool still_live();
   bool expired();
 
@@ -38,8 +36,8 @@ public:
 class CancelOrderReq{
 public:
   CancelOrderReq();
-  CancelOrderReq(CancelOrder* co);
-  void parse_cancel_order(CancelOrder* co);
+  CancelOrderReq(ouch::CancelOrder* co);
+  void parse_cancel_order(ouch::CancelOrder* co);
 
   Token token;
   uint32_t qty;
@@ -48,8 +46,8 @@ public:
 class ModifyOrderReq{
 public:
   ModifyOrderReq();
-  ModifyOrderReq(ModifyOrder* mo);
-  void parse_modify_order(ModifyOrder* mo);
+  ModifyOrderReq(ouch::ModifyOrder* mo);
+  void parse_modify_order(ouch::ModifyOrder* mo);
 
   Token token;
   uint32_t req_qty;
@@ -59,8 +57,8 @@ public:
 class ReplaceOrderReq{
 public:
   ReplaceOrderReq();
-  ReplaceOrderReq(ReplaceOrder* ro);
-  void parse_replace_order(ReplaceOrder* ro);
+  ReplaceOrderReq(ouch::ReplaceOrder* ro);
+  void parse_replace_order(ouch::ReplaceOrder* ro);
 
   Token existing_token;
   Token new_token;
@@ -71,6 +69,3 @@ public:
   char intermarket_sweep_eligibility;
   uint32_t min_qty;
 };
-
-}
-}

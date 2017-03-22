@@ -52,7 +52,7 @@ void SoupBinTCPServer::send(){
   if (!alive) return;
   boost::system::error_code ec;
   for (const auto & msg : market->pending_out_messages){
-    l.write("SEND: "+inbound_to_string(reinterpret_cast<const MsgHeader*>(&msg[0])));
+    l.write("SEND: "+inbound_to_string(reinterpret_cast<const ouch::MsgHeader*>(&msg[0])));
     asio::write(*_socket, asio::buffer(&msg[0], msg.size()), asio::transfer_all(), ec);
   }
   market->pending_out_messages.clear();
@@ -85,8 +85,8 @@ int SoupBinTCPServer::read(char* & outbuf){
     outbuf = nullptr;
     return 0;
   }
-  l.write("RECV: " + outbound_to_string(reinterpret_cast<const MsgHeader*>(read_pos)));
-  packet_len = big_to_native((reinterpret_cast<const MsgHeader*>(read_pos))->length) + 2;
+  l.write("RECV: " + outbound_to_string(reinterpret_cast<const ouch::MsgHeader*>(read_pos)));
+  packet_len = big_to_native((reinterpret_cast<const ouch::MsgHeader*>(read_pos))->length) + 2;
   outbuf = read_pos;
   return packet_len;
 }

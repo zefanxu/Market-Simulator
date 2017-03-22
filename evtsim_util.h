@@ -20,12 +20,12 @@
 
 using namespace std;
 using namespace evt;
-using namespace evt::ouch;
+
 using boost::endian::big_to_native;
 using boost::endian::native_to_big;
 
-const std::string inbound_to_string(const MsgHeader* m);
-const std::string outbound_to_string(const MsgHeader* m);
+const std::string inbound_to_string(const ouch::MsgHeader* m);
+const std::string outbound_to_string(const ouch::MsgHeader* m);
 
 class logger{
 public:
