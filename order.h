@@ -2,7 +2,7 @@
 #include <boost/enum.hpp>
 #include <time.h>
 #include <stdlib.h>
-#include "evtsim_messages.h"
+#include "ouch_messages.h"
 
 namespace evt{
 namespace ouch{
