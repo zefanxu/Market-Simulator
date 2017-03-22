@@ -248,8 +248,9 @@ uint64_t ouch_session::get_timestamp(){
 }
 
 bool ouch_session::exe_random_reject(){
-  double x = (double)(rand()%1000000)/(double)1000000;
-  return (x <= 0.999998);
+  // double x = (double)(rand()%1000000)/(double)1000000;
+  // return (x <= 0.999998);
+  return order_random_reject();
 }
 
 bool ouch_session::order_random_reject(){

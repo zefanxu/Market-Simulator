@@ -6,7 +6,7 @@
 #include <boost/asio.hpp>
 #include <iostream>
 #include <string>
-
+#include <unistd.h>
 #include <evt_server.h>
 #include <evt_util.h>
 #include "evtsim_util.h"
@@ -78,6 +78,7 @@ main(int argc, char** argv) {
     size_t len = s->read(buf);
     if (len)
       session.handle_packet(buf, len);
+    usleep(100000);
     session.market_logic();
     s->send(session.pending_out_messages);
   }
