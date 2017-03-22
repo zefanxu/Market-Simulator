@@ -70,17 +70,13 @@ main(int argc, char** argv) {
   }
   int port_num = vm["port"].as<int>();
 
-  ouch_session session;
   char * buf;
   TCPServer* s = new SoupBinTCPServer(port_num);
   s->accept();
   while (s->isAlive()){
     size_t len = s->read(buf);
-    if (len)
-      session.handle_packet(buf, len);
-    usleep(100000);
-    session.market_logic();
-    s->send(session.pending_out_messages);
+    s->process(buf, len);
+    s->send();
   }
   delete s;
   return 0;

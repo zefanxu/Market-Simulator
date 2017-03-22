@@ -22,9 +22,11 @@ public:
   void accept();
   bool isAlive();
   virtual int read(char* & buf)=0;
-  virtual void send(vector<message> & msgs)=0;
+  virtual void send()=0;
+  virtual void process(char * buf, size_t len)=0;
 
 protected:
+  session* market;
   bool alive;
   asio::io_service io_service;
   asio::ip::tcp::endpoint* _endpoint;
@@ -38,7 +40,8 @@ public:
   SoupBinTCPServer();
   SoupBinTCPServer(unsigned int port);
   virtual int read(char* & outbuf);
-  virtual void send(vector<message> & msgs);
+  virtual void send();
+  virtual void process(char * buf, size_t len);
 
 private:
   unsigned int packet_len, read_len;

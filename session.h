@@ -18,17 +18,25 @@ namespace ouch_state{
   constexpr char losing_heartbeat = '1';
 }
 
-class ouch_session{
+class session{
 public:
-  void init();
-  ouch_session();
-  ouch_session(double random_reject_rate);
-  void market_logic();
-  void handle_packet(char * packet, size_t len);
-
+  virtual void market_logic()=0;
+  virtual void handle_packet(char* packet, size_t len)=0;
   vector<vector<char>> pending_out_messages;
 
+protected:
+  char state;
+};
+
+class ouch_session : public session{
+public:
+  ouch_session();
+  ouch_session(double random_reject_rate);
+  virtual void market_logic();
+  virtual void handle_packet(char * packet, size_t len);
+
 private:
+  void init();
   void handle_login_request(MsgHeader * packet, size_t len);
   void handle_logout_request(MsgHeader * packet, size_t len);
   void handle_client_heartbeat(MsgHeader * packet, size_t len);
@@ -65,7 +73,6 @@ private:
   time_t last_send_heartbeat;
   time_t last_recv_heartbeat;
   chrono::system_clock::time_point start_of_day;
-  char state;
 };
 
 #endif
