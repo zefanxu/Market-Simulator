@@ -56,8 +56,8 @@ private:
   void replace_logic();
 
   void constructOrderAccpeted(const order & o);
-  void constructOrderRejected(char reason, Token t);
-  void constructOrderCanceled(uint32_t dec_qty, char reason, Token t);
+  void constructOrderRejected(char reason, ouch::Token t);
+  void constructOrderCanceled(uint32_t dec_qty, char reason, ouch::Token t);
   void constructOrderModified(uint32_t remaining_qty, const ModifyOrderReq & mo);
   void constructOrderExecuted(order & o);
   void constructOrderReplaced(const ReplaceOrderReq & ro, const order & new_order);

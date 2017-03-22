@@ -23,8 +23,8 @@ public:
   int32_t price;
   uint32_t min_qty;
   char symbol[8];
-  Token token;
-  OrderState state;
+  ouch::Token token;
+  ouch::OrderState state;
   char side;
   char cross_type;
   char intermarket_sweep_eligibility;
@@ -39,7 +39,7 @@ public:
   CancelOrderReq(ouch::CancelOrder* co);
   void parse_cancel_order(ouch::CancelOrder* co);
 
-  Token token;
+  ouch::Token token;
   uint32_t qty;
 };
 
@@ -49,7 +49,7 @@ public:
   ModifyOrderReq(ouch::ModifyOrder* mo);
   void parse_modify_order(ouch::ModifyOrder* mo);
 
-  Token token;
+  ouch::Token token;
   uint32_t req_qty;
   char new_side;
 };
@@ -60,8 +60,8 @@ public:
   ReplaceOrderReq(ouch::ReplaceOrder* ro);
   void parse_replace_order(ouch::ReplaceOrder* ro);
 
-  Token existing_token;
-  Token new_token;
+  ouch::Token existing_token;
+  ouch::Token new_token;
   uint32_t qty;
   uint32_t price;
   uint32_t time_in_force;

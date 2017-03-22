@@ -32,7 +32,8 @@ void logger::write(string text){
 logger::~logger(){
   file.close();
 }
-
+namespace evt{
+namespace ouch{
 int to_string(const LoginRequest& m, char* buf, size_t len) {
   return std::snprintf(buf, len, "LoginRequest(length=%hu,packet_type=%c,username=%s,password=%s,requested_session=%s,requested_seq_num=%s)",
                 big_to_native(m.length), m.packet_type,
@@ -372,3 +373,4 @@ outbound_to_string(const MsgHeader* hdr) {
   } // switch
   return std::string(buf, ret_len);
 }
+}}
