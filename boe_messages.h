@@ -9,7 +9,7 @@ namespace evt {
 namespace boe {
 
   struct Token {
-    std::string _str_(){
+    std::string _str_()const{
       return std::string(val, 20);
     }
     char val[20];

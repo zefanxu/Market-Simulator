@@ -29,7 +29,11 @@ namespace evt{
 namespace ouch{
 const std::string inbound_to_string(const MsgHeader* m);
 const std::string outbound_to_string(const MsgHeader* m);
-}}
+}
+namespace boe{
+const std::string to_string(const MsgHeader* msg);
+}
+}
 
 class logger{
 public:
