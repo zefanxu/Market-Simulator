@@ -67,7 +67,7 @@ namespace { // anonymous
   void to_string(const NewOrder& m, char* buf, size_t len) {
     std::snprintf(buf, len,
                   ",clordid=%s,side=%c,qty=%u,num_bitfields=%hhu,bitfield1=%hhu,bitfield2=%hhu,bitfield3=%hhu,bitfield4=%hhu,bitfield5=%hhu,bitfield6=%hhu,clearing_firm=%s,clearing_acct=%s,price=%lu,exec_inst=%c,order_type=%c,time_in_force=%c,min_qty=%u,max_floor=%u,symbol=%s,capacity=%c,routing_inst=%s,acct=%s,display_indicator=%c,max_remove_pct=%hhu,discretion_amt=%hu,peg_difference=%ld,attributed_quote=%c,ext_exec_inst=%c)",
-                  m.clordid.str().c_str(), m.side, m.qty, m.num_bitfields, m.bitfield[0],
+                  m.token._str_().c_str(), m.side, m.qty, m.num_bitfields, m.bitfield[0],
                   m.bitfield[1], m.bitfield[2], m.bitfield[3], m.bitfield[4], m.bitfield[5],
                   std::string(m.clearing_firm, sizeof(m.clearing_firm)).c_str(),
                   std::string(m.clearing_acct, sizeof(m.clearing_acct)).c_str(), m.price,
@@ -81,14 +81,14 @@ namespace { // anonymous
 
   void to_string(const CancelOrder& m, char* buf, size_t len) {
     std::snprintf(buf, len, ",orig_clordid=%s,num_bitfields=%hhu,bitfield1=%hhu,clearing_firm=%s)",
-                  m.orig_clordid.str().c_str(), m.num_bitfields, m.bitfield[0],
+                  m.orig_token._str_().c_str(), m.num_bitfields, m.bitfield[0],
                   std::string(m.clearing_firm, sizeof(m.clearing_firm)).c_str());
   }
 
   void to_string(const ModifyOrder& m, char* buf, size_t len) {
     std::snprintf(buf, len,
                   ",clordid=%s,orig_clordid=%s,num_bitfields=%hhu,bitfield1=%hhu,bitfield2=%hhu,clearing_firm=%s,qty=%u,price=%lu,order_type=%c,cancel_orig_on_reject=%c,exec_inst=%c,side=%c)",
-                  m.clordid.str().c_str(), m.orig_clordid.str().c_str(), m.num_bitfields,
+                  m.token._str_().c_str(), m.orig_token._str_().c_str(), m.num_bitfields,
                   m.bitfield[0], m.bitfield[1],
                   std::string(m.clearing_firm, sizeof(m.clearing_firm)).c_str(), m.qty, m.price,
                   m.order_type, m.cancel_orig_on_reject, (m.exec_inst == 0 ? '0' : m.exec_inst),
@@ -123,7 +123,7 @@ namespace { // anonymous
                   ",transaction_time=%s,clordid=%s,order_id=%lu,reserved=0x%02hhx,num_bitfields=%hhu,"
                   "bitfield1=%hhu,bitfield2=%hhu,bitfield3=%hhu,bitfield4=%hhu,bitfield5=%hhu,"
                   "leaves_qty=%u)",
-                  tt, m.clordid.str().c_str(), m.order_id, m.reserved, m.num_bitfields,
+                  tt, m.token._str_().c_str(), m.order_id, m.reserved, m.num_bitfields,
                   m.bitfield[0], m.bitfield[1], m.bitfield[2], m.bitfield[3], m.bitfield[4],
                   m.leaves_qty);
   }
@@ -135,7 +135,7 @@ namespace { // anonymous
                   ",transaction_time=%s,clordid=%s,order_id=%lu,reserved=0x%02hhx,num_bitfields=%hhu,"
                   "bitfield1=%hhu,bitfield2=%hhu,bitfield3=%hhu,bitfield4=%hhu,bitfield5=%hhu,"
                   "price=%lu,qty=%u,leaves_qty=%u)",
-                  tt, m.clordid.str().c_str(), m.order_id, m.reserved, m.num_bitfields,
+                  tt, m.token._str_().c_str(), m.order_id, m.reserved, m.num_bitfields,
                   m.bitfield[0], m.bitfield[1], m.bitfield[2], m.bitfield[3], m.bitfield[4],
                   m.price, m.qty, m.leaves_qty);
   }
@@ -147,7 +147,7 @@ namespace { // anonymous
                   ",transaction_time=%s,clordid=%s,reason=%c,reserved=0x%02hhx,num_bitfields=%hhu,"
                   "bitfield1=%hhu,bitfield2=%hhu,bitfield3=%hhu,bitfield4=%hhu,bitfield5=%hhu,"
                   "leaves_qty=%u)",
-                  tt, m.clordid.str().c_str(), m.reason, m.reserved, m.num_bitfields, m.bitfield[0],
+                  tt, m.token._str_().c_str(), m.reason, m.reserved, m.num_bitfields, m.bitfield[0],
                   m.bitfield[1], m.bitfield[2], m.bitfield[3], m.bitfield[4], m.leaves_qty);
   }
 
@@ -156,7 +156,7 @@ namespace { // anonymous
     evt::nsec_to_datetime(m.transaction_time, tt, sizeof(tt));
     std::snprintf(buf, len,
                   ",transaction_time=%s,clordid=%s,exec_id=%lu,last_shares=%u,last_price=%lu,leaves_qty=%u,base_liquidity_indicator=%c,sub_liquidity_indicator=%c,contra_broker=%s,reserved=0x%hhx,num_bitfields=%hhu)",
-                  tt, m.clordid.str().c_str(), m.exec_id, m.last_shares, m.last_price, m.leaves_qty,
+                  tt, m.token._str_().c_str(), m.exec_id, m.last_shares, m.last_price, m.leaves_qty,
                   (m.base_liquidity_indicator == '\0' ? '0' : m.base_liquidity_indicator),
                   (m.sub_liquidity_indicator == '\0' ? '0' : m.sub_liquidity_indicator),
                   std::string(m.contra_broker, sizeof(m.contra_broker)).c_str(), m.reserved,
@@ -168,7 +168,7 @@ namespace { // anonymous
     evt::nsec_to_datetime(m.transaction_time, tt, sizeof(tt));
     std::snprintf(buf, len,
                   ",transaction_time=%s,clordid=%s,reason=0x%02hhx,text=%s,reserved=0x%02hhx,num_bitfields=%hhu)",
-                  tt, m.clordid.str().c_str(), m.reason,
+                  tt, m.token._str_().c_str(), m.reason,
                   std::string(m.text, sizeof(m.text)).c_str(), m.reserved, m.num_bitfields);
   }
 
@@ -177,7 +177,7 @@ namespace { // anonymous
     evt::nsec_to_datetime(m.transaction_time, tt, sizeof(tt));
     std::snprintf(buf, len,
                   ",transaction_time=%s,clordid=%s,reason=0x%02hhx,text=%s,reserved=0x%02hhx,num_bitfields=%hhu)",
-                  tt, m.clordid.str().c_str(), m.reason,
+                  tt, m.token._str_().c_str(), m.reason,
                   std::string(m.text, sizeof(m.text)).c_str(), m.reserved, m.num_bitfields);
   }
 
@@ -186,7 +186,7 @@ namespace { // anonymous
     evt::nsec_to_datetime(m.transaction_time, tt, sizeof(tt));
     std::snprintf(buf, len,
                   ",transaction_time=%s,clordid=%s,reason=0x%02hhx,text=%s,reserved=0x%02hhx,num_bitfields=%hhu,...",
-                  tt, m.clordid.str().c_str(), m.reason,
+                  tt, m.token._str_().c_str(), m.reason,
                   std::string(m.text, sizeof(m.text)).c_str(), m.reserved, m.num_bitfields);
   }
 
@@ -197,7 +197,7 @@ namespace { // anonymous
                   ",transaction_time=%s,clordid=%s,reason=0x%02hhx,reserved=0x%02hhx,num_bitfields=%hhu,"
                   "bitfield1=%hhu,bitfield2=%hhu,bitfield3=%hhu,bitfield4=%hhu,bitfield5=%hhu,"
                   "qty=%u,leaves_qty=%u)",
-                  tt, m.clordid.str().c_str(), m.reason, m.reserved, m.num_bitfields,
+                  tt, m.token._str_().c_str(), m.reason, m.reserved, m.num_bitfields,
                   m.bitfield[0], m.bitfield[1], m.bitfield[2], m.bitfield[3], m.bitfield[4],
                   m.qty, m.leaves_qty);
   }
@@ -209,7 +209,7 @@ namespace { // anonymous
     evt::nsec_to_datetime(m.orig_time, ot, sizeof(ot));
     std::snprintf(buf, len,
                   ",transaction_time=%s,clordid=%s,order_id=%lu,exec_ref_id=%lu,side=%c,base_liquidity_indicator=%c,clearing_firm=%s,clearing_acct=%s,last_shares=%u,last_price=%lu,corrected_price=%lu,orig_time=%s,reserved=0x%02hhx,num_bitfields=%hhu,...",
-                  tt, m.clordid.str().c_str(), m.order_id, m.exec_ref_id, m.side,
+                  tt, m.token._str_().c_str(), m.order_id, m.exec_ref_id, m.side,
                   (m.base_liquidity_indicator == '\0' ? '0' : m.base_liquidity_indicator),
                   std::string(m.clearing_firm, sizeof(m.clearing_firm)).c_str(),
                   std::string(m.clearing_acct, sizeof(m.clearing_acct)).c_str(), m.last_shares,

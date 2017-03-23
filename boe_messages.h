@@ -157,7 +157,7 @@ namespace boe {
 
   struct CancelOrder {
     BOE_MSG_HEADER
-    Token orig_clordid;
+    Token orig_token;
     uint8_t num_bitfields;
     uint8_t bitfield[1];
     char clearing_firm[4];
@@ -167,7 +167,7 @@ namespace boe {
   struct ModifyOrder {
     BOE_MSG_HEADER
     Token token;
-    Token orig_clordid;
+    Token orig_token;
     uint8_t num_bitfields;
     uint8_t bitfield[2];
     char clearing_firm[4];
