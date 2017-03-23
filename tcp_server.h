@@ -23,7 +23,7 @@ public:
   bool isAlive();
   virtual int read(char* & buf)=0;
   virtual void send()=0;
-  virtual void process(char * buf, size_t len)=0;
+  virtual void process(char * buf, size_t len);
 
 protected:
   session* market;
@@ -41,10 +41,22 @@ public:
   SoupBinTCPServer(unsigned int port);
   virtual int read(char* & outbuf);
   virtual void send();
-  virtual void process(char * buf, size_t len);
 
 private:
   unsigned int packet_len, read_len;
   char * read_pos;
   boost::array<char, 4096> buf;
 };
+
+class BOEServer: public TCPServer{
+public:
+  BOEServer();
+  BOEServer(unsigned int port);
+  virtual int read(char* & outbuf);
+  virtual void send();
+
+private:
+  unsigned int packet_len, read_len;
+  char * read_pos;
+  boost::array<char, 4096> buf;
+}

@@ -29,6 +29,18 @@ protected:
   char state;
 };
 
+class boe_session : public session{
+public:
+  boe_session();
+  boe_session(double random_reject_rate);
+  virtual ~boe_session();
+  virtual void market_logic();
+  virtual void handle_packet(char * packet, size_t len);
+
+private:
+  double random_reject_rate;
+};
+
 class ouch_session : public session{
 public:
   ouch_session();

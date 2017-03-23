@@ -32,6 +32,284 @@ void logger::write(string text){
 logger::~logger(){
   file.close();
 }
+
+namespace evt {
+namespace boe {
+
+namespace { // anonymous
+
+  void to_string(const LoginRequest& m, char* buf, size_t len) {
+    std::snprintf(buf, len,
+                  ",session_sub_id=%s,username=%s,password=%s,number_of_param_groups=%hhu,"
+                  "order_ack.length=%hu,order_ack.type=0x%02hhx,order_ack.msg_type=0x%02hhx,order_ack.num_bitfields=%hhu,"
+                      "order_ack_bitfield1=%hhu,order_ack_bitfield2=%hhu,order_ack_bitfield3=%hhu,order_ack_bitfield4=%hhu,order_ack_bitfield5=%hhu,"
+                  "order_modified.length=%hu,order_modified.type=0x%02hhx,order_modified.msg_type=0x%02hhx,order_modified.num_bitfields=%hhu,"
+                      "order_modified_bitfield1=%hhu,order_modified_bitfield2=%hhu,order_modified_bitfield3=%hhu,order_modified_bitfield4=%hhu,order_modified_bitfield5=%hhu,"
+                  "order_restated.length=%hu,order_restated.type=0x%02hhx,order_restated.msg_type=0x%02hhx,order_restated.num_bitfields=%hhu,"
+                      "order_restated_bitfield1=%hhu,order_restated_bitfield2=%hhu,order_restated_bitfield3=%hhu,order_restated_bitfield4=%hhu,order_restated_bitfield5=%hhu,"
+                  "order_canceled.length=%hu,order_canceled.type=0x%02hhx,order_canceled.msg_type=0x%02hhx,order_canceled.num_bitfields=%hhu,"
+                      "order_canceled_bitfield1=%hhu,order_canceled_bitfield2=%hhu,order_canceled_bitfield3=%hhu,order_canceled_bitfield4=%hhu,order_canceled_bitfield5=%hhu)",
+                  // "cancel_rejected.length=%hu,cancel_rejected.type=0x%02hhx,cancel_rejected.msg_type=0x%02hhx,cancel_rejected.num_bitfields=%hhu,\n"
+                  //     "cancel_rejected_bitfield1=%hhu,cancel_rejected_bitfield2=%hhu,\n"
+                  // "order_execution.length=%hu,order_execution.type=0x%02hhx,order_execution.msg_type=0x%02hhx,order_execution.num_bitfields=%hhu,\n"
+                  //     "order_execution_bitfield1=%hhu,order_execution_bitfield2=%hhu,order_execution_bitfield3=%hhu)",
+                  std::string(m.session_sub_id, sizeof(m.session_sub_id)).c_str(),
+                  std::string(m.username, sizeof(m.username)).c_str(),
+                  std::string(m.password, sizeof(m.password)).c_str(), m.number_of_param_groups,
+                  m.order_ack.length, m.order_ack.type, m.order_ack.msg_type, m.order_ack.num_bitfields, m.order_ack_bitfield[0], m.order_ack_bitfield[1], m.order_ack_bitfield[2], m.order_ack_bitfield[3], m.order_ack_bitfield[4],
+                  m.order_modified.length, m.order_modified.type, m.order_modified.msg_type, m.order_modified.num_bitfields, m.order_modified_bitfield[0], m.order_modified_bitfield[1], m.order_modified_bitfield[2], m.order_modified_bitfield[3], m.order_modified_bitfield[4],
+                  m.order_restated.length, m.order_restated.type, m.order_restated.msg_type, m.order_restated.num_bitfields, m.order_restated_bitfield[0], m.order_restated_bitfield[1], m.order_restated_bitfield[2], m.order_restated_bitfield[3], m.order_restated_bitfield[4],
+                  m.order_canceled.length, m.order_canceled.type, m.order_canceled.msg_type, m.order_canceled.num_bitfields, m.order_canceled_bitfield[0], m.order_canceled_bitfield[1], m.order_canceled_bitfield[2], m.order_canceled_bitfield[3], m.order_canceled_bitfield[4]);
+                  // m.cancel_rejected.length, m.cancel_rejected.type, m.cancel_rejected.msg_type, m.cancel_rejected.num_bitfields, m.cancel_rejected_bitfield[0], m.cancel_rejected_bitfield[1],
+                  // m.order_execution.length, m.order_execution.type, m.order_execution.msg_type, m.order_execution.num_bitfields, m.order_execution_bitfield[0], m.order_execution_bitfield[1], m.order_execution_bitfield[2]);
+  }
+
+  void to_string(const NewOrder& m, char* buf, size_t len) {
+    std::snprintf(buf, len,
+                  ",clordid=%s,side=%c,qty=%u,num_bitfields=%hhu,bitfield1=%hhu,bitfield2=%hhu,bitfield3=%hhu,bitfield4=%hhu,bitfield5=%hhu,bitfield6=%hhu,clearing_firm=%s,clearing_acct=%s,price=%lu,exec_inst=%c,order_type=%c,time_in_force=%c,min_qty=%u,max_floor=%u,symbol=%s,capacity=%c,routing_inst=%s,acct=%s,display_indicator=%c,max_remove_pct=%hhu,discretion_amt=%hu,peg_difference=%ld,attributed_quote=%c,ext_exec_inst=%c)",
+                  m.clordid.str().c_str(), m.side, m.qty, m.num_bitfields, m.bitfield[0],
+                  m.bitfield[1], m.bitfield[2], m.bitfield[3], m.bitfield[4], m.bitfield[5],
+                  std::string(m.clearing_firm, sizeof(m.clearing_firm)).c_str(),
+                  std::string(m.clearing_acct, sizeof(m.clearing_acct)).c_str(), m.price,
+                  (m.exec_inst == 0 ? '0' : m.exec_inst), m.order_type, m.time_in_force, m.min_qty,
+                  m.max_floor, std::string(m.symbol, sizeof(m.symbol)).c_str(), m.capacity,
+                  std::string(m.routing_inst, sizeof(m.routing_inst)).c_str(),
+                  std::string(m.acct, sizeof(m.acct)).c_str(), m.display_indicator,
+                  m.max_remove_pct, m.discretion_amt, m.peg_difference, m.attributed_quote,
+                  (m.ext_exec_inst == 0 ? '0' : m.ext_exec_inst));
+  }
+
+  void to_string(const CancelOrder& m, char* buf, size_t len) {
+    std::snprintf(buf, len, ",orig_clordid=%s,num_bitfields=%hhu,bitfield1=%hhu,clearing_firm=%s)",
+                  m.orig_clordid.str().c_str(), m.num_bitfields, m.bitfield[0],
+                  std::string(m.clearing_firm, sizeof(m.clearing_firm)).c_str());
+  }
+
+  void to_string(const ModifyOrder& m, char* buf, size_t len) {
+    std::snprintf(buf, len,
+                  ",clordid=%s,orig_clordid=%s,num_bitfields=%hhu,bitfield1=%hhu,bitfield2=%hhu,clearing_firm=%s,qty=%u,price=%lu,order_type=%c,cancel_orig_on_reject=%c,exec_inst=%c,side=%c)",
+                  m.clordid.str().c_str(), m.orig_clordid.str().c_str(), m.num_bitfields,
+                  m.bitfield[0], m.bitfield[1],
+                  std::string(m.clearing_firm, sizeof(m.clearing_firm)).c_str(), m.qty, m.price,
+                  m.order_type, m.cancel_orig_on_reject, (m.exec_inst == 0 ? '0' : m.exec_inst),
+                  m.side);
+  }
+
+  void to_string(const LoginResponse& m, char* buf, size_t len) {
+    int written = std::snprintf(buf, len,
+                                ",status=%hhu,text=%s,no_unspecified_unit_replay=%hhu,last_received_seq_num=%u,number_of_units=%hhu,",
+                                m.status, std::string(m.text, sizeof(m.text)).c_str(),
+                                m.no_unspecified_unit_replay, m.last_received_seq_num,
+                                m.number_of_units);
+    for(int i = 0; i < static_cast<int>(m.number_of_units); ++i) {
+      int n = std::snprintf(buf + written, len - written, "matching_unit=%hhu,seq_num=%u,",
+                            m.unit[i].number, m.unit[i].seq_num);
+      written += n;
+    }
+    buf[written-1] = ')';
+    buf[written] = '\0';
+  }
+
+  void to_string(const LogoutResponse& m, char* buf, size_t len) {
+    std::snprintf(buf, len, ",reason=%c,text=%s,last_received_seq_num=%u,number_of_units=%hhu,...",
+                  m.reason, std::string(m.text, sizeof(m.text)).c_str(), m.last_received_seq_num,
+                  m.number_of_units);
+  }
+
+  void to_string(const OrderAck& m, char* buf, size_t len) {
+    char tt[32];
+    evt::nsec_to_datetime(m.transaction_time, tt, sizeof(tt));
+    std::snprintf(buf, len,
+                  ",transaction_time=%s,clordid=%s,order_id=%lu,reserved=0x%02hhx,num_bitfields=%hhu,"
+                  "bitfield1=%hhu,bitfield2=%hhu,bitfield3=%hhu,bitfield4=%hhu,bitfield5=%hhu,"
+                  "leaves_qty=%u)",
+                  tt, m.clordid.str().c_str(), m.order_id, m.reserved, m.num_bitfields,
+                  m.bitfield[0], m.bitfield[1], m.bitfield[2], m.bitfield[3], m.bitfield[4],
+                  m.leaves_qty);
+  }
+
+  void to_string(const OrderModified& m, char* buf, size_t len) {
+    char tt[32];
+    evt::nsec_to_datetime(m.transaction_time, tt, sizeof(tt));
+    std::snprintf(buf, len,
+                  ",transaction_time=%s,clordid=%s,order_id=%lu,reserved=0x%02hhx,num_bitfields=%hhu,"
+                  "bitfield1=%hhu,bitfield2=%hhu,bitfield3=%hhu,bitfield4=%hhu,bitfield5=%hhu,"
+                  "price=%lu,qty=%u,leaves_qty=%u)",
+                  tt, m.clordid.str().c_str(), m.order_id, m.reserved, m.num_bitfields,
+                  m.bitfield[0], m.bitfield[1], m.bitfield[2], m.bitfield[3], m.bitfield[4],
+                  m.price, m.qty, m.leaves_qty);
+  }
+
+  void to_string(const OrderCanceled& m, char* buf, size_t len) {
+    char tt[32];
+    evt::nsec_to_datetime(m.transaction_time, tt, sizeof(tt));
+    std::snprintf(buf, len,
+                  ",transaction_time=%s,clordid=%s,reason=%c,reserved=0x%02hhx,num_bitfields=%hhu,"
+                  "bitfield1=%hhu,bitfield2=%hhu,bitfield3=%hhu,bitfield4=%hhu,bitfield5=%hhu,"
+                  "leaves_qty=%u)",
+                  tt, m.clordid.str().c_str(), m.reason, m.reserved, m.num_bitfields, m.bitfield[0],
+                  m.bitfield[1], m.bitfield[2], m.bitfield[3], m.bitfield[4], m.leaves_qty);
+  }
+
+  void to_string(const OrderExecution& m, char* buf, size_t len) {
+    char tt[32];
+    evt::nsec_to_datetime(m.transaction_time, tt, sizeof(tt));
+    std::snprintf(buf, len,
+                  ",transaction_time=%s,clordid=%s,exec_id=%lu,last_shares=%u,last_price=%lu,leaves_qty=%u,base_liquidity_indicator=%c,sub_liquidity_indicator=%c,contra_broker=%s,reserved=0x%hhx,num_bitfields=%hhu)",
+                  tt, m.clordid.str().c_str(), m.exec_id, m.last_shares, m.last_price, m.leaves_qty,
+                  (m.base_liquidity_indicator == '\0' ? '0' : m.base_liquidity_indicator),
+                  (m.sub_liquidity_indicator == '\0' ? '0' : m.sub_liquidity_indicator),
+                  std::string(m.contra_broker, sizeof(m.contra_broker)).c_str(), m.reserved,
+                  m.num_bitfields);
+  }
+
+  void to_string(const OrderRejected& m, char* buf, size_t len) {
+    char tt[32];
+    evt::nsec_to_datetime(m.transaction_time, tt, sizeof(tt));
+    std::snprintf(buf, len,
+                  ",transaction_time=%s,clordid=%s,reason=0x%02hhx,text=%s,reserved=0x%02hhx,num_bitfields=%hhu)",
+                  tt, m.clordid.str().c_str(), m.reason,
+                  std::string(m.text, sizeof(m.text)).c_str(), m.reserved, m.num_bitfields);
+  }
+
+  void to_string(const CancelRejected& m, char* buf, size_t len) {
+    char tt[32];
+    evt::nsec_to_datetime(m.transaction_time, tt, sizeof(tt));
+    std::snprintf(buf, len,
+                  ",transaction_time=%s,clordid=%s,reason=0x%02hhx,text=%s,reserved=0x%02hhx,num_bitfields=%hhu)",
+                  tt, m.clordid.str().c_str(), m.reason,
+                  std::string(m.text, sizeof(m.text)).c_str(), m.reserved, m.num_bitfields);
+  }
+
+  void to_string(const ModifyRejected& m, char* buf, size_t len) {
+    char tt[32];
+    evt::nsec_to_datetime(m.transaction_time, tt, sizeof(tt));
+    std::snprintf(buf, len,
+                  ",transaction_time=%s,clordid=%s,reason=0x%02hhx,text=%s,reserved=0x%02hhx,num_bitfields=%hhu,...",
+                  tt, m.clordid.str().c_str(), m.reason,
+                  std::string(m.text, sizeof(m.text)).c_str(), m.reserved, m.num_bitfields);
+  }
+
+  void to_string(const OrderRestated& m, char* buf, size_t len) {
+    char tt[32];
+    evt::nsec_to_datetime(m.transaction_time, tt, sizeof(tt));
+    std::snprintf(buf, len,
+                  ",transaction_time=%s,clordid=%s,reason=0x%02hhx,reserved=0x%02hhx,num_bitfields=%hhu,"
+                  "bitfield1=%hhu,bitfield2=%hhu,bitfield3=%hhu,bitfield4=%hhu,bitfield5=%hhu,"
+                  "qty=%u,leaves_qty=%u)",
+                  tt, m.clordid.str().c_str(), m.reason, m.reserved, m.num_bitfields,
+                  m.bitfield[0], m.bitfield[1], m.bitfield[2], m.bitfield[3], m.bitfield[4],
+                  m.qty, m.leaves_qty);
+  }
+
+  void to_string(const TradeCancelOrCorrect& m, char* buf, size_t len) {
+    char tt[32];
+    char ot[32];
+    evt::nsec_to_datetime(m.transaction_time, tt, sizeof(tt));
+    evt::nsec_to_datetime(m.orig_time, ot, sizeof(ot));
+    std::snprintf(buf, len,
+                  ",transaction_time=%s,clordid=%s,order_id=%lu,exec_ref_id=%lu,side=%c,base_liquidity_indicator=%c,clearing_firm=%s,clearing_acct=%s,last_shares=%u,last_price=%lu,corrected_price=%lu,orig_time=%s,reserved=0x%02hhx,num_bitfields=%hhu,...",
+                  tt, m.clordid.str().c_str(), m.order_id, m.exec_ref_id, m.side,
+                  (m.base_liquidity_indicator == '\0' ? '0' : m.base_liquidity_indicator),
+                  std::string(m.clearing_firm, sizeof(m.clearing_firm)).c_str(),
+                  std::string(m.clearing_acct, sizeof(m.clearing_acct)).c_str(), m.last_shares,
+                  m.last_price, m.corrected_price, ot, m.reserved, m.num_bitfields);
+  }
+
+} // anonymous
+
+
+
+  const std::string
+  to_string(const MsgHeader* msg) {
+    std::string result;
+    char buf[4096];
+    int written = std::snprintf(buf, sizeof(buf),
+                                "%s(length=%hu,type=0x%02hhx,matching_unit=%hhu,seq_num=%u",
+                                to_string(static_cast<MsgType>(msg->type)), msg->length, msg->type,
+                                msg->matching_unit, msg->seq_num);
+    result.reserve(sizeof(buf));
+
+    const size_t bytes_left = sizeof(buf) - written;
+
+    switch(static_cast<MsgType>(msg->type)) {
+    // Member to BOE
+    case MsgType::LoginRequest:
+      to_string((const LoginRequest&)*msg, buf + written, bytes_left);
+      break;
+
+    case MsgType::NewOrder:
+      to_string((const NewOrder&)*msg, buf + written, bytes_left);
+      break;
+
+    case MsgType::CancelOrder:
+      to_string((const CancelOrder&)*msg, buf + written, bytes_left);
+      break;
+
+    case MsgType::ModifyOrder:
+      to_string((const ModifyOrder&)*msg, buf + written, bytes_left);
+      break;
+
+    case MsgType::LoginResponse:
+      to_string((const LoginResponse&)*msg, buf + written, bytes_left);
+      break;
+
+    case MsgType::LogoutResponse:
+      to_string((const LogoutResponse&)*msg, buf + written, bytes_left);
+      break;
+
+    case MsgType::OrderAck:
+      to_string((const OrderAck&)*msg, buf + written, bytes_left);
+      break;
+
+    case MsgType::OrderModified:
+      to_string((const OrderModified&)*msg, buf + written, bytes_left);
+      break;
+
+    case MsgType::OrderCanceled:
+      to_string((const OrderCanceled&)*msg, buf + written, bytes_left);
+      break;
+
+    case MsgType::OrderExecution:
+      to_string((const OrderExecution&)*msg, buf + written, bytes_left);
+      break;
+
+    case MsgType::OrderRejected:
+      to_string((const OrderRejected&)*msg, buf + written, bytes_left);
+      break;
+
+    case MsgType::CancelRejected:
+      to_string((const CancelRejected&)*msg, buf + written, bytes_left);
+      break;
+
+    case MsgType::ModifyRejected:
+      to_string((const ModifyRejected&)*msg, buf + written, bytes_left);
+      break;
+
+    case MsgType::OrderRestated:
+      to_string((const OrderRestated&)*msg, buf + written, bytes_left);
+      break;
+
+    case MsgType::TradeCancelOrCorrect:
+      to_string((const TradeCancelOrCorrect&)*msg, buf + written, bytes_left);
+      break;
+
+    case MsgType::ClientHeartbeat:
+    case MsgType::LogoutRequest:
+    case MsgType::ReplayComplete:
+    case MsgType::ServerHeartbeat:
+    default:
+      buf[written] = ')';
+      buf[written + 1] = '\0';
+      break;
+    }
+    return result.assign(buf, sizeof(buf));
+  }
+
+} // boe
+} // evt
+
+
 namespace evt{
 namespace ouch{
 int to_string(const LoginRequest& m, char* buf, size_t len) {
