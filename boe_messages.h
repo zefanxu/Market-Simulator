@@ -1,7 +1,7 @@
 #pragma once
 
-#include "enums.h"
 #include <cstdint>
+#include <string>
 
 // All data is put on the wire in little-endian byte order.
 
@@ -9,21 +9,21 @@ namespace evt {
 namespace boe {
 
   struct Token {
-    string _str_(){
-      return string(val, 20);
+    std::string _str_(){
+      return std::string(val, 20);
     }
     char val[20];
   } __attribute__((packed));
 
-  #define MSG_HEADER\
-  char start_of_msg = {0xBA, 0xBA};\
+  #define BOE_MSG_HEADER\
+  unsigned char start_of_msg[2] = {0xBA, 0xBA};\
   uint16_t length;\
   uint8_t type;\
   uint8_t matching_unit;\
   uint32_t seq_num;
 
   struct MsgHeader {
-    MSG_HEADER
+    BOE_MSG_HEADER
   } __attribute__((packed));
 
 
@@ -47,7 +47,7 @@ namespace boe {
   /**********************************************************************/
 
   struct LoginRequest {
-    MSG_HEADER
+    BOE_MSG_HEADER
     char session_sub_id[4];
     char username[4];
     char password[10];
@@ -74,12 +74,12 @@ namespace boe {
   // in the header but one type in the cpp, but I didn't spend too much
   // time trying to figure it out.
   struct LogoutRequest {
-    MSG_HEADER
+    BOE_MSG_HEADER
   } __attribute__((packed));
 
 
   struct ClientHeartbeat {
-    MSG_HEADER
+    BOE_MSG_HEADER
   } __attribute__((packed));
 
 
@@ -92,7 +92,7 @@ namespace boe {
 
 
   struct LoginResponse {
-    MSG_HEADER
+    BOE_MSG_HEADER
     uint8_t status;
     char text[60];
     uint8_t no_unspecified_unit_replay;
@@ -103,7 +103,7 @@ namespace boe {
 
 
   struct LogoutResponse {
-    MSG_HEADER
+    BOE_MSG_HEADER
     char reason;
     char text[60];
     uint32_t last_received_seq_num;
@@ -115,12 +115,12 @@ namespace boe {
   // NOTE: See note above regarding typedefs for LogoutRequest and
   // ClientHeartbeat.
   struct ServerHeartbeat {
-    MSG_HEADER
+    BOE_MSG_HEADER
   } __attribute__((packed));
 
 
   struct ReplayComplete{
-    MSG_HEADER
+    BOE_MSG_HEADER
   } __attribute__((packed));
 
 
@@ -128,7 +128,7 @@ namespace boe {
   /**********************************************************************/
 
   struct NewOrder {
-    MSG_HEADER
+    BOE_MSG_HEADER
     Token token;
     char side;
     uint32_t qty;
@@ -156,7 +156,7 @@ namespace boe {
 
 
   struct CancelOrder {
-    MSG_HEADER
+    BOE_MSG_HEADER
     Token orig_clordid;
     uint8_t num_bitfields;
     uint8_t bitfield[1];
@@ -165,7 +165,7 @@ namespace boe {
 
 
   struct ModifyOrder {
-    MSG_HEADER
+    BOE_MSG_HEADER
     Token token;
     Token orig_clordid;
     uint8_t num_bitfields;
@@ -184,7 +184,7 @@ namespace boe {
   /**********************************************************************/
 
   struct OrderAck {
-    MSG_HEADER
+    BOE_MSG_HEADER
     uint64_t transaction_time;
     Token token;
     uint64_t order_id;
@@ -196,7 +196,7 @@ namespace boe {
 
 
   struct OrderRejected {
-    MSG_HEADER
+    BOE_MSG_HEADER
     uint64_t transaction_time;
     Token token;
     uint8_t reason;
@@ -207,7 +207,7 @@ namespace boe {
 
 
   struct OrderModified {
-    MSG_HEADER
+    BOE_MSG_HEADER
     uint64_t transaction_time;
     Token token;
     uint64_t order_id;
@@ -221,7 +221,7 @@ namespace boe {
 
 
   struct OrderRestated {
-    MSG_HEADER
+    BOE_MSG_HEADER
     uint64_t transaction_time;
     Token token;
     uint64_t order_id;
@@ -235,7 +235,7 @@ namespace boe {
 
 
   struct ModifyRejected {
-    MSG_HEADER
+    BOE_MSG_HEADER
     uint64_t transaction_time;
     Token token;
     uint8_t reason;
@@ -246,7 +246,7 @@ namespace boe {
 
 
   struct OrderCanceled {
-    MSG_HEADER
+    BOE_MSG_HEADER
     uint64_t transaction_time;
     Token token;
     char reason;
@@ -258,7 +258,7 @@ namespace boe {
 
 
   struct CancelRejected {
-    MSG_HEADER
+    BOE_MSG_HEADER
     uint64_t transaction_time;
     Token token;
     uint8_t reason;
@@ -269,7 +269,7 @@ namespace boe {
 
 
   struct OrderExecution {
-    MSG_HEADER
+    BOE_MSG_HEADER
     uint64_t transaction_time;
     Token token;
     uint64_t exec_id;
@@ -285,7 +285,7 @@ namespace boe {
 
 
   struct TradeCancelOrCorrect {
-    MSG_HEADER
+    BOE_MSG_HEADER
     uint64_t transaction_time;
     Token token;
     uint64_t order_id;

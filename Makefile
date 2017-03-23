@@ -41,7 +41,7 @@ all: $(TARGETS)
 dep: $(DEPENDS)
 
 clean:
-	rm -f $(TARGETS) $(OBJECTS) $(DEPENDS) regtest.o
+	rm -f log_* core.* $(TARGETS) $(OBJECTS) $(DEPENDS) regtest.o
 
 %.o: %.cpp
 	$(CXX) -c -fPIC $(CXXFLAGS) $< -o $@

@@ -17,6 +17,7 @@
 
 #include <evt_util.h>
 #include "ouch_messages.h"
+#include "boe_messages.h"
 
 using namespace std;
 using namespace evt;

@@ -59,4 +59,4 @@ private:
   unsigned int packet_len, read_len;
   char * read_pos;
   boost::array<char, 4096> buf;
-}
+};
