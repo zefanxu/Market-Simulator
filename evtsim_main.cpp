@@ -70,14 +70,25 @@ main(int argc, char** argv) {
   }
   int port_num = vm["port"].as<int>();
 
-  char * buf;
-  TCPServer* s = new SoupBinTCPServer(port_num);
-  s->accept();
-  while (s->isAlive()){
-    size_t len = s->read(buf);
-    s->process(buf, len);
-    s->send();
+  char * buf; bool any_alive = false;
+
+  vector<unique_ptr<TCPServer>> servers;
+  servers.push_back(unique_ptr<TCPServer>(new SoupBinTCPServer(port_num)));
+  servers.push_back(unique_ptr<TCPServer>(new BOEServer(port_num+1)));
+
+  for (const auto & s : servers){
+    s->accept();
+    if (s->isAlive()) any_alive = true;
   }
-  delete s;
+  while (any_alive){
+    any_alive = false;
+    for (const auto & s : servers){
+      if (!s->isAlive()) continue;
+      any_alive = true;
+      size_t len = s->read(buf);
+      s->process(buf, len);
+      s->send();
+    }
+  }
   return 0;
 }
