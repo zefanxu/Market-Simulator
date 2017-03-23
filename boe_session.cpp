@@ -15,8 +15,8 @@ boe_session::boe_session(double random_reject_rate){
 void boe_session::handle_packet(char * packet, size_t len){
   MsgHeader * hdr = reinterpret_cast<MsgHeader*>(packet);
   switch (hdr->type) {
-    case MsgType::LoginRequest:
-      handle_login_request(hdr);
+    case static_cast<char>(MsgType::LoginRequest):
+      handle_login_request(hdr, len);
   }
 
 }
