@@ -15,6 +15,31 @@ namespace boe {
     char val[20];
   } __attribute__((packed));
 
+    enum class MsgType : uint8_t {
+      // Member to boe
+      CancelOrder = 0x39,
+      ClientHeartbeat = 0x03,
+      LoginRequest = 0x37,
+      LogoutRequest = 0x02,
+      ModifyOrder = 0x3a,
+      NewOrder = 0x38,
+
+      // boe to member
+      CancelRejected = 0x2b,
+      LoginResponse = 0x24,
+      LogoutResponse = 0x08,
+      ModifyRejected = 0x29,
+      OrderAck = 0x25,
+      OrderCanceled = 0x2a,
+      OrderExecution = 0x2c,
+      OrderModified = 0x27,
+      OrderRejected = 0x26,
+      OrderRestated = 0x28,
+      ReplayComplete = 0x13,
+      ServerHeartbeat = 0x09,
+      TradeCancelOrCorrect = 0x2d,
+    };
+
   #define BOE_MSG_HEADER\
   unsigned char start_of_msg[2] = {0xBA, 0xBA};\
   uint16_t length;\
@@ -47,6 +72,8 @@ namespace boe {
   /**********************************************************************/
 
   struct LoginRequest {
+    LoginRequest(): length(sizeof(LoginRequest)-2), type(MsgType::LoginRequest),
+        matching_unit(0), seq_num(0){}
     BOE_MSG_HEADER
     char session_sub_id[4];
     char username[4];
@@ -74,11 +101,15 @@ namespace boe {
   // in the header but one type in the cpp, but I didn't spend too much
   // time trying to figure it out.
   struct LogoutRequest {
+    LogoutRequest(): length(sizeof(LogoutRequest)-2), type(MsgType::LogoutRequest),
+        matching_unit(0), seq_num(0){}
     BOE_MSG_HEADER
   } __attribute__((packed));
 
 
   struct ClientHeartbeat {
+    ClientHeartbeat(): length(sizeof(ClientHeartbeat)-2), type(MsgType::ClientHeartbeat),
+        matching_unit(0), seq_num(0){}
     BOE_MSG_HEADER
   } __attribute__((packed));
 
@@ -92,6 +123,8 @@ namespace boe {
 
 
   struct LoginResponse {
+    LoginResponse(): length(sizeof(LoginResponse)-2), type(MsgType::LoginResponse),
+        matching_unit(0), seq_num(0){}
     BOE_MSG_HEADER
     uint8_t status;
     char text[60];
@@ -103,6 +136,8 @@ namespace boe {
 
 
   struct LogoutResponse {
+    LogoutResponse(): length(sizeof(LogoutResponse)-2), type(MsgType::LogoutResponse),
+        matching_unit(0), seq_num(0){}
     BOE_MSG_HEADER
     char reason;
     char text[60];
@@ -115,11 +150,15 @@ namespace boe {
   // NOTE: See note above regarding typedefs for LogoutRequest and
   // ClientHeartbeat.
   struct ServerHeartbeat {
+    ServerHeartbeat(): length(sizeof(ServerHeartbeat)-2), type(MsgType::ServerHeartbeat),
+        matching_unit(0), seq_num(0){}
     BOE_MSG_HEADER
   } __attribute__((packed));
 
 
   struct ReplayComplete{
+    ReplayComplete(): length(sizeof(ReplayComplete)-2), type(MsgType::ReplayComplete),
+        matching_unit(0), seq_num(0){}
     BOE_MSG_HEADER
   } __attribute__((packed));
 
@@ -333,30 +372,6 @@ enum class LoginResponseStatus : char {
   }
 
 
-  enum class MsgType : uint8_t {
-    // Member to boe
-    CancelOrder = 0x39,
-    ClientHeartbeat = 0x03,
-    LoginRequest = 0x37,
-    LogoutRequest = 0x02,
-    ModifyOrder = 0x3a,
-    NewOrder = 0x38,
-
-    // boe to member
-    CancelRejected = 0x2b,
-    LoginResponse = 0x24,
-    LogoutResponse = 0x08,
-    ModifyRejected = 0x29,
-    OrderAck = 0x25,
-    OrderCanceled = 0x2a,
-    OrderExecution = 0x2c,
-    OrderModified = 0x27,
-    OrderRejected = 0x26,
-    OrderRestated = 0x28,
-    ReplayComplete = 0x13,
-    ServerHeartbeat = 0x09,
-    TradeCancelOrCorrect = 0x2d,
-  };
 
   inline const char*
   to_string(MsgType e) {

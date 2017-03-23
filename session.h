@@ -9,6 +9,7 @@
 #include <chrono>
 #include "evtsim_util.h"
 #include "ouch_messages.h"
+#include "boe_messages.h"
 #include "order.h"
 
 using namespace evt;
@@ -38,6 +39,8 @@ public:
   virtual void handle_packet(char * packet, size_t len);
 
 private:
+  handle_login_request(boe::MsgHeader* hdr, size_t len);
+  
   double random_reject_rate;
 };
 
