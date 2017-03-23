@@ -72,7 +72,7 @@ namespace boe {
   /**********************************************************************/
 
   struct LoginRequest {
-    LoginRequest(): length(sizeof(LoginRequest)-2), type(static_cast<char>MsgType::LoginRequest),
+    LoginRequest(): length(sizeof(LoginRequest)-2), type(static_cast<char>(MsgType::LoginRequest)),
         matching_unit(0), seq_num(0){}
     BOE_MSG_HEADER
     char session_sub_id[4];
@@ -101,14 +101,14 @@ namespace boe {
   // in the header but one type in the cpp, but I didn't spend too much
   // time trying to figure it out.
   struct LogoutRequest {
-    LogoutRequest(): length(sizeof(LogoutRequest)-2), type(static_cast<char>MsgType::LogoutRequest),
+    LogoutRequest(): length(sizeof(LogoutRequest)-2), type(static_cast<char>(MsgType::LogoutRequest)),
         matching_unit(0), seq_num(0){}
     BOE_MSG_HEADER
   } __attribute__((packed));
 
 
   struct ClientHeartbeat {
-    ClientHeartbeat(): length(sizeof(ClientHeartbeat)-2), type(static_cast<char>MsgType::ClientHeartbeat),
+    ClientHeartbeat(): length(sizeof(ClientHeartbeat)-2), type(static_cast<char>(MsgType::ClientHeartbeat)),
         matching_unit(0), seq_num(0){}
     BOE_MSG_HEADER
   } __attribute__((packed));
@@ -123,7 +123,7 @@ namespace boe {
 
 
   struct LoginResponse {
-    LoginResponse(): length(sizeof(LoginResponse)-2), type(static_cast<char>MsgType::LoginResponse),
+    LoginResponse(): length(sizeof(LoginResponse)-2), type(static_cast<char>(MsgType::LoginResponse)),
         matching_unit(0), seq_num(0){}
     BOE_MSG_HEADER
     uint8_t status;
@@ -136,7 +136,7 @@ namespace boe {
 
 
   struct LogoutResponse {
-    LogoutResponse(): length(sizeof(LogoutResponse)-2), type(static_cast<char>MsgType::LogoutResponse),
+    LogoutResponse(): length(sizeof(LogoutResponse)-2), type(static_cast<char>(MsgType::LogoutResponse)),
         matching_unit(0), seq_num(0){}
     BOE_MSG_HEADER
     char reason;
@@ -150,14 +150,14 @@ namespace boe {
   // NOTE: See note above regarding typedefs for LogoutRequest and
   // ClientHeartbeat.
   struct ServerHeartbeat {
-    ServerHeartbeat(): length(sizeof(ServerHeartbeat)-2), type(static_cast<char>MsgType::ServerHeartbeat),
+    ServerHeartbeat(): length(sizeof(ServerHeartbeat)-2), type(static_cast<char>(MsgType::ServerHeartbeat)),
         matching_unit(0), seq_num(0){}
     BOE_MSG_HEADER
   } __attribute__((packed));
 
 
   struct ReplayComplete{
-    ReplayComplete(): length(sizeof(ReplayComplete)-2), type(static_cast<char>MsgType::ReplayComplete),
+    ReplayComplete(): length(sizeof(ReplayComplete)-2), type(static_cast<char>(MsgType::ReplayComplete)),
         matching_unit(0), seq_num(0){}
     BOE_MSG_HEADER
   } __attribute__((packed));
