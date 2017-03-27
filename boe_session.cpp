@@ -31,10 +31,10 @@ void boe_session::constructLoginResponse(LoginResponseStatus status, LoginReques
   LoginResponse lr;
   lr.status = static_cast<uint8_t>(status);
   memset(lr.text, 0, sizeof(lr.text));
-  lr.last_recv_heartbeat = 0;
-  lr.no_unspecified_unit_replay = req.replay.no_unspecified_unit_replay;
+  lr.last_received_seq_num = 0;
+  lr.no_unspecified_unit_replay = req->replay.no_unspecified_unit_replay;
   lr.number_of_units = 0;
-  auto packet = vector<char>(reinterpret_cast<const char*>(&lr), sizeof(lr));
+  auto packet = vector<char>(reinterpret_cast<const char*>(&lr), reinterpret_cast<const char*>(&lr)+sizeof(lr));
   pending_out_messages.push_back(packet);
 }
 
