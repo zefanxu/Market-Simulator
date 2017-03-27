@@ -2,8 +2,8 @@
 using namespace evt::ouch;
 //SoupBinTCP functions
 void ouch_session::handle_login_request(MsgHeader * packet, size_t len){
-  if (state == ouch_state::not_logged_in){
-    state = ouch_state::logged_in;
+  if (state == session_state::not_logged_in){
+    state = session_state::logged_in;
     LoginAccepted la;
     strncpy(la.session, "         0", sizeof(la.session));
     strncpy(la.seq_num, "                   0", sizeof(la.seq_num));
@@ -18,7 +18,7 @@ void ouch_session::handle_login_request(MsgHeader * packet, size_t len){
 }
 
 void ouch_session::handle_logout_request(MsgHeader * packet, size_t len){
-  state = ouch_state::not_logged_in;
+  state = session_state::not_logged_in;
   return;
 }
 
@@ -75,7 +75,7 @@ void ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
     constructOrderRejected('O', eo->token);
   else if (eo->qty > MAX_SHARES)
     constructOrderRejected('Z', eo->token);
-  else if ((state != ouch_state::logged_in))
+  else if ((state != session_state::logged_in))
     constructOrderRejected('O', eo->token);
   else if((active_orders.find(eo->token._str_()) == active_orders.end()) and
       (finished_orders.find(eo->token._str_()) == finished_orders.end())){
@@ -232,7 +232,7 @@ void ouch_session::execution_logic(){
 
 void ouch_session::heartbeat_logic(){
   double second = difftime(time(NULL), last_send_heartbeat);
-  if (state == ouch_state::not_logged_in) return;
+  if (state == session_state::not_logged_in) return;
   if (second >= 1){
     last_send_heartbeat = time(NULL);
     ServerHeartbeat h;
@@ -266,7 +266,7 @@ ouch_session::~ouch_session(){
 }
 
 void ouch_session::init(){
-  state = ouch_state::not_logged_in;
+  state = session_state::not_logged_in;
   time_t curr_time = time(NULL);
   last_send_heartbeat = curr_time;
   last_recv_heartbeat = curr_time;

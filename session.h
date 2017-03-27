@@ -13,7 +13,7 @@
 #include "order.h"
 
 using namespace evt;
-namespace ouch_state{
+namespace session_state{
   constexpr char not_logged_in = 'N';
   constexpr char logged_in = 'L';
   constexpr char losing_heartbeat = '1';
@@ -41,6 +41,7 @@ public:
 private:
   void handle_login_request(boe::MsgHeader* hdr, size_t len);
 
+  void constructLoginResponse(LoginResponseStatus status, LoginRequest * req);
   double random_reject_rate;
 };
 
