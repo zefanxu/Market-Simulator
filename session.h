@@ -41,7 +41,7 @@ public:
 private:
   void handle_login_request(boe::MsgHeader* hdr, size_t len);
 
-  void constructLoginResponse(LoginResponseStatus status, LoginRequest * req);
+  void constructLoginResponse(boe::LoginResponseStatus status, boe::LoginRequest * req);
   double random_reject_rate;
 };
 
