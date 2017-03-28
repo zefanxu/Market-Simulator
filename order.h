@@ -27,6 +27,7 @@ public:
 };
 
 class boe_order : public order{
+public:
   boe_order(boe::NewOrder* no);
   void parse_order(boe::NewOrder* no);
 
@@ -37,6 +38,7 @@ class boe_order : public order{
 };
 
 class ouch_order : public order{
+public:
   ouch_order(ouch::EnterOrder* eo);
   void parse_order(ouch::EnterOrder* eo);
 
