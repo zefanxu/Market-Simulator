@@ -80,18 +80,18 @@ private:
   void modify_logic();
   void replace_logic();
 
-  void constructOrderAccpeted(const order & o);
+  void constructOrderAccpeted(const ouch_order & o);
   void constructOrderRejected(char reason, ouch::Token t);
   void constructOrderCanceled(uint32_t dec_qty, char reason, ouch::Token t);
   void constructOrderModified(uint32_t remaining_qty, const ModifyOrderReq & mo);
-  void constructOrderExecuted(order & o);
-  void constructOrderReplaced(const ReplaceOrderReq & ro, const order & new_order);
+  void constructOrderExecuted(ouch_order & o);
+  void constructOrderReplaced(const ReplaceOrderReq & ro, const ouch_order & new_order);
 
   uint64_t get_timestamp();
   bool order_random_reject();
 
-  unordered_map<string, order> active_orders;
-  unordered_map<string, order> finished_orders;
+  unordered_map<string, ouch_order> active_orders;
+  unordered_map<string, ouch_order> finished_orders;
   vector<CancelOrderReq> pending_cancel;
   vector<ModifyOrderReq> pending_modify;
   vector<ReplaceOrderReq> pending_replace;
