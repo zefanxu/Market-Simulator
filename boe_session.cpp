@@ -41,6 +41,7 @@ void boe_session::handle_login_request(MsgHeader* hdr, size_t len){
   LoginRequest * req = reinterpret_cast<LoginRequest*>(hdr);
   if (state != session_state::not_logged_in) constructLoginResponse(LoginResponseStatus::SessionInUse, req);
   else constructLoginResponse(LoginResponseStatus::Accepted, req);
+  state = session_state::logged_in;
 }
 
 void boe_session::constructLoginResponse(LoginResponseStatus status, LoginRequest * req){
