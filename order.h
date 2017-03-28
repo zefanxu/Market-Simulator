@@ -34,7 +34,7 @@ class boe_order : public order{
 
   boe::Token token;
   uint64_t price;
-}
+};
 
 class ouch_order : public order{
   ouch_order(ouch::EnterOrder* eo);
@@ -51,7 +51,7 @@ class ouch_order : public order{
   ouch::Token token;
   ouch::OrderState state;
   uint32_t min_qty;
-}
+};
 
 class CancelOrderReq{
 public:
