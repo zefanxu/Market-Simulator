@@ -19,8 +19,6 @@ ouch_order::ouch_order(){
 }
 
 ouch_order::ouch_order(EnterOrder* eo){
-  recv_order_time = time(NULL);
-  orderID = rand() * rand();
   parse_order(eo);
 }
 

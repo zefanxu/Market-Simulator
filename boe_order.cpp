@@ -17,6 +17,9 @@ void boe_order::parse_order(NewOrder* no){
   side = no->side;
   strncpy(firm, no->clearing_firm, sizeof(firm));
   capacity = no->capacity;
+  min_qty = no->min_qty;
+  price = no->price;
+  display = no->display_indicator;
 }
 
 bool boe_order::still_live(){

@@ -49,6 +49,7 @@ private:
   void heartbeat_logic();
   void constructLoginResponse(boe::LoginResponseStatus status, boe::LoginRequest * req);
 
+  uint64_t get_timestamp();
   time_t last_send_heartbeat;
   time_t last_recv_heartbeat;
   double random_reject_rate;

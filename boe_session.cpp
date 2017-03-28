@@ -36,7 +36,7 @@ void boe_session::handle_packet(char * packet, size_t len){
 }
 
 void boe_session::enterOrder(MsgHeader * hdr, size_t len){
-  
+
 }
 
 void boe_session::handle_client_heartbeat(MsgHeader* hdr, size_t len){
@@ -69,6 +69,11 @@ void boe_session::constructLoginResponse(LoginResponseStatus status, LoginReques
   packet_begin->length = packet_size-2;
   auto packet = vector<char>(buf, buf + packet_size);
   pending_out_messages.push_back(packet);
+}
+
+uint64_t boe_session::get_timestamp(){
+  chrono::milliseconds ms = chrono::duration_cast< milliseconds >(chrono::system_clock::now().time_since_epoch());
+  return ms;
 }
 
 void boe_session::heartbeat_logic(){

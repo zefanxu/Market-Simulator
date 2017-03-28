@@ -22,7 +22,9 @@ public:
   char side;
   char firm[4];
   char capacity;
+  char display;
   int32_t remain_time_in_force;
+  uint32_t min_qty;
 };
 
 class boe_order : public order{
@@ -45,14 +47,12 @@ public:
   virtual bool still_live();
   bool expired();
 
-  char display;
   uint32_t time_in_force;
   char intermarket_sweep_eligibility;
   int32_t price;
   char cross_type;
   ouch::Token token;
   ouch::OrderState state;
-  uint32_t min_qty;
 };
 
 class CancelOrderReq{

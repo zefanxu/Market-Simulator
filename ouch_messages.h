@@ -233,16 +233,16 @@ namespace ouch {
     char val[14];
   } __attribute__((packed));
 
-  #define MSG_HEADER\
+  #define OUCH_MSG_HEADER\
     uint16_t length;\
     char packet_type;
 
   struct MsgHeader{
-    MSG_HEADER
+    OUCH_MSG_HEADER
   }__attribute__((packed));
 
   struct Ouch_MsgHeader{
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type;
   }__attribute__((packed));
 
@@ -252,7 +252,7 @@ namespace ouch {
 
   struct LoginAccepted{
     LoginAccepted(): length(native_to_big(static_cast<uint16_t>(sizeof(LoginAccepted)-2))), packet_type(static_cast<char>(PacketType::LoginAccepted)){}
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char session[10]; // left-padded with spaces
     char seq_num[20]; // left-padded with spaces
   } __attribute__((packed));
@@ -260,18 +260,18 @@ namespace ouch {
 
   struct LoginRejected{
     LoginRejected(): length(native_to_big(static_cast<uint16_t>(sizeof(LoginRejected)-2))), packet_type(static_cast<char>(PacketType::LoginRejected)){}
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char reason;
   } __attribute__((packed));
 
   struct ServerHeartbeat{
     ServerHeartbeat(): length(native_to_big(static_cast<uint16_t>(sizeof(ServerHeartbeat)-2))), packet_type(static_cast<char>(PacketType::ServerHeartbeat)){}
-    MSG_HEADER
+    OUCH_MSG_HEADER
   } __attribute__((packed));
 
   struct EndOfSession{
     EndOfSession(): length(native_to_big(static_cast<uint16_t>(sizeof(EndOfSession)-2))), packet_type(static_cast<char>(PacketType::EndOfSession)){}
-    MSG_HEADER
+    OUCH_MSG_HEADER
   } __attribute__((packed));
 
 
@@ -280,7 +280,7 @@ namespace ouch {
 
   struct LoginRequest{
     LoginRequest(): length(native_to_big(static_cast<uint16_t>(sizeof(LoginRequest)-2))), packet_type(static_cast<char>(PacketType::LoginRequest)){}
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char username[6]; // right-padded with spaces
     char password[10]; // right-padded with spaces
     char requested_session[10]; // left-padded with spaces
@@ -290,13 +290,13 @@ namespace ouch {
 
   struct ClientHeartbeat{
     ClientHeartbeat(): length(native_to_big(static_cast<uint16_t>(sizeof(ClientHeartbeat)-2))), packet_type(static_cast<char>(PacketType::ClientHeartbeat)){}
-    MSG_HEADER
+    OUCH_MSG_HEADER
   } __attribute__((packed));
 
 
   struct LogoutRequest{
     LogoutRequest(): length(native_to_big(static_cast<uint16_t>(sizeof(LogoutRequest)-2))), packet_type(static_cast<char>(PacketType::LogoutRequest)){}
-    MSG_HEADER
+    OUCH_MSG_HEADER
   } __attribute__((packed));
 
 
@@ -314,7 +314,7 @@ namespace ouch {
       time_in_force = big_to_native(time_in_force);
       min_qty = big_to_native(min_qty);
     }
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
     Token token;
     char side; ///< \see ouch::Side
@@ -342,7 +342,7 @@ namespace ouch {
       time_in_force = big_to_native(time_in_force);
       min_qty = big_to_native(min_qty);
     }
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
     Token existing_token;
     Token token;
@@ -362,7 +362,7 @@ namespace ouch {
     void from_network(){
       qty = big_to_native(qty);
     }
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
     Token token;
     uint32_t qty; // 0 <= qty <= 1,000,000
@@ -376,7 +376,7 @@ namespace ouch {
     void from_network(){
       qty = big_to_native(qty);
     }
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type; ///< \see ouch::OutboundMsgType
     Token token;
     char side; ///< \see ouch::Side
@@ -394,7 +394,7 @@ namespace ouch {
     void to_network(){
       timestamp = native_to_big(timestamp);
     }
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp; // nsecs past midnight
     char event_code; ///< \see ouch::EventCode
@@ -413,7 +413,7 @@ namespace ouch {
       order_reference_number = native_to_big(order_reference_number);
       min_qty = native_to_big(min_qty);
     }
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp; // nsecs past midnight
     Token token;
@@ -442,7 +442,7 @@ namespace ouch {
       timestamp = native_to_big(timestamp);
       decrement_qty = native_to_big(decrement_qty);
     }
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Token token;
@@ -459,7 +459,7 @@ namespace ouch {
       timestamp = native_to_big(timestamp);
       shares = native_to_big(shares);
     }
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Token token;
@@ -475,7 +475,7 @@ namespace ouch {
     void to_network(){
       timestamp = native_to_big(timestamp);
     }
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Token token;
@@ -494,7 +494,7 @@ namespace ouch {
       time_in_force = native_to_big(time_in_force);
       min_qty = native_to_big(min_qty);
     }
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Token token; ///< called Replacement Token in specs
@@ -526,7 +526,7 @@ namespace ouch {
       executed_qty = native_to_big(executed_qty);
       match_number = native_to_big(match_number);
     }
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Token token;
@@ -549,7 +549,7 @@ namespace ouch {
       reference_price = native_to_big(reference_price);
       match_number = native_to_big(match_number);
     }
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Token token;
@@ -570,7 +570,7 @@ namespace ouch {
       timestamp = native_to_big(timestamp);
       match_number = native_to_big(match_number);
     }
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Token token;
@@ -586,7 +586,7 @@ namespace ouch {
     void to_network(){
       timestamp = native_to_big(timestamp);
     }
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Token token;
@@ -600,7 +600,7 @@ namespace ouch {
     void to_network(){
       timestamp = native_to_big(timestamp);
     }
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Token token;
@@ -617,7 +617,7 @@ namespace ouch {
       qty_prevented_from_trading = native_to_big(qty_prevented_from_trading);
       execution_price = native_to_big(execution_price);
     }
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Token token;
@@ -638,7 +638,7 @@ namespace ouch {
       order_reference_number = native_to_big(order_reference_number);
       price = native_to_big(price);
     }
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Token token;
@@ -658,7 +658,7 @@ namespace ouch {
       execution_price = native_to_big(execution_price);
       match_number = native_to_big(match_number);
     }
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Token token;
@@ -677,7 +677,7 @@ namespace ouch {
     void to_network(){
       timestamp = native_to_big(timestamp);
     }
-    MSG_HEADER
+    OUCH_MSG_HEADER
     char msg_type; ///< \see ouch::InboundMsgType
     uint64_t timestamp;
     Token token;
