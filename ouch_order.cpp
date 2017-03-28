@@ -15,18 +15,13 @@ void CancelOrderReq::parse_cancel_order(CancelOrder * co){
   qty = co->qty;
 }
 
-order::order(){
-  recv_order_time = time(NULL);
-  orderID = rand() * rand();
-}
-
-order::order(EnterOrder* eo){
+ouch_order::ouch_order(EnterOrder* eo){
   recv_order_time = time(NULL);
   orderID = rand() * rand();
   parse_order(eo);
 }
 
-void order::parse_order(EnterOrder* eo){
+void ouch_order::parse_order(EnterOrder* eo){
   time_in_force = eo->time_in_force;
   remain_time_in_force = time_in_force;
   token = eo->token;
@@ -44,20 +39,12 @@ void order::parse_order(EnterOrder* eo){
   capacity = eo->capacity;
 }
 
-bool order::still_live(){
+bool ouch_order::still_live(){
   if ((remaining_qty <= 0) or expired() or (state == OrderState::Dead)){
     state = OrderState::Dead;
     return false;
   }
   return true;
-}
-
-bool order::expired(){
-  if ((time_in_force != TimeInForce::Ioc) and (time_in_force != TimeInForce::Market) and (time_in_force != TimeInForce::System)){
-    auto curr_time = time(NULL);
-    remain_time_in_force = time_in_force - (curr_time - recv_order_time);
-  }
-  return (remain_time_in_force <= 0);
 }
 
 ModifyOrderReq::ModifyOrderReq(){

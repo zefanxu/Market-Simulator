@@ -10,31 +10,48 @@ using namespace evt;
 class order{
 public:
   order();
-  order(ouch::EnterOrder* eo);
-  order(boe::NewOrder* no);
-  void parse_order(ouch::EnterOrder* eo);
-  void parse_order(boe::NewOrder* no);
-  bool still_live();
+
+  virtual bool still_live()=0;
   bool expired();
 
   time_t recv_order_time;
-  uint32_t time_in_force;
-  int32_t remain_time_in_force;
+
+  char time_in_force;
   uint32_t remaining_qty;
   uint64_t orderID;
   uint64_t executed_qty;
-  int32_t price;
-  uint32_t min_qty;
   char symbol[8];
-  ouch::Token token;
-  ouch::OrderState state;
   char side;
-  char cross_type;
-  char intermarket_sweep_eligibility;
   char firm[4];
-  char display;
   char capacity;
 };
+
+class boe_order : public order{
+  boe_order(boe::NewOrder* no);
+  void parse_order(boe::NewOrder* no);
+
+  virtual bool still_live();
+
+  boe::Token token;
+  uint64_t price;
+}
+
+class ouch_order : public order{
+  ouch_order(ouch::EnterOrder* eo);
+  void parse_order(ouch::EnterOrder* eo);
+
+  virtual bool still_live();
+
+  char display;
+  uint32_t time_in_force;
+  int32_t remain_time_in_force;
+  char intermarket_sweep_eligibility;
+  int32_t price;
+  char cross_type;
+  ouch::Token token;
+  ouch::OrderState state;
+  uint32_t min_qty;
+}
 
 class CancelOrderReq{
 public:
