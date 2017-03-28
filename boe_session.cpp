@@ -2,7 +2,7 @@
 using namespace evt::boe;
 
 boe_session::boe_session(){
-  state = not_logged_in;
+  state = session_state::not_logged_in;
 }
 
 boe_session::~boe_session(){
@@ -10,7 +10,7 @@ boe_session::~boe_session(){
 
 
 boe_session::boe_session(double random_reject_rate){
-  state = not_logged_in;
+  state = session_state::not_logged_in;
   this->random_reject_rate = random_reject_rate;
 }
 
