@@ -28,13 +28,20 @@ void boe_session::handle_login_request(MsgHeader* hdr, size_t len){
 }
 
 void boe_session::constructLoginResponse(LoginResponseStatus status, LoginRequest * req){
+  char * buf = (char*)calloc(300, sizeof(char));
   LoginResponse lr;
   lr.status = static_cast<uint8_t>(status);
   memset(lr.text, 0, sizeof(lr.text));
   lr.last_received_seq_num = 0;
   lr.no_unspecified_unit_replay = req->replay.no_unspecified_unit_replay;
-  lr.number_of_units = 0;
-  auto packet = vector<char>(reinterpret_cast<const char*>(&lr), reinterpret_cast<const char*>(&lr)+sizeof(lr));
+  lr.number_of_units = 1;
+  *((LoginResponse*)buf) = lr;
+  buf->unit[0] = UnitSequence();
+  buf->unit[0].number = 1;
+  buf->unit[0].seq_num = 0;
+  memcpy(&(buf->unit[1]), &(req->order_ack), (sizeof(ReturnBitfieldParamGroup)*4+20));
+  auto packet = vector<char>(reinterpret_cast<const char*>(&lr), reinterpret_cast<const char*>(&lr)
+                  + sizeof(lr) + sizeof(UnitSequence) + sizeof(ReturnBitfieldParamGroup) * 4 + 20);
   pending_out_messages.push_back(packet);
 }
 
