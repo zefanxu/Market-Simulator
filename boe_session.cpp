@@ -19,8 +19,16 @@ void boe_session::handle_packet(char * packet, size_t len){
   switch (hdr->type) {
     case static_cast<char>(MsgType::LoginRequest):
       handle_login_request(hdr, len);
+      break;
+    case static_cast<char>(MsgType::ClientHeartbeat):
+      handle_client_heartbeat(hdr,len);
+      break;
   }
 
+}
+
+void boe_session::handle_client_heartbeat(MsgHeader* hdr, size_t len){
+  last_recv_heartbeat = clock();
 }
 
 void boe_session::handle_login_request(MsgHeader* hdr, size_t len){
@@ -42,6 +50,7 @@ void boe_session::constructLoginResponse(LoginResponseStatus status, LoginReques
   packet_begin->unit[0] = UnitSequence();
   packet_begin->unit[0].number = 1;
   packet_begin->unit[0].seq_num = 0;
+  //echo back the param groups
   memcpy(&(packet_begin->unit[1]), &(req->order_ack), (sizeof(ReturnBitfieldParamGroup)*4+20));
   size_t packet_size = sizeof(lr) + sizeof(UnitSequence) + sizeof(ReturnBitfieldParamGroup) * 4 + 20;
   packet_begin->length = packet_size-2;
@@ -49,5 +58,17 @@ void boe_session::constructLoginResponse(LoginResponseStatus status, LoginReques
   pending_out_messages.push_back(packet);
 }
 
+void boe_session::heartbeat_logic(){
+  double second = difftime(time(NULL), last_send_heartbeat);
+  if (state == session_state::not_logged_in) return;
+  if (second >= 1){
+    last_send_heartbeat = time(NULL);
+    ServerHeartbeat h;
+    auto packet = vector<char>(reinterpret_cast<const char*>(&h), reinterpret_cast<const char*>(&h) + sizeof(h));
+    pending_out_messages.push_back(packet);
+  }
+}
+
 void boe_session::market_logic(){
+  heartbeat_logic();
 }
