@@ -41,8 +41,9 @@ void boe_session::constructLoginResponse(LoginResponseStatus status, LoginReques
   packet_begin->unit[0].number = 1;
   packet_begin->unit[0].seq_num = 0;
   memcpy(&(packet_begin->unit[1]), &(req->order_ack), (sizeof(ReturnBitfieldParamGroup)*4+20));
-  auto packet = vector<char>(buf, buf + sizeof(lr) + sizeof(UnitSequence)
-                + sizeof(ReturnBitfieldParamGroup) * 4 + 20);
+  size_t packet_size = sizeof(lr) + sizeof(UnitSequence) + sizeof(ReturnBitfieldParamGroup) * 4 + 20;
+  packet_begin->length = packet_size-2;
+  auto packet = vector<char>(buf, buf + packet_size);
   pending_out_messages.push_back(packet);
 }
 
