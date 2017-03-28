@@ -10,7 +10,9 @@ class order{
 public:
   order();
   order(ouch::EnterOrder* eo);
+  order(boe::NewOrder* no);
   void parse_order(ouch::EnterOrder* eo);
+  void parse_order(boe::NewOrder* no);
   bool still_live();
   bool expired();
 

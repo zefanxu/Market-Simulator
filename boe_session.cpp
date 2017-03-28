@@ -29,8 +29,14 @@ void boe_session::handle_packet(char * packet, size_t len){
     case static_cast<char>(MsgType::ClientHeartbeat):
       handle_client_heartbeat(hdr,len);
       break;
+    case static_cast<char>(MsgType::NewOrder):
+      enterOrder(hdr, len);
+      break;
   }
+}
 
+void boe_session::enterOrder(MsgHeader * hdr, size_t len){
+  
 }
 
 void boe_session::handle_client_heartbeat(MsgHeader* hdr, size_t len){
