@@ -3,6 +3,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include "ouch_messages.h"
+#include "boe_messages.h"
 
 using namespace evt;
 

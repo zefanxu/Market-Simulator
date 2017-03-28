@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string>
+#include <assert.h>
 
 // All data is put on the wire in little-endian byte order.
 

@@ -7,6 +7,6 @@ order::order(NewOrder* no){
   parse_order(no);
 }
 
-order::parse_order(NewOrder* no){
+void order::parse_order(NewOrder* no){
 
 }

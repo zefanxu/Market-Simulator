@@ -44,6 +44,8 @@ private:
   void handle_login_request(boe::MsgHeader* hdr, size_t len);
   void handle_client_heartbeat(boe::MsgHeader* hdr, size_t len);
 
+  void enterOrder(boe::MsgHeader * msg, size_t len);
+
   void heartbeat_logic();
   void constructLoginResponse(boe::LoginResponseStatus status, boe::LoginRequest * req);
 
