@@ -2,16 +2,22 @@
 using namespace evt::boe;
 
 boe_session::boe_session(){
-  state = session_state::not_logged_in;
+  init();
 }
 
 boe_session::~boe_session(){
 }
 
-
 boe_session::boe_session(double random_reject_rate){
-  state = session_state::not_logged_in;
+  init();
   this->random_reject_rate = random_reject_rate;
+}
+
+void boe_session::init(){
+  state = session_state::not_logged_in;
+  time_t curr_time = time(NULL);
+  last_send_heartbeat = curr_time;
+  last_recv_heartbeat = curr_time;
 }
 
 void boe_session::handle_packet(char * packet, size_t len){

@@ -39,6 +39,8 @@ public:
   virtual void handle_packet(char * packet, size_t len);
 
 private:
+  void init();
+
   void handle_login_request(boe::MsgHeader* hdr, size_t len);
   void handle_client_heartbeat(boe::MsgHeader* hdr, size_t len);
 
