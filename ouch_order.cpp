@@ -15,10 +15,21 @@ void CancelOrderReq::parse_cancel_order(CancelOrder * co){
   qty = co->qty;
 }
 
+ouch_order::ouch_order(){
+}
+
 ouch_order::ouch_order(EnterOrder* eo){
   recv_order_time = time(NULL);
   orderID = rand() * rand();
   parse_order(eo);
+}
+
+bool ouch_order::expired(){
+  if ((time_in_force != TimeInForce::Ioc) and (time_in_force != TimeInForce::Market) and (time_in_force != TimeInForce::System)){
+    auto curr_time = time(NULL);
+    remain_time_in_force = time_in_force - (curr_time - recv_order_time);
+  }
+  return (remain_time_in_force <= 0);
 }
 
 void ouch_order::parse_order(EnterOrder* eo){

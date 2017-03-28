@@ -12,10 +12,8 @@ public:
   order();
 
   virtual bool still_live()=0;
-  bool expired();
 
   time_t recv_order_time;
-
   char time_in_force;
   uint32_t remaining_qty;
   uint64_t orderID;
@@ -24,6 +22,7 @@ public:
   char side;
   char firm[4];
   char capacity;
+  int32_t remain_time_in_force;
 };
 
 class boe_order : public order{
@@ -39,14 +38,15 @@ public:
 
 class ouch_order : public order{
 public:
+  ouch_order();
   ouch_order(ouch::EnterOrder* eo);
   void parse_order(ouch::EnterOrder* eo);
 
   virtual bool still_live();
+  bool expired();
 
   char display;
   uint32_t time_in_force;
-  int32_t remain_time_in_force;
   char intermarket_sweep_eligibility;
   int32_t price;
   char cross_type;

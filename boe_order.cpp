@@ -9,14 +9,13 @@ boe_order::boe_order(NewOrder* no){
 
 void boe_order::parse_order(NewOrder* no){
   token = no->token;
-  recv_order_time;
   time_in_force = no->time_in_force;
-  remain_time_in_force = INT_MAX;
+  remain_time_in_force = 0xFFFFFF;
   remaining_qty = no->qty;
   executed_qty = 0;
   strncpy(symbol, no->symbol, sizeof(symbol));
   side = no->side;
-  strncpy(firm, no->firm, sizeof(firm));
+  strncpy(firm, no->clearing_firm, sizeof(firm));
   capacity = no->capacity;
 }
 
