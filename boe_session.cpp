@@ -35,13 +35,14 @@ void boe_session::constructLoginResponse(LoginResponseStatus status, LoginReques
   lr.last_received_seq_num = 0;
   lr.no_unspecified_unit_replay = req->replay.no_unspecified_unit_replay;
   lr.number_of_units = 1;
-  *((LoginResponse*)buf) = lr;
-  buf->unit[0] = UnitSequence();
-  buf->unit[0].number = 1;
-  buf->unit[0].seq_num = 0;
-  memcpy(&(buf->unit[1]), &(req->order_ack), (sizeof(ReturnBitfieldParamGroup)*4+20));
-  auto packet = vector<char>(reinterpret_cast<const char*>(&lr), reinterpret_cast<const char*>(&lr)
-                  + sizeof(lr) + sizeof(UnitSequence) + sizeof(ReturnBitfieldParamGroup) * 4 + 20);
+  auto packet_begin = (LoginResponse*)buf;
+  *(packet_begin) = lr;
+  packet_begin->unit[0] = UnitSequence();
+  packet_begin->unit[0].number = 1;
+  packet_begin->unit[0].seq_num = 0;
+  memcpy(&(packet_begin->unit[1]), &(req->order_ack), (sizeof(ReturnBitfieldParamGroup)*4+20));
+  auto packet = vector<char>(buf, buf + sizeof(lr) + sizeof(UnitSequence)
+                + sizeof(ReturnBitfieldParamGroup) * 4 + 20);
   pending_out_messages.push_back(packet);
 }
 
