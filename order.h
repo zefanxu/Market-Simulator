@@ -29,6 +29,7 @@ public:
 
 class boe_order : public order{
 public:
+  boe_order();
   boe_order(boe::NewOrder* no);
   void parse_order(boe::NewOrder* no);
 

@@ -7,6 +7,9 @@ boe_order::boe_order(NewOrder* no){
   parse_order(no);
 }
 
+boe_order::boe_order(){
+}
+
 void boe_order::parse_order(NewOrder* no){
   token = no->token;
   time_in_force = no->time_in_force;

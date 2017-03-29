@@ -49,7 +49,7 @@ private:
   void heartbeat_logic();
 
   void constructLoginResponse(boe::LoginResponseStatus status, boe::LoginRequest * req);
-  void constructOrderAccpeted(boe::boe_order & new_order);
+  void constructOrderAccpeted(boe_order & new_order);
   void constructOrderRejected(boe::NewOrder * no);
 
   uint64_t get_timestamp();

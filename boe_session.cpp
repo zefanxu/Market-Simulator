@@ -55,7 +55,7 @@ void boe_session::constructOrderRejected(NewOrder * no){
   pending_out_messages.push_back(packet);
 }
 
-void boe_session::constructOrderAccpeted(NewOrder & new_order){
+void boe_session::constructOrderAccpeted(boe_order & new_order){
   OrderAck ack;
   ack.seq_num = ++seq_num;
   ack.transaction_time = get_timestamp();
@@ -100,8 +100,8 @@ void boe_session::constructLoginResponse(LoginResponseStatus status, LoginReques
 }
 
 uint64_t boe_session::get_timestamp(){
-  chrono::milliseconds ms = chrono::duration_cast< milliseconds >(chrono::system_clock::now().time_since_epoch());
-  return ms;
+  chrono::milliseconds ms = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch());
+  return ms.count();
 }
 
 void boe_session::heartbeat_logic(){
