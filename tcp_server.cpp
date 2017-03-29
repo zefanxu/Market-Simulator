@@ -136,13 +136,7 @@ int BOEServer::read(char* & outbuf){
     outbuf = nullptr;
     return 0;
   }
-  packet_len = 0;
-  for (char * i = read_pos + 2; i < buf.c_array() + read_len - 1; i++){
-    if (*i == 0xBA and *(i+1) == 0xBA)
-      packet_len = i - read_pos;
-  }
-  if (!packet_len)
-    packet_len = buf.c_array() + read_len - read_pos;
+  packet_len = (reinterpret_cast<const boe::MsgHeader*>(read_pos))->length + 2;
   l.write("RECV: " + boe::to_string(reinterpret_cast<const boe::MsgHeader*>(read_pos)));
   outbuf = read_pos;
   return packet_len;
