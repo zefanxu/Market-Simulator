@@ -224,6 +224,8 @@ namespace boe {
   /**********************************************************************/
 
   struct OrderAck {
+    OrderAck(): length(sizeof(OrderAck)-2), type(static_cast<char>(MsgType::OrderAck)),
+        matching_unit(3){}
     BOE_MSG_HEADER
     uint64_t transaction_time;
     Token token;
@@ -236,6 +238,8 @@ namespace boe {
 
 
   struct OrderRejected {
+    OrderRejected(): length(sizeof(OrderRejected)-2), type(static_cast<char>(MsgType::OrderRejected)),
+        matching_unit(0), seq_num(0), num_bitfields(0){}
     BOE_MSG_HEADER
     uint64_t transaction_time;
     Token token;

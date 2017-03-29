@@ -14,6 +14,7 @@ boe_session::boe_session(double random_reject_rate){
 }
 
 void boe_session::init(){
+  seq_num = 0;
   state = session_state::not_logged_in;
   time_t curr_time = time(NULL);
   last_send_heartbeat = curr_time;
@@ -36,7 +37,33 @@ void boe_session::handle_packet(char * packet, size_t len){
 }
 
 void boe_session::enterOrder(MsgHeader * hdr, size_t len){
+  NewOrder * no = reinterpret_cast<NewOrder*>(hdr);
+  string t = no->token._str_();
+  if (active_orders.find(t) != active_orders.end())
+    constructOrderRejected(no);
+  boe_order new_order = boe_order(no);
+  active_orders[t] = new_order;
+  constructOrderAccpeted(new_order);
+}
 
+void boe_session::constructOrderRejected(NewOrder * no){
+  OrderRejected oj;
+  oj.token = no->token;
+  oj.reason = 'D';
+  strcpy(oj.text, "Duplicate CIOrdID");
+  auto packet = vector<char>(reinterpret_cast<char*>(&oj), reinterpret_cast<char*>(&oj)+sizeof(oj));
+  pending_out_messages.push_back(packet);
+}
+
+void boe_session::constructOrderAccpeted(NewOrder & new_order){
+  OrderAck ack;
+  ack.seq_num = ++seq_num;
+  ack.transaction_time = get_timestamp();
+  ack.order_id = new_order.orderID;
+  ack.token = new_order.token;
+  ack.num_bitfields = 0;
+  auto packet = vector<char>(reinterpret_cast<char*>(&ack), reinterpret_cast<char*>(&ack)+sizeof(ack));
+  pending_out_messages.push_back(packet);
 }
 
 void boe_session::handle_client_heartbeat(MsgHeader* hdr, size_t len){
@@ -69,6 +96,7 @@ void boe_session::constructLoginResponse(LoginResponseStatus status, LoginReques
   packet_begin->length = packet_size-2;
   auto packet = vector<char>(buf, buf + packet_size);
   pending_out_messages.push_back(packet);
+  free(buf);
 }
 
 uint64_t boe_session::get_timestamp(){

@@ -47,9 +47,20 @@ private:
   void enterOrder(boe::MsgHeader * msg, size_t len);
 
   void heartbeat_logic();
+
   void constructLoginResponse(boe::LoginResponseStatus status, boe::LoginRequest * req);
+  void constructOrderAccpeted(boe::boe_order & new_order);
+  void constructOrderRejected(boe::NewOrder * no);
 
   uint64_t get_timestamp();
+
+  unordered_map<string, boe_order> active_orders;
+  unordered_map<string, boe_order> done_orders;
+  vector<boe_order> pending_modify;
+  vector<boe_order> pending_cancel;
+  vector<boe_order> pending_replace;
+
+  unsigned int seq_num;
   time_t last_send_heartbeat;
   time_t last_recv_heartbeat;
   double random_reject_rate;
