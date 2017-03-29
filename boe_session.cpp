@@ -117,12 +117,13 @@ void boe_session::heartbeat_logic(){
 
 void boe_session::market_logic(){
   heartbeat_logic();
+  execution_logic();
 }
 
 void boe_session::execution_logic(){
   vector<string> done_tokens;
   for (auto & order_pair : active_orders){
-    ouch_order & each_order = order_pair.second;
+    boe_order & each_order = order_pair.second;
     const string & each_token = order_pair.first;
     if (each_order.still_live()){
       if (order_random_reject()) continue;

@@ -49,10 +49,12 @@ private:
   void enterOrder(boe::MsgHeader * msg, size_t len);
 
   void heartbeat_logic();
+  void execution_logic();
 
   void constructLoginResponse(boe::LoginResponseStatus status, boe::LoginRequest * req);
   void constructOrderAccpeted(boe_order & new_order);
   void constructOrderRejected(boe::NewOrder * no);
+  void constructOrderExecuted(boe_order & curr_order);
 
   uint64_t get_timestamp();
 

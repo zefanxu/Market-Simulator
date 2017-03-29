@@ -26,5 +26,5 @@ void boe_order::parse_order(NewOrder* no){
 }
 
 bool boe_order::still_live(){
-  return true;
+  return (remaining_qty > 0);
 }
