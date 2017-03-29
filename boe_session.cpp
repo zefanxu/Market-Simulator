@@ -101,7 +101,7 @@ void boe_session::constructLoginResponse(LoginResponseStatus status, LoginReques
 
 uint64_t boe_session::get_timestamp(){
   chrono::milliseconds ms = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch());
-  return ms.count();
+  return ms.count() * 1000;
 }
 
 void boe_session::heartbeat_logic(){
@@ -117,4 +117,41 @@ void boe_session::heartbeat_logic(){
 
 void boe_session::market_logic(){
   heartbeat_logic();
+}
+
+void boe_session::execution_logic(){
+  vector<string> done_tokens;
+  for (auto & order_pair : active_orders){
+    ouch_order & each_order = order_pair.second;
+    const string & each_token = order_pair.first;
+    if (each_order.still_live()){
+      if (order_random_reject()) continue;
+      constructOrderExecuted(each_order);
+    }
+    else{
+      finished_orders[each_token] = each_order;
+      done_tokens.push_back(each_token);
+    }
+  }
+  for (const auto & each_token : done_tokens)
+    active_orders.erase(each_token);
+}
+
+void boe_session::constructOrderExecuted(boe_order & curr_order){
+  OrderExecution oe;
+  oe.seq_num = ++seq_num;
+  oe.transaction_time = get_timestamp();
+  oe.token = curr_order.token;
+  oe.exec_id = rand() * rand();
+  uint32_t exe_qty = (2 + rand() % 10) * 100;
+  exe_qty = min(exe_qty, curr_order.remaining_qty);
+  oe.last_shares = exe_qty;
+  curr_order.remaining_qty -= exe_qty;
+  oe.last_price = curr_order.price;
+  oe.leaves_qty = curr_order.remaining_qty;
+  oe.base_liquidity_indicator = 'A';
+  oe.sub_liquidity_indicator = 'E';
+  strncpy(oe.contra_broker, "BATS", 4);
+  auto packet = vector<char>(reinterpret_cast<const char*>(&oe), reinterpret_cast<const char*>(&oe) + sizeof(oe));
+  pending_out_messages.push_back(packet);
 }

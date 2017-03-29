@@ -313,6 +313,8 @@ namespace boe {
 
 
   struct OrderExecution {
+    OrderExecution(): length(sizeof(OrderExecution)-2), type(static_cast<char>(MsgType::OrderExecution)),
+         num_bitfields(0){}
     BOE_MSG_HEADER
     uint64_t transaction_time;
     Token token;

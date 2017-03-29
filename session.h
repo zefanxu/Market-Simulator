@@ -27,7 +27,9 @@ public:
   vector<vector<char>> pending_out_messages;
 
 protected:
+  bool order_random_reject();
   char state;
+  double random_reject_rate; //0 <= x <= 1, default to 0.3333
 };
 
 class boe_session : public session{
@@ -63,7 +65,7 @@ private:
   unsigned int seq_num;
   time_t last_send_heartbeat;
   time_t last_recv_heartbeat;
-  double random_reject_rate;
+
 };
 
 class ouch_session : public session{
@@ -100,7 +102,7 @@ private:
   void constructOrderReplaced(const ReplaceOrderReq & ro, const ouch_order & new_order);
 
   uint64_t get_timestamp();
-  bool order_random_reject();
+
 
   unordered_map<string, ouch_order> active_orders;
   unordered_map<string, ouch_order> finished_orders;
@@ -108,7 +110,6 @@ private:
   vector<ModifyOrderReq> pending_modify;
   vector<ReplaceOrderReq> pending_replace;
 
-  double random_reject_rate; //0 <= x <= 1, default to 0.3333
   time_t last_send_heartbeat;
   time_t last_recv_heartbeat;
   chrono::system_clock::time_point start_of_day;

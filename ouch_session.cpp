@@ -247,7 +247,7 @@ uint64_t ouch_session::get_timestamp(){
   return diff.count();
 }
 
-bool ouch_session::order_random_reject(){
+bool session::order_random_reject(){
   double x = (double)(rand()%100)/(double)100;
   return (x <= random_reject_rate);
 }
