@@ -57,7 +57,7 @@ private:
   uint64_t get_timestamp();
 
   unordered_map<string, boe_order> active_orders;
-  unordered_map<string, boe_order> done_orders;
+  unordered_map<string, boe_order> finished_orders;
   vector<boe_order> pending_modify;
   vector<boe_order> pending_cancel;
   vector<boe_order> pending_replace;
