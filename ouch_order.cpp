@@ -56,27 +56,27 @@ bool ouch_order::still_live(){
   return true;
 }
 
-ModifyOrderReq::ModifyOrderReq(){
+Ouch_ModifyOrderReq::Ouch_ModifyOrderReq(){
 }
 
-ModifyOrderReq::ModifyOrderReq(ModifyOrder * mo){
+Ouch_ModifyOrderReq::Ouch_ModifyOrderReq(ModifyOrder * mo){
   parse_modify_order(mo);
 }
 
-void ModifyOrderReq::parse_modify_order(ModifyOrder * mo){
+void Ouch_ModifyOrderReq::parse_modify_order(ModifyOrder * mo){
   token = mo -> token;
   req_qty = mo -> qty;
   new_side = mo -> side;
 }
 
-ReplaceOrderReq::ReplaceOrderReq(){
+Ouch_ReplaceOrderReq::Ouch_ReplaceOrderReq(){
 }
 
-ReplaceOrderReq::ReplaceOrderReq(ReplaceOrder * ro){
+Ouch_ReplaceOrderReq::Ouch_ReplaceOrderReq(ReplaceOrder * ro){
   parse_replace_order(ro);
 }
 
-void ReplaceOrderReq::parse_replace_order(ReplaceOrder * ro){
+void Ouch_ReplaceOrderReq::parse_replace_order(ReplaceOrder * ro){
   existing_token = ro -> existing_token;
   new_token = ro -> token;
   qty = ro -> qty;

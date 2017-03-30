@@ -90,7 +90,7 @@ void ouch_session::modifyOrder(Ouch_MsgHeader * msg, size_t len){
   mo_msg -> from_network();
   if (active_orders.find(mo_msg->token._str_()) == active_orders.end())
     return;
-  ModifyOrderReq mo = ModifyOrderReq(mo_msg);
+  Ouch_ModifyOrderReq mo = Ouch_ModifyOrderReq(mo_msg);
   pending_modify.push_back(mo);
 }
 
@@ -99,7 +99,7 @@ void ouch_session::replaceOrder(Ouch_MsgHeader * msg, size_t len){
   ro_msg->from_network();
   if (order_random_reject())
     constructOrderRejected('O', ro_msg->token);
-  ReplaceOrderReq ro = ReplaceOrderReq(ro_msg);
+  Ouch_ReplaceOrderReq ro = Ouch_ReplaceOrderReq(ro_msg);
   pending_replace.push_back(ro);
   return;
 }
@@ -328,7 +328,7 @@ void ouch_session::constructOrderCanceled(uint32_t dec_qty, char reason, Token t
   pending_out_messages.push_back(packet);
 }
 
-void ouch_session::constructOrderModified(uint32_t remaining_qty, const ModifyOrderReq & mo){
+void ouch_session::constructOrderModified(uint32_t remaining_qty, const Ouch_ModifyOrderReq & mo){
   OrderModified m;
   m.timestamp = get_timestamp();
   m.token = mo.token;
@@ -358,7 +358,7 @@ void ouch_session::constructOrderExecuted(ouch_order & o){
   pending_out_messages.push_back(packet);
 }
 
-void ouch_session::constructOrderReplaced(const ReplaceOrderReq & ro, const ouch_order & new_order){
+void ouch_session::constructOrderReplaced(const Ouch_ReplaceOrderReq & ro, const ouch_order & new_order){
   OrderReplaced _or;
   _or.timestamp = get_timestamp();
   _or.token = new_order.token;

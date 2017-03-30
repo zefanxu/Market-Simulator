@@ -36,7 +36,18 @@ void boe_session::handle_packet(char * packet, size_t len){
     case static_cast<char>(MsgType::CancelOrder):
       cancelOrder(hdr, len);
       break;
+    case static_cast<char>(MsgType::ModifyOrder):
+      modifyOrder(hdr, len);
+      break;
   }
+}
+
+void boe_session::modifyOrder(MsgHeader * msg, size_t len){
+
+}
+
+void boe_session::modify_logic(){
+
 }
 
 void boe_session::cancel_logic(){
@@ -166,6 +177,7 @@ void boe_session::heartbeat_logic(){
 void boe_session::market_logic(){
   heartbeat_logic();
   cancel_logic();
+  modify_logic();
   execution_logic();
 }
 

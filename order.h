@@ -76,10 +76,10 @@ public:
 
 
 
-class ModifyOrderReq{
+class Ouch_ModifyOrderReq{
 public:
-  ModifyOrderReq();
-  ModifyOrderReq(ouch::ModifyOrder* mo);
+  Ouch_ModifyOrderReq();
+  Ouch_ModifyOrderReq(ouch::ModifyOrder* mo);
   void parse_modify_order(ouch::ModifyOrder* mo);
 
   ouch::Token token;
@@ -87,10 +87,21 @@ public:
   char new_side;
 };
 
-class ReplaceOrderReq{
+class Boe_ModifyOrderReq{
 public:
-  ReplaceOrderReq();
-  ReplaceOrderReq(ouch::ReplaceOrder* ro);
+  Boe_ModifyOrderReq();
+  Boe_ModifyOrderReq(boe::ModifyOrder* mo);
+  void parse_modify_order(boe::ModifyOrder* mo);
+
+  ouch::Token token;
+  uint32_t req_qty;
+  char new_side;
+};
+
+class Ouch_ReplaceOrderReq{
+public:
+  Ouch_ReplaceOrderReq();
+  Ouch_ReplaceOrderReq(ouch::ReplaceOrder* ro);
   void parse_replace_order(ouch::ReplaceOrder* ro);
 
   ouch::Token existing_token;

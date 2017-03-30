@@ -48,10 +48,12 @@ private:
 
   void enterOrder(boe::MsgHeader * msg, size_t len);
   void cancelOrder(boe::MsgHeader * msg, size_t len);
+  void modifyOrder(boe::MsgHeader * msg, size_t len);
 
   void heartbeat_logic();
   void execution_logic();
   void cancel_logic();
+  void modify_logic();
 
   void constructLoginResponse(boe::LoginResponseStatus status, boe::LoginRequest * req);
   void constructOrderAccpeted(boe_order & new_order);
@@ -103,9 +105,9 @@ private:
   void constructOrderAccpeted(const ouch_order & o);
   void constructOrderRejected(char reason, ouch::Token t);
   void constructOrderCanceled(uint32_t dec_qty, char reason, ouch::Token t);
-  void constructOrderModified(uint32_t remaining_qty, const ModifyOrderReq & mo);
+  void constructOrderModified(uint32_t remaining_qty, const Ouch_ModifyOrderReq & mo);
   void constructOrderExecuted(ouch_order & o);
-  void constructOrderReplaced(const ReplaceOrderReq & ro, const ouch_order & new_order);
+  void constructOrderReplaced(const Ouch_ReplaceOrderReq & ro, const ouch_order & new_order);
 
   uint64_t get_timestamp();
 
@@ -113,8 +115,8 @@ private:
   unordered_map<string, ouch_order> active_orders;
   unordered_map<string, ouch_order> finished_orders;
   vector<Ouch_CancelOrderReq> pending_cancel;
-  vector<ModifyOrderReq> pending_modify;
-  vector<ReplaceOrderReq> pending_replace;
+  vector<Ouch_ModifyOrderReq> pending_modify;
+  vector<Ouch_ReplaceOrderReq> pending_replace;
 
   time_t last_send_heartbeat;
   time_t last_recv_heartbeat;
