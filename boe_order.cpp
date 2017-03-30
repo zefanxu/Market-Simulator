@@ -29,9 +29,9 @@ bool boe_order::still_live(){
   return (remaining_qty > 0);
 }
 
-void Boe_CancelOrderReq::Boe_CancelOrderReq(){
+Boe_CancelOrderReq::Boe_CancelOrderReq(){
 }
 
-void Boe_CancelOrderReq::Boe_CancelOrderReq(CancelOrder * co){
-  token = co->token;
+Boe_CancelOrderReq::Boe_CancelOrderReq(CancelOrder * co){
+  token = co->orig_token;
 }

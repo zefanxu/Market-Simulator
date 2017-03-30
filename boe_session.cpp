@@ -43,11 +43,11 @@ void boe_session::cancel_logic(){
   vector<string> done_tokens;
   for (const auto & co : pending_cancel){
     if (active_orders.find(co.token._str_()) == active_orders.end()){
-      constructCancelRejected(co->token);
+      constructCancelRejected(co.token);
       continue;
     }
     done_tokens.push_back(co.token._str_());
-    constructOrderCanceled(co->token);
+    constructOrderCanceled(co.token);
   }
   pending_cancel.clear();
   for (const auto & each_token : done_tokens)
@@ -55,20 +55,19 @@ void boe_session::cancel_logic(){
 }
 
 void boe_session::cancelOrder(MsgHeader * msg, size_t len){
-  CancelOrder* co = reinterpret_cast<CancelOrder*>(hdr);
-  string t = co->token._str_();
+  CancelOrder* co = reinterpret_cast<CancelOrder*>(msg);
+  string t = co->orig_token._str_();
   if (active_orders.find(t) != active_orders.end() and active_orders[t].remaining_qty>0){
-
     pending_cancel.push_back(Boe_CancelOrderReq(co));
   }
-  else constructCancelRejected(co->token);
+  else constructCancelRejected(co->orig_token);
 }
 
 void boe_session::constructOrderCanceled(Token t){
   OrderCanceled oc;
   oc.transaction_time = get_timestamp();
   oc.token = t;
-  oc.reason = Reason::UserRequested;
+  oc.reason = static_cast<char>(Reason::UserRequested);
   oc.num_bitfields = 0;
   auto packet = vector<char>(reinterpret_cast<char*>(&oc), reinterpret_cast<char*>(&oc)+sizeof(oc));
   pending_out_messages.push_back(packet);
@@ -78,7 +77,7 @@ void boe_session::constructCancelRejected(Token t){
   CancelRejected cr;
   cr.transaction_time = get_timestamp();
   cr.token = t;
-  cr.reason = Reason::ClordidDoesntMatchAKnownOrder;
+  cr.reason = static_cast<char>(Reason::ClordidDoesntMatchAKnownOrder);
   cr.num_bitfields = 0;
   strcpy(cr.text, "Cannot locate specified order");
   auto packet = vector<char>(reinterpret_cast<char*>(&cr), reinterpret_cast<char*>(&cr)+sizeof(cr));

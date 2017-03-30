@@ -71,7 +71,7 @@ public:
   Boe_CancelOrderReq();
   Boe_CancelOrderReq(boe::CancelOrder* co);
 
-  ouch::Token token;
+  boe::Token token;
 };
 
 
