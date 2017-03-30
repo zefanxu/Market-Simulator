@@ -56,15 +56,25 @@ public:
   ouch::OrderState state;
 };
 
-class CancelOrderReq{
+class Ouch_CancelOrderReq{
 public:
-  CancelOrderReq();
-  CancelOrderReq(ouch::CancelOrder* co);
+  Ouch_CancelOrderReq();
+  Ouch_CancelOrderReq(ouch::CancelOrder* co);
   void parse_cancel_order(ouch::CancelOrder* co);
 
   ouch::Token token;
   uint32_t qty;
 };
+
+class Boe_CancelOrderReq{
+public:
+  Boe_CancelOrderReq();
+  Boe_CancelOrderReq(boe::CancelOrder* co);
+
+  ouch::Token token;
+};
+
+
 
 class ModifyOrderReq{
 public:

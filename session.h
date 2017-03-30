@@ -47,21 +47,25 @@ private:
   void handle_client_heartbeat(boe::MsgHeader* hdr, size_t len);
 
   void enterOrder(boe::MsgHeader * msg, size_t len);
+  void cancelOrder(boe::MsgHeader * msg, size_t len);
 
   void heartbeat_logic();
   void execution_logic();
+  void cancel_logic();
 
   void constructLoginResponse(boe::LoginResponseStatus status, boe::LoginRequest * req);
   void constructOrderAccpeted(boe_order & new_order);
   void constructOrderRejected(boe::NewOrder * no);
   void constructOrderExecuted(boe_order & curr_order);
+  void constructCancelRejected(boe::Token t);
+  void constructOrderCanceled(boe::Token t);
 
   uint64_t get_timestamp();
 
   unordered_map<string, boe_order> active_orders;
   unordered_map<string, boe_order> finished_orders;
   vector<boe_order> pending_modify;
-  vector<boe_order> pending_cancel;
+  vector<Boe_CancelOrderReq> pending_cancel;
   vector<boe_order> pending_replace;
 
   unsigned int seq_num;
@@ -108,7 +112,7 @@ private:
 
   unordered_map<string, ouch_order> active_orders;
   unordered_map<string, ouch_order> finished_orders;
-  vector<CancelOrderReq> pending_cancel;
+  vector<Ouch_CancelOrderReq> pending_cancel;
   vector<ModifyOrderReq> pending_modify;
   vector<ReplaceOrderReq> pending_replace;
 

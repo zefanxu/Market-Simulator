@@ -28,3 +28,10 @@ void boe_order::parse_order(NewOrder* no){
 bool boe_order::still_live(){
   return (remaining_qty > 0);
 }
+
+void Boe_CancelOrderReq::Boe_CancelOrderReq(){
+}
+
+void Boe_CancelOrderReq::Boe_CancelOrderReq(CancelOrder * co){
+  token = co->token;
+}

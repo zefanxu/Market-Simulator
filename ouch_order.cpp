@@ -3,14 +3,14 @@
 
 using namespace evt::ouch;
 
-CancelOrderReq::CancelOrderReq(){
+Ouch_CancelOrderReq::Ouch_CancelOrderReq(){
 }
 
-CancelOrderReq::CancelOrderReq(CancelOrder* co){
+Ouch_CancelOrderReq::Ouch_CancelOrderReq(CancelOrder* co){
   parse_cancel_order(co);
 }
 
-void CancelOrderReq::parse_cancel_order(CancelOrder * co){
+void Ouch_CancelOrderReq::parse_cancel_order(CancelOrder * co){
   token = co->token;
   qty = co->qty;
 }

@@ -109,7 +109,7 @@ void ouch_session::cancelOrder(Ouch_MsgHeader * msg, size_t len){
   co_msg->from_network();
   if (active_orders.find(co_msg->token._str_()) == active_orders.end())
     return;
-  CancelOrderReq co = CancelOrderReq(co_msg);
+  Ouch_CancelOrderReq co = Ouch_CancelOrderReq(co_msg);
   pending_cancel.push_back(co);
 }
 

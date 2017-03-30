@@ -290,6 +290,8 @@ namespace boe {
 
 
   struct OrderCanceled {
+    OrderCanceled(): length(sizeof(OrderCanceled)-2), type(static_cast<char>(MsgType::OrderCanceled)),
+        matching_unit(3){}
     BOE_MSG_HEADER
     uint64_t transaction_time;
     Token token;
@@ -302,6 +304,8 @@ namespace boe {
 
 
   struct CancelRejected {
+    CancelRejected(): length(sizeof(CancelRejected)-2), type(static_cast<char>(MsgType::CancelRejected)),
+        matching_unit(3){}
     BOE_MSG_HEADER
     uint64_t transaction_time;
     Token token;
