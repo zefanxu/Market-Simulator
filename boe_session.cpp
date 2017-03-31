@@ -139,7 +139,8 @@ void boe_session::constructOrderCanceled(Token t){
   oc.transaction_time = get_timestamp();
   oc.token = t;
   oc.reason = static_cast<char>(Reason::UserRequested);
-  oc.num_bitfields = 0;
+  memset(oc.bitfield, 0, sizeof(oc.bitfield));
+  oc.bitfield[4] = 2;
   auto packet = vector<char>(reinterpret_cast<char*>(&oc), reinterpret_cast<char*>(&oc)+sizeof(oc));
   pending_out_messages.push_back(packet);
 }
@@ -182,6 +183,8 @@ void boe_session::constructOrderAccpeted(Boe_Order & new_order){
   ack.token = new_order.token;
   ack.num_bitfields = 5;
   memset(ack.bitfield, 0, sizeof(ack.bitfield));
+  ack.bitfield[4] = 2;
+  ack.leaves_qty = new_order.remaining_qty;
   auto packet = vector<char>(reinterpret_cast<char*>(&ack), reinterpret_cast<char*>(&ack)+sizeof(ack));
   pending_out_messages.push_back(packet);
 }

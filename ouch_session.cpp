@@ -138,10 +138,10 @@ void ouch_session::replace_logic(){
     target_order.remain_time_in_force = ro.time_in_force;
     target_order.price = ro.price;
     target_order.intermarket_sweep_eligibility = ro.intermarket_sweep_eligibility;
+    constructOrderReplaced(ro, target_order);
     //update the key in the map
     swap(active_orders[ro.existing_token._str_()], active_orders[ro.new_token._str_()]);
     active_orders.erase(ro.existing_token._str_());
-    constructOrderReplaced(ro, target_order);
   }
   for (const auto & each_token : done_tokens)
     active_orders.erase(each_token);
