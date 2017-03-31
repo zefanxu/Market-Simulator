@@ -161,6 +161,8 @@ void boe_session::enterOrder(MsgHeader * hdr, size_t len){
   string t = no->token._str_();
   if (active_orders.find(t) != active_orders.end())
     constructOrderRejected(no);
+  if (order_random_reject())
+    constructOrderRejected(no);
   Boe_Order new_order = Boe_Order(no);
   active_orders[t] = new_order;
   constructOrderAccpeted(new_order);
