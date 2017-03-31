@@ -59,7 +59,7 @@ private:
   void constructOrderAccpeted(boe_order & new_order);
   void constructOrderRejected(boe::NewOrder * no);
   void constructOrderExecuted(boe_order & curr_order);
-  void constructCancelRejected(boe::Token t);
+  void constructCancelRejected(boe::Token t, boe::Reason r);
   void constructOrderCanceled(boe::Token t);
 
   uint64_t get_timestamp();
