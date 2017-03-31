@@ -3,9 +3,11 @@ using namespace evt::boe;
 
 boe_session::boe_session(){
   init();
+  this->random_reject_rate = 0.3333;
 }
 
 boe_session::~boe_session(){
+  this->random_reject_rate = 0.3333;
 }
 
 boe_session::boe_session(double random_reject_rate){
