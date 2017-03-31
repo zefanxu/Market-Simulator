@@ -45,8 +45,10 @@ void boe_session::handle_packet(char * packet, size_t len){
 void boe_session::modifyOrder(MsgHeader * msg, size_t len){
   ModifyOrder * mo = reinterpret_cast<ModifyOrder*>(msg);
   string t = mo->orig_token._str_();
-  if (active_orders.find(t) == active_orders.end() or finished_orders.find(t) == finished_orders.end())
+  if (active_orders.find(t) == active_orders.end() and finished_orders.find(t) == finished_orders.end()){
     constructModifyRejected(mo->orig_token, Reason::ClordidDoesntMatchAKnownOrder);
+    return;
+  }
   Boe_ModifyOrderReq modify_req = Boe_ModifyOrderReq(mo);
   pending_modify.push_back(modify_req);
 }
@@ -81,7 +83,7 @@ void boe_session::modify_logic(){
     //change the key in the map
     swap(active_orders[mo.token._str_()], active_orders[mo.orig_token._str_()]);
     active_orders.erase(mo.orig_token._str_());
-    constructOrderModified(target_order);
+    constructOrderModified(active_orders[mo.token._str_()]);
   }
   for (const auto & each_token : done_tokens)
     active_orders.erase(each_token);
@@ -93,7 +95,7 @@ void boe_session::constructOrderModified(const Boe_Order & bo){
   om.bitfield[0] = 4;
   om.bitfield[1] = 0;
   om.bitfield[2] = 64;
-  om.bitfield[3] = 0
+  om.bitfield[3] = 0;
   om.bitfield[4] = 2;
   om.price = bo.price;
   om.leaves_qty = bo.remaining_qty;
@@ -268,6 +270,7 @@ void boe_session::constructOrderExecuted(Boe_Order & curr_order){
   exe_qty = min(exe_qty, curr_order.remaining_qty);
   oe.last_shares = exe_qty;
   curr_order.remaining_qty -= exe_qty;
+  curr_order.executed_qty += exe_qty;
   oe.last_price = curr_order.price;
   oe.leaves_qty = curr_order.remaining_qty;
   oe.base_liquidity_indicator = 'A';
