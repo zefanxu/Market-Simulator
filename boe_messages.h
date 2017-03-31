@@ -251,6 +251,8 @@ namespace boe {
 
 
   struct OrderModified {
+    OrderModified(): length(sizeof(OrderModified)-2), type(static_cast<char>(MsgType::OrderModified)),
+        matching_unit(3), num_bitfields(5){}
     BOE_MSG_HEADER
     uint64_t transaction_time;
     Token token;
@@ -279,6 +281,8 @@ namespace boe {
 
 
   struct ModifyRejected {
+    ModifyRejected(): length(sizeof(ModifyRejected)-2), type(static_cast<char>(MsgType::ModifyRejected)),
+        matching_unit(3), seq_num(0){}
     BOE_MSG_HEADER
     uint64_t transaction_time;
     Token token;

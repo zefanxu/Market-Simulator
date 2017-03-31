@@ -27,10 +27,10 @@ public:
   uint32_t min_qty;
 };
 
-class boe_order : public order{
+class Boe_Order : public order{
 public:
-  boe_order();
-  boe_order(boe::NewOrder* no);
+  Boe_Order();
+  Boe_Order(boe::NewOrder* no);
   void parse_order(boe::NewOrder* no);
 
   virtual bool still_live();
@@ -39,10 +39,10 @@ public:
   uint64_t price;
 };
 
-class ouch_order : public order{
+class Ouch_Order : public order{
 public:
-  ouch_order();
-  ouch_order(ouch::EnterOrder* eo);
+  Ouch_Order();
+  Ouch_Order(ouch::EnterOrder* eo);
   void parse_order(ouch::EnterOrder* eo);
 
   virtual bool still_live();
@@ -93,9 +93,15 @@ public:
   Boe_ModifyOrderReq(boe::ModifyOrder* mo);
   void parse_modify_order(boe::ModifyOrder* mo);
 
-  ouch::Token token;
-  uint32_t req_qty;
-  char new_side;
+  boe::Token token;
+  boe::Token orig_token;
+  char clearing_firm[4];
+  uint32_t qty;
+  uint64_t price;
+  char order_type;
+  char cancel_orig_on_reject;
+  char exec_inst;
+  char side;
 };
 
 class Ouch_ReplaceOrderReq{

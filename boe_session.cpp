@@ -43,11 +43,66 @@ void boe_session::handle_packet(char * packet, size_t len){
 }
 
 void boe_session::modifyOrder(MsgHeader * msg, size_t len){
+  ModifyOrder * mo = reinterpret_cast<ModifyOrder*>(msg);
+  string t = mo->orig_token._str_();
+  if (active_orders.find(t) == active_orders.end() or finished_orders.find(t) == finished_orders.end())
+    constructModifyRejected(mo->orig_token, Reason::ClordidDoesntMatchAKnownOrder);
+  Boe_ModifyOrderReq modify_req = Boe_ModifyOrderReq(mo);
+  pending_modify.push_back(modify_req);
+}
 
+void boe_session::constructModifyRejected(Token t, Reason r){
+  ModifyRejected mr;
+  mr.transaction_time = get_timestamp();
+  mr.token = t;
+  mr.reason = static_cast<char>(r);
+  strcpy(mr.text, to_string(r));
+  mr.num_bitfields = 0;
+  auto packet = vector<char>(reinterpret_cast<char*>(&mr), reinterpret_cast<char*>(&mr)+sizeof(mr));
+  pending_out_messages.push_back(packet);
 }
 
 void boe_session::modify_logic(){
+  vector<string> done_tokens;
+  for (const auto & mo: pending_modify){
+    if (active_orders.find(mo.orig_token._str_()) == active_orders.end())
+      continue;
+    auto & target_order = active_orders[mo.orig_token._str_()];
 
+    if (target_order.executed_qty >= mo.qty){
+      done_tokens.push_back(target_order.token._str_());
+      target_order.remaining_qty = 0;
+    }
+    else target_order.remaining_qty = mo.qty - target_order.executed_qty;
+    target_order.side = mo.side;
+    target_order.price = mo.price;
+    target_order.token = mo.token;
+    strncpy(target_order.firm, mo.clearing_firm, 4);
+    //change the key in the map
+    swap(active_orders[mo.token._str_()], active_orders[mo.orig_token._str_()]);
+    active_orders.erase(mo.orig_token._str_());
+    constructOrderModified(target_order);
+  }
+  for (const auto & each_token : done_tokens)
+    active_orders.erase(each_token);
+}
+
+void boe_session::constructOrderModified(const Boe_Order & bo){
+  OrderModified om;
+  //price, OrderQty, LeavesQty
+  om.bitfield[0] = 4;
+  om.bitfield[1] = 0;
+  om.bitfield[2] = 64;
+  om.bitfield[3] = 0
+  om.bitfield[4] = 2;
+  om.price = bo.price;
+  om.leaves_qty = bo.remaining_qty;
+  om.qty = bo.remaining_qty + bo.executed_qty;
+  om.transaction_time = get_timestamp();
+  om.order_id = bo.orderID;
+  om.token = bo.token;
+  auto packet = vector<char>(reinterpret_cast<char*>(&om), reinterpret_cast<char*>(&om)+sizeof(om));
+  pending_out_messages.push_back(packet);
 }
 
 void boe_session::cancel_logic(){
@@ -93,7 +148,7 @@ void boe_session::constructCancelRejected(Token t, Reason r){
   cr.token = t;
   cr.reason = static_cast<char>(r);
   cr.num_bitfields = 0;
-  strcpy(cr.text, "Cannot locate specified order");
+  strcpy(cr.text, to_string(r));
   auto packet = vector<char>(reinterpret_cast<char*>(&cr), reinterpret_cast<char*>(&cr)+sizeof(cr));
   pending_out_messages.push_back(packet);
 }
@@ -103,7 +158,7 @@ void boe_session::enterOrder(MsgHeader * hdr, size_t len){
   string t = no->token._str_();
   if (active_orders.find(t) != active_orders.end())
     constructOrderRejected(no);
-  boe_order new_order = boe_order(no);
+  Boe_Order new_order = Boe_Order(no);
   active_orders[t] = new_order;
   constructOrderAccpeted(new_order);
 }
@@ -117,13 +172,14 @@ void boe_session::constructOrderRejected(NewOrder * no){
   pending_out_messages.push_back(packet);
 }
 
-void boe_session::constructOrderAccpeted(boe_order & new_order){
+void boe_session::constructOrderAccpeted(Boe_Order & new_order){
   OrderAck ack;
   ack.seq_num = ++seq_num;
   ack.transaction_time = get_timestamp();
   ack.order_id = new_order.orderID;
   ack.token = new_order.token;
-  ack.num_bitfields = 0;
+  ack.num_bitfields = 5;
+  memset(ack.bitfield, 0, sizeof(ack.bitfield));
   auto packet = vector<char>(reinterpret_cast<char*>(&ack), reinterpret_cast<char*>(&ack)+sizeof(ack));
   pending_out_messages.push_back(packet);
 }
@@ -187,7 +243,7 @@ void boe_session::market_logic(){
 void boe_session::execution_logic(){
   vector<string> done_tokens;
   for (auto & order_pair : active_orders){
-    boe_order & each_order = order_pair.second;
+    Boe_Order & each_order = order_pair.second;
     const string & each_token = order_pair.first;
     if (each_order.still_live()){
       if (order_random_reject()) continue;
@@ -202,7 +258,7 @@ void boe_session::execution_logic(){
     active_orders.erase(each_token);
 }
 
-void boe_session::constructOrderExecuted(boe_order & curr_order){
+void boe_session::constructOrderExecuted(Boe_Order & curr_order){
   OrderExecution oe;
   oe.seq_num = ++seq_num;
   oe.transaction_time = get_timestamp();

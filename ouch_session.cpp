@@ -79,7 +79,7 @@ void ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
     constructOrderRejected('O', eo->token);
   else if((active_orders.find(eo->token._str_()) == active_orders.end()) and
       (finished_orders.find(eo->token._str_()) == finished_orders.end())){
-    ouch_order new_order = ouch_order(eo);
+    Ouch_Order new_order = Ouch_Order(eo);
     active_orders[eo->token._str_()] = new_order;
     constructOrderAccpeted(new_order);
   }
@@ -138,6 +138,9 @@ void ouch_session::replace_logic(){
     target_order.remain_time_in_force = ro.time_in_force;
     target_order.price = ro.price;
     target_order.intermarket_sweep_eligibility = ro.intermarket_sweep_eligibility;
+    //update the key in the map
+    swap(active_orders[ro.existing_token._str_()], active_orders[ro.new_token._str_()]);
+    active_orders.erase(ro.existing_token._str_());
     constructOrderReplaced(ro, target_order);
   }
   for (const auto & each_token : done_tokens)
@@ -201,7 +204,7 @@ void ouch_session::cancel_logic(){
 void ouch_session::execution_logic(){
   vector<string> done_tokens;
   for (auto & order_pair : active_orders){
-    ouch_order & each_order = order_pair.second;
+    Ouch_Order & each_order = order_pair.second;
     const string & each_token = order_pair.first;
     if (each_order.expired()){
       constructOrderCanceled(each_order.remaining_qty, 'T', each_order.token);
@@ -282,7 +285,7 @@ void ouch_session::init(){
   start_of_day = chrono::system_clock::from_time_t(t1);
 }
 
-void ouch_session::constructOrderAccpeted(const ouch_order & o){
+void ouch_session::constructOrderAccpeted(const Ouch_Order & o){
   OrderAccepted oa;
   oa.timestamp = get_timestamp();
   oa.token = o.token;
@@ -339,7 +342,7 @@ void ouch_session::constructOrderModified(uint32_t remaining_qty, const Ouch_Mod
   pending_out_messages.push_back(packet);
 }
 
-void ouch_session::constructOrderExecuted(ouch_order & o){
+void ouch_session::constructOrderExecuted(Ouch_Order & o){
   uint32_t exe_qty = (2 + rand() % 10) * 100;
   exe_qty = min(exe_qty, o.remaining_qty);
   if (o.min_qty and exe_qty > o.min_qty)
@@ -358,7 +361,7 @@ void ouch_session::constructOrderExecuted(ouch_order & o){
   pending_out_messages.push_back(packet);
 }
 
-void ouch_session::constructOrderReplaced(const Ouch_ReplaceOrderReq & ro, const ouch_order & new_order){
+void ouch_session::constructOrderReplaced(const Ouch_ReplaceOrderReq & ro, const Ouch_Order & new_order){
   OrderReplaced _or;
   _or.timestamp = get_timestamp();
   _or.token = new_order.token;

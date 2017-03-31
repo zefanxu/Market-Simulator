@@ -15,14 +15,14 @@ void Ouch_CancelOrderReq::parse_cancel_order(CancelOrder * co){
   qty = co->qty;
 }
 
-ouch_order::ouch_order(){
+Ouch_Order::Ouch_Order(){
 }
 
-ouch_order::ouch_order(EnterOrder* eo){
+Ouch_Order::Ouch_Order(EnterOrder* eo){
   parse_order(eo);
 }
 
-bool ouch_order::expired(){
+bool Ouch_Order::expired(){
   if ((time_in_force != TimeInForce::Ioc) and (time_in_force != TimeInForce::Market) and (time_in_force != TimeInForce::System)){
     auto curr_time = time(NULL);
     remain_time_in_force = time_in_force - (curr_time - recv_order_time);
@@ -30,7 +30,7 @@ bool ouch_order::expired(){
   return (remain_time_in_force <= 0);
 }
 
-void ouch_order::parse_order(EnterOrder* eo){
+void Ouch_Order::parse_order(EnterOrder* eo){
   time_in_force = eo->time_in_force;
   remain_time_in_force = time_in_force;
   token = eo->token;
@@ -48,7 +48,7 @@ void ouch_order::parse_order(EnterOrder* eo){
   capacity = eo->capacity;
 }
 
-bool ouch_order::still_live(){
+bool Ouch_Order::still_live(){
   if ((remaining_qty <= 0) or expired() or (state == OrderState::Dead)){
     state = OrderState::Dead;
     return false;

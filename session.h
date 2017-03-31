@@ -56,19 +56,21 @@ private:
   void modify_logic();
 
   void constructLoginResponse(boe::LoginResponseStatus status, boe::LoginRequest * req);
-  void constructOrderAccpeted(boe_order & new_order);
+  void constructOrderAccpeted(Boe_Order & new_order);
   void constructOrderRejected(boe::NewOrder * no);
-  void constructOrderExecuted(boe_order & curr_order);
+  void constructOrderExecuted(Boe_Order & curr_order);
   void constructCancelRejected(boe::Token t, boe::Reason r);
   void constructOrderCanceled(boe::Token t);
+  void constructModifyRejected(boe::Token t, boe::Reason r);
+  void constructOrderModified(const boe::Boe_Order & bo);
 
   uint64_t get_timestamp();
 
-  unordered_map<string, boe_order> active_orders;
-  unordered_map<string, boe_order> finished_orders;
-  vector<boe_order> pending_modify;
+  unordered_map<string, Boe_Order> active_orders;
+  unordered_map<string, Boe_Order> finished_orders;
+  vector<Boe_ModifyOrderReq> pending_modify;
   vector<Boe_CancelOrderReq> pending_cancel;
-  vector<boe_order> pending_replace;
+  vector<Boe_Order> pending_replace;
 
   unsigned int seq_num;
   time_t last_send_heartbeat;
@@ -102,18 +104,18 @@ private:
   void modify_logic();
   void replace_logic();
 
-  void constructOrderAccpeted(const ouch_order & o);
+  void constructOrderAccpeted(const Ouch_Order & o);
   void constructOrderRejected(char reason, ouch::Token t);
   void constructOrderCanceled(uint32_t dec_qty, char reason, ouch::Token t);
   void constructOrderModified(uint32_t remaining_qty, const Ouch_ModifyOrderReq & mo);
-  void constructOrderExecuted(ouch_order & o);
-  void constructOrderReplaced(const Ouch_ReplaceOrderReq & ro, const ouch_order & new_order);
+  void constructOrderExecuted(Ouch_Order & o);
+  void constructOrderReplaced(const Ouch_ReplaceOrderReq & ro, const Ouch_Order & new_order);
 
   uint64_t get_timestamp();
 
 
-  unordered_map<string, ouch_order> active_orders;
-  unordered_map<string, ouch_order> finished_orders;
+  unordered_map<string, Ouch_Order> active_orders;
+  unordered_map<string, Ouch_Order> finished_orders;
   vector<Ouch_CancelOrderReq> pending_cancel;
   vector<Ouch_ModifyOrderReq> pending_modify;
   vector<Ouch_ReplaceOrderReq> pending_replace;
