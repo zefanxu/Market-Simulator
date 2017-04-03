@@ -30,7 +30,7 @@ public:
 
 protected:
   bool should_execute();
-  time_t last_exec;
+  clock_t last_exec;
   session* market;
   bool alive;
   asio::io_service io_service;

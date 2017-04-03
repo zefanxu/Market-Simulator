@@ -6,7 +6,7 @@ TCPServer::TCPServer(){
   _socket = nullptr;
   market = nullptr;
   alive = false;
-  last_exec = time(NULL);
+  last_exec = clock();
 }
 
 TCPServer::TCPServer(unsigned int port){
@@ -16,7 +16,7 @@ TCPServer::TCPServer(unsigned int port){
   _acceptor = new asio::ip::tcp::acceptor(io_service, *_endpoint);
   _socket = new asio::ip::tcp::socket(io_service);
 
-  last_exec = time(NULL);
+  last_exec = clock();
   alive = false;
 }
 
@@ -51,9 +51,10 @@ bool TCPServer::isAlive(){
 }
 
 bool TCPServer::should_execute(){
-  time_t curr_time = time(NULL);
+  clock_t curr_time = clock();
   double interval = (double)1/(double)MAX_EXEC_PER_SECOND;
-  if (difftime(curr_time, last_exec) >= interval){
+  double time_passed = (double) (clock() - last_exec) / CLOCKS_PER_SEC;
+  if (time_passed >= interval){
     last_exec = curr_time;
     return true;
   }
