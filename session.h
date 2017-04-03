@@ -32,6 +32,9 @@ protected:
   virtual void modify_logic()=0;
   virtual void replace_logic()=0;
 
+  time_t last_send_heartbeat;
+  time_t last_recv_heartbeat;
+
   bool order_random_reject();
   char state;
   double random_reject_rate; //0 <= x <= 1, default to 0.3333
@@ -79,9 +82,6 @@ private:
   vector<Boe_Order> pending_replace;
 
   unsigned int seq_num;
-  time_t last_send_heartbeat;
-  time_t last_recv_heartbeat;
-
 };
 
 class ouch_session : public session{
@@ -118,15 +118,12 @@ private:
 
   uint64_t get_timestamp();
 
-
   unordered_map<string, Ouch_Order> active_orders;
   unordered_map<string, Ouch_Order> finished_orders;
   vector<Ouch_CancelOrderReq> pending_cancel;
   vector<Ouch_ModifyOrderReq> pending_modify;
   vector<Ouch_ReplaceOrderReq> pending_replace;
 
-  time_t last_send_heartbeat;
-  time_t last_recv_heartbeat;
   chrono::system_clock::time_point start_of_day;
 };
 

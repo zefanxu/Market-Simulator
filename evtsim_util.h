@@ -26,13 +26,13 @@ using boost::endian::big_to_native;
 using boost::endian::native_to_big;
 
 namespace evt{
-namespace ouch{
-const std::string inbound_to_string(const MsgHeader* m);
-const std::string outbound_to_string(const MsgHeader* m);
-}
-namespace boe{
-const std::string to_string(const MsgHeader* msg);
-}
+  namespace ouch{
+    const std::string inbound_to_string(const MsgHeader* m);
+    const std::string outbound_to_string(const MsgHeader* m);
+  }
+  namespace boe{
+    const std::string to_string(const MsgHeader* msg);
+  }
 }
 
 class logger{

@@ -74,8 +74,6 @@ public:
   boe::Token token;
 };
 
-
-
 class Ouch_ModifyOrderReq{
 public:
   Ouch_ModifyOrderReq();
