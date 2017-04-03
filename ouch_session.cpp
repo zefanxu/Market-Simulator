@@ -113,7 +113,7 @@ void ouch_session::cancelOrder(Ouch_MsgHeader * msg, size_t len){
   pending_cancel.push_back(co);
 }
 
-void ouch_session::market_logic(){
+void session::market_logic(){
   heartbeat_logic();
   cancel_logic();
   modify_logic();

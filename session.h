@@ -22,11 +22,17 @@ namespace session_state{
 class session{
 public:
   virtual ~session(){};
-  virtual void market_logic()=0;
+  virtual void market_logic();
   virtual void handle_packet(char* packet, size_t len)=0;
   vector<vector<char>> pending_out_messages;
 
 protected:
+  virtual void heartbeat_logic()=0;
+  virtual void cancel_logic()=0;
+  virtual void execution_logic()=0;
+  virtual void modify_logic()=0;
+  virtual void replace_logic()=0;
+
   bool order_random_reject();
   char state;
   double random_reject_rate; //0 <= x <= 1, default to 0.3333
@@ -50,10 +56,11 @@ private:
   void cancelOrder(boe::MsgHeader * msg, size_t len);
   void modifyOrder(boe::MsgHeader * msg, size_t len);
 
-  void heartbeat_logic();
-  void execution_logic();
-  void cancel_logic();
-  void modify_logic();
+  virtual void heartbeat_logic();
+  virtual void execution_logic();
+  virtual void cancel_logic();
+  virtual void modify_logic();
+  virtual void replace_logic(){};
 
   void constructLoginResponse(boe::LoginResponseStatus status, boe::LoginRequest * req);
   void constructOrderAccpeted(Boe_Order & new_order);
@@ -83,7 +90,6 @@ public:
   ouch_session();
   ouch_session(double random_reject_rate);
   virtual ~ouch_session();
-  virtual void market_logic();
   virtual void handle_packet(char * packet, size_t len);
 
 private:
@@ -98,11 +104,11 @@ private:
   void modifyOrder(ouch::Ouch_MsgHeader * msg, size_t len);
   void replaceOrder(ouch::Ouch_MsgHeader * msg, size_t len);
 
-  void heartbeat_logic();
-  void cancel_logic();
-  void execution_logic();
-  void modify_logic();
-  void replace_logic();
+  virtual void heartbeat_logic();
+  virtual void cancel_logic();
+  virtual void execution_logic();
+  virtual void modify_logic();
+  virtual void replace_logic();
 
   void constructOrderAccpeted(const Ouch_Order & o);
   void constructOrderRejected(char reason, ouch::Token t);
