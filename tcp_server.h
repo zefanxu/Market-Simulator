@@ -8,6 +8,9 @@
 #include "ouch_messages.h"
 #include "session.h"
 
+//maxinum number of execution per second
+#define MAX_EXEC_PER_SECOND 5;
+
 using namespace std;
 using namespace evt;
 
@@ -26,6 +29,8 @@ public:
   virtual void process(char * buf, size_t len);
 
 protected:
+  bool should_execute();
+  time_t last_exec;
   session* market;
   bool alive;
   asio::io_service io_service;

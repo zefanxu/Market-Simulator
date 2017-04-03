@@ -6,6 +6,7 @@ TCPServer::TCPServer(){
   _socket = nullptr;
   market = nullptr;
   alive = false;
+  last_exec = time(NULL);
 }
 
 TCPServer::TCPServer(unsigned int port){
@@ -15,6 +16,7 @@ TCPServer::TCPServer(unsigned int port){
   _acceptor = new asio::ip::tcp::acceptor(io_service, *_endpoint);
   _socket = new asio::ip::tcp::socket(io_service);
 
+  last_exec = time(NULL);
   alive = false;
 }
 
@@ -48,12 +50,22 @@ bool TCPServer::isAlive(){
   return alive;
 }
 
+bool should_execute(){
+  time_t curr_time = time(NULL);
+  double interval = (double)1/(double)MAX_EXEC_PER_SECOND;
+  if (difftime(curr_time, last_exec) >= interval){
+    last_exec = curr_time;
+    return true;
+  }
+  return false;
+}
+
 void TCPServer::process(char * buf, size_t len){
   if (!market) throw runtime_error("uninitialized server");
   if (len)
     market->handle_packet(buf, len);
-  usleep(100000); //sleep for 0.1s
-  market->market_logic();
+  if (should_execute()) //sleep for 0.1s
+    market->market_logic();
 }
 
 void SoupBinTCPServer::send(){
