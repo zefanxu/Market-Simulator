@@ -50,7 +50,7 @@ bool TCPServer::isAlive(){
   return alive;
 }
 
-bool should_execute(){
+bool TCPServer::should_execute(){
   time_t curr_time = time(NULL);
   double interval = (double)1/(double)MAX_EXEC_PER_SECOND;
   if (difftime(curr_time, last_exec) >= interval){
@@ -64,7 +64,7 @@ void TCPServer::process(char * buf, size_t len){
   if (!market) throw runtime_error("uninitialized server");
   if (len)
     market->handle_packet(buf, len);
-  if (should_execute()) //sleep for 0.1s
+  if (should_execute())
     market->market_logic();
 }
 
