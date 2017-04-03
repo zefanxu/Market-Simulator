@@ -16,7 +16,6 @@ using namespace evt;
 namespace session_state{
   constexpr char not_logged_in = 'N';
   constexpr char logged_in = 'L';
-  constexpr char losing_heartbeat = '1';
 }
 
 class session{

@@ -3,6 +3,11 @@
 
 using namespace evt::ouch;
 
+order::order(){
+  recv_order_time = time(NULL);
+  orderID = rand() * rand();
+}
+
 Ouch_CancelOrderReq::Ouch_CancelOrderReq(){
 }
 
