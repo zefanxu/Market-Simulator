@@ -116,6 +116,7 @@ void ouch_session::cancelOrder(Ouch_MsgHeader * msg, size_t len){
 void ouch_session::market_logic(){
   heartbeat_logic();
   cancel_logic();
+  modify_logic();
   replace_logic();
   execution_logic();
 }
