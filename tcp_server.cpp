@@ -42,6 +42,7 @@ void TCPServer::accept(){
     l.write(e.what());
     throw e;
   }
+  market->setLogger(&l);
   _socket->non_blocking(true);
   alive = true;
 }

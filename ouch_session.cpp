@@ -29,6 +29,7 @@ void ouch_session::handle_client_heartbeat(MsgHeader * packet, size_t len){
 
 void ouch_session::handle_packet(char * packet, size_t len){
   MsgHeader * msg_h = reinterpret_cast<MsgHeader*>(packet);
+  if (!validate(msg_h, len)) return;
   switch (msg_h->packet_type){
     case(static_cast<char>(PacketType::LoginRequest)):
       handle_login_request(msg_h, len);
@@ -66,6 +67,58 @@ void ouch_session::handle_message(MsgHeader * packet, size_t len){
     default:
       return;
   }
+}
+
+bool ouch_session::validate(MsgHeader* msg_h, size_t len){
+  if (!l) throw runtime_error("logger has not been set");
+  if (big_to_native(msg_h->length) != (len-2))
+    l.write_warning("message length mismatch: "+outbound_to_string(msg_h));
+  switch (msg_h->packet_type){
+    case(static_cast<char>(PacketType::LoginRequest)):
+      return validate_login_request(msg_h, len);
+    // case(static_cast<char>(PacketType::LogoutRequest)):
+    //   return validate_logout_request(msg_h, len);
+    // case(static_cast<char>(PacketType::ClientHeartbeat)):
+    //   return validate_client_heartbeat(msg_h, len);
+    // case(static_cast<char>(PacketType::UnsequencedData)):
+    //   auto ouch_msg_h = reinterpret_cast<Ouch_MsgHeader*>(msg_h);
+    //   switch (ouch_msg_h->msg_type) {
+    //     case(static_cast<char>(OutboundMsgType::EnterOrder)):
+    //       return validate_enterOrder(ouch_msg_h, len);
+    //     case(static_cast<char>(OutboundMsgType::ReplaceOrder)):
+    //       return validate_replaceOrder(ouch_msg_h, len);
+    //     case(static_cast<char>(OutboundMsgType::CancelOrder)):
+    //       return validate_cancelOrder(ouch_msg_h, len);
+    //     case(static_cast<char>(OutboundMsgType::ModifyOrder)):
+    //       return validate_modifyOrder(ouch_msg_h, len);
+        default:
+          return false;
+      }
+    default:
+      return false;
+}
+
+bool ouch_session::validate_login_request(MsgHeader* msg_h, size_t len){
+  if (big_to_native(msg_h->length) != (sizeof(LoginRequest)-2))
+    l.write_warning("message length mismatch: "+outbound_to_string(msg_h));
+  LoginRequest lr = *(reinterpret_cast<LoginRequest*>(msg_h));
+  int pos = 0;
+  for (pos = 0; pos < sizeof(lr.requested_seq_num); pos++){
+    if (lr.requested_seq_num[pos] == ' ') continue;
+    if (lr.requested_seq_num[pos] >= '0' and lr.requested_seq_num[i] <= '9')
+      break;
+    else{
+      l.write_warning("ill-formed login request packet: " + outbound_to_string(msg_h));
+      return false;
+    }
+  }
+  char * num_end = nullptr;
+  long long seq_num = strtol((msg_h->requested_seq_num + pos), &num_end, 10);
+  if (!num_end or num_end != &(lr.requested_seq_num[20])){
+    l.write_warning("invalid login request seq_num: " + outbound_to_string(msg_h));
+    return false;
+  }
+  return true;
 }
 
 void ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
@@ -119,6 +172,10 @@ void session::market_logic(){
   modify_logic();
   replace_logic();
   execution_logic();
+}
+
+void session:setLogger(Logger * l){
+  this->l = l;
 }
 
 void ouch_session::replace_logic(){
@@ -274,6 +331,8 @@ void ouch_session::init(){
   time_t curr_time = time(NULL);
   last_send_heartbeat = curr_time;
   last_recv_heartbeat = curr_time;
+
+  l = nullptr;
 
   //get the start of the day time
   time_t t1 = time(NULL);

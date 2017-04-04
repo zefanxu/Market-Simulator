@@ -35,10 +35,10 @@ namespace evt{
   }
 }
 
-class logger{
+class Logger{
 public:
-  logger();
-  ~logger();
+  Logger();
+  ~Logger();
   void write(string text);
   bool also_print;
 private:

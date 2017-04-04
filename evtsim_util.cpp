@@ -1,6 +1,6 @@
 #include "evtsim_util.h"
 
-string logger::get_datetime_string(){
+string Logger::get_datetime_string(){
   time_t t = time(nullptr);
   tm curr_tm = *localtime(&t);
   stringstream ss;
@@ -8,7 +8,7 @@ string logger::get_datetime_string(){
   return ss.str();
 }
 
-string logger::get_time_string(){
+string Logger::get_time_string(){
   time_t t = time(nullptr);
   tm curr_tm = *localtime(&t);
   stringstream ss;
@@ -16,20 +16,27 @@ string logger::get_time_string(){
   return ss.str();
 }
 
-logger::logger(){
+Logger::Logger(){
   string file_name = "log_" + get_datetime_string() + ".txt";
   file.open(file_name, ofstream::out);
   also_print = true;
 }
 
-void logger::write(string text){
+void Logger::write(string text){
   string log_text = "[" + get_time_string() + "] " + text + "\n";
   if (also_print)
     cout << log_text;
   file << log_text;
 }
 
-logger::~logger(){
+void Logger::write_warning(string text){
+  string log_text = "[" + get_time_string() + "][Warning] "+ text + "\n";
+  if (also_print)
+    cout << log_text;
+  file << log_text;
+}
+
+Logger::~Logger(){
   file.close();
 }
 

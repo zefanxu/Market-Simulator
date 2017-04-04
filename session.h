@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <map>
+#include <stdlib.h>
 #include <time.h>
 #include <chrono>
 #include "evtsim_util.h"
@@ -24,6 +24,7 @@ public:
   virtual void market_logic();
   virtual void handle_packet(char* packet, size_t len)=0;
   vector<vector<char>> pending_out_messages;
+  void setLogger(Logger * l);
 
 protected:
   virtual void heartbeat_logic()=0;
@@ -38,6 +39,7 @@ protected:
   bool order_random_reject();
   char state;
   double random_reject_rate; //0 <= x <= 1, default to 0.3333
+  Logger * l;
 };
 
 class boe_session : public session{
@@ -93,6 +95,9 @@ public:
 
 private:
   void init();
+  bool validate(ouch::MsgHeader* msg_h, size_t len);
+  bool validate_login_request(ouch::MsgHeader* msg_h, size_t len);
+
   void handle_login_request(ouch::MsgHeader * packet, size_t len);
   void handle_logout_request(ouch::MsgHeader * packet, size_t len);
   void handle_client_heartbeat(ouch::MsgHeader * packet, size_t len);
