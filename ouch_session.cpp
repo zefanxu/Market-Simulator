@@ -84,7 +84,7 @@ bool ouch_session::validate(MsgHeader* msg_h, size_t len){
       auto ouch_msg_h = reinterpret_cast<Ouch_MsgHeader*>(msg_h);
       switch (ouch_msg_h->msg_type) {
         case(static_cast<char>(OutboundMsgType::EnterOrder)):
-          return validate_enterOrder(ouch_msg_h, len);
+          return validate_enterOrder(msg_h, len);
     //     case(static_cast<char>(OutboundMsgType::ReplaceOrder)):
     //       return validate_replaceOrder(ouch_msg_h, len);
     //     case(static_cast<char>(OutboundMsgType::CancelOrder)):
@@ -94,12 +94,11 @@ bool ouch_session::validate(MsgHeader* msg_h, size_t len){
     //    default:
     //      return false;
     }
-    default:
-      return true;
   }
+  return true;
 }
 
-bool ouch_session::validate_enterOrder(ouch::Ouch_MsgHeader * packet, size_t len){
+bool ouch_session::validate_enterOrder(ouch::MsgHeader * packet, size_t len){
   if (big_to_native(packet->length) != (sizeof(EnterOrder)-2)){
     l->write_warning("message length mismatch: "+outbound_to_string(packet));
     return false;
