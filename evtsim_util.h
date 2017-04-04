@@ -40,6 +40,7 @@ namespace evtsim{
     Logger();
     ~Logger();
     void write(string text);
+    void write_warning(string text);
     bool also_print;
   private:
     ofstream file;
