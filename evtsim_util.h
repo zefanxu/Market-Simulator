@@ -34,18 +34,18 @@ namespace evt{
     const std::string to_string(const MsgHeader* msg);
   }
 }
-
-class Logger{
-public:
-  Logger();
-  ~Logger();
-  void write(string text);
-  bool also_print;
-private:
-  ofstream file;
-  string get_time_string();
-  string get_datetime_string();
-};
-
+namespace evtsim{
+  class Logger{
+  public:
+    Logger();
+    ~Logger();
+    void write(string text);
+    bool also_print;
+  private:
+    ofstream file;
+    string get_time_string();
+    string get_datetime_string();
+  };
+}
 
 #endif

@@ -70,7 +70,7 @@ void ouch_session::handle_message(MsgHeader * packet, size_t len){
 }
 
 bool ouch_session::validate(MsgHeader* msg_h, size_t len){
-  if (!l) throw runtime_error("logger has not been set");
+  if (!l) throw runtime_error("evtsim::Logger has not been set");
   if (big_to_native(msg_h->length) != (len-2))
     l.write_warning("message length mismatch: "+outbound_to_string(msg_h));
   switch (msg_h->packet_type){
@@ -174,7 +174,7 @@ void session::market_logic(){
   execution_logic();
 }
 
-void session:setLogger(Logger * l){
+void session:setLogger(evtsim::Logger * l){
   this->l = l;
 }
 

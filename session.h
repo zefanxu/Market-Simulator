@@ -24,7 +24,7 @@ public:
   virtual void market_logic();
   virtual void handle_packet(char* packet, size_t len)=0;
   vector<vector<char>> pending_out_messages;
-  void setLogger(Logger * l);
+  void setLogger(evtsim::Logger * l);
 
 protected:
   virtual void heartbeat_logic()=0;
@@ -39,7 +39,7 @@ protected:
   bool order_random_reject();
   char state;
   double random_reject_rate; //0 <= x <= 1, default to 0.3333
-  Logger * l;
+  evtsim::Logger * l;
 };
 
 class boe_session : public session{

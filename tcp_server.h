@@ -37,7 +37,7 @@ protected:
   asio::ip::tcp::endpoint* _endpoint;
   asio::ip::tcp::acceptor* _acceptor;
   asio::ip::tcp::socket* _socket;
-  Logger l;
+  evtsim::Logger l;
 };
 
 class SoupBinTCPServer: public TCPServer{
