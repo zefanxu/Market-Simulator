@@ -99,7 +99,7 @@ bool ouch_session::validate(MsgHeader* msg_h, size_t len){
   }
 }
 
-bool ouch_session::validate_enterOrder(ouch::MsgHeader * packet, size_t len){
+bool ouch_session::validate_enterOrder(ouch::Ouch_MsgHeader * packet, size_t len){
   if (big_to_native(packet->length) != (sizeof(EnterOrder)-2)){
     l->write_warning("message length mismatch: "+outbound_to_string(packet));
     return false;
