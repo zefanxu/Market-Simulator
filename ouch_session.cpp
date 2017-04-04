@@ -91,11 +91,12 @@ bool ouch_session::validate(MsgHeader* msg_h, size_t len){
     //       return validate_cancelOrder(ouch_msg_h, len);
     //     case(static_cast<char>(OutboundMsgType::ModifyOrder)):
     //       return validate_modifyOrder(ouch_msg_h, len);
-        default:
-          return false;
-      }
+    //    default:
+    //      return false;
+    //}
     default:
       return false;
+  }
 }
 
 bool ouch_session::validate_login_request(MsgHeader* msg_h, size_t len){
@@ -113,7 +114,7 @@ bool ouch_session::validate_login_request(MsgHeader* msg_h, size_t len){
     }
   }
   char * num_end = nullptr;
-  long long seq_num = strtol((msg_h->requested_seq_num + pos), &num_end, 10);
+  strtol((lr.requested_seq_num + pos), &num_end, 10);
   if (!num_end or num_end != &(lr.requested_seq_num[20])){
     l->write_warning("invalid login request seq_num: " + outbound_to_string(msg_h));
     return false;

@@ -73,8 +73,8 @@ main(int argc, char** argv) {
   char * buf; bool any_alive = false;
 
   vector<unique_ptr<TCPServer>> servers;
-  //servers.push_back(unique_ptr<TCPServer>(new SoupBinTCPServer(port_num)));
-  servers.push_back(unique_ptr<TCPServer>(new BOEServer(port_num+1)));
+  servers.push_back(unique_ptr<TCPServer>(new SoupBinTCPServer(port_num)));
+  //servers.push_back(unique_ptr<TCPServer>(new BOEServer(port_num+1)));
 
   for (const auto & s : servers){
     s->accept();
