@@ -80,11 +80,11 @@ bool ouch_session::validate(MsgHeader* msg_h, size_t len){
       return validate_logout_request(msg_h, len);
     case(static_cast<char>(PacketType::ClientHeartbeat)):
       return validate_client_heartbeat(msg_h, len);
-    // case(static_cast<char>(PacketType::UnsequencedData)):
-    //   auto ouch_msg_h = reinterpret_cast<Ouch_MsgHeader*>(msg_h);
-    //   switch (ouch_msg_h->msg_type) {
-    //     case(static_cast<char>(OutboundMsgType::EnterOrder)):
-    //       return validate_enterOrder(ouch_msg_h, len);
+    case(static_cast<char>(PacketType::UnsequencedData)):
+      auto ouch_msg_h = reinterpret_cast<Ouch_MsgHeader*>(msg_h);
+      switch (ouch_msg_h->msg_type) {
+        case(static_cast<char>(OutboundMsgType::EnterOrder)):
+          return validate_enterOrder(ouch_msg_h, len);
     //     case(static_cast<char>(OutboundMsgType::ReplaceOrder)):
     //       return validate_replaceOrder(ouch_msg_h, len);
     //     case(static_cast<char>(OutboundMsgType::CancelOrder)):
@@ -93,11 +93,49 @@ bool ouch_session::validate(MsgHeader* msg_h, size_t len){
     //       return validate_modifyOrder(ouch_msg_h, len);
     //    default:
     //      return false;
-    //}
+    }
     default:
-      return false;
+      return true;
   }
 }
+
+bool ouch_session::validate_enterOrder(ouch::MsgHeader * packet, size_t len){
+  if (big_to_native(msg_h->length) != (sizeof(EnterOrder)-2)){
+    l->write_warning("message length mismatch: "+outbound_to_string(msg_h));
+    return false;
+  }
+  EnterOrder eo = *(reinterpret_cast<EnterOrder*>(msg_h));
+  eo.from_network();
+  if (eo.side != 'B' and eo.side != 'S' and eo.side != 'T' and eo.side != 'E'){
+    l->write_warning("invalide EnterOrder side: "+outbound_to_string(msg_h));
+    return false;
+  if (eo.qty <= 0 or eo.qty > 1000000){
+    l->write_warning("invalide EnterOrder qty: "+outbound_to_string(msg_h));
+    return false;
+  }
+  if (eo.display != 'A' and eo.display != 'Y' and eo.display != 'N' and eo.display != 'P'
+      and eo.display != 'I' and eo.display != 'M' and eo.display != 'W' and eo.display != 'L'
+      and eo.display != 'O' and eo.display != 'T' and eo.display != 'Q'){
+        l->write_warning("invalide EnterOrder display: "+outbound_to_string(msg_h));
+        return false;
+  }
+  if (eo.intermarket_sweep_eligibility != 'Y' and eo.intermarket_sweep_eligibility != 'N'
+      and eo.intermarket_sweep_eligibility != 'y'){
+        l->write_warning("invalide EnterOrder intermarket_sweep_eligibility: "+outbound_to_string(msg_h));
+        return false;
+  }
+  if (eo.cross_type != 'N' and eo.cross_type != 'O' and eo.cross_type != 'C' and eo.cross_type != 'H'
+      and eo.cross_type != 'S' and eo.cross_type != 'R'){
+        l->write_warning("invalide EnterOrder cross_type: "+outbound_to_string(msg_h));
+        return false;
+  }
+  if (eo.customer_type != ' ' and eo.customer_type != 'R' and eo.customer_type != 'N'){
+    l->write_warning("invalide EnterOrder customer_type: "+outbound_to_string(msg_h));
+    return false;
+  }
+  return true;
+}
+
 
 bool ouch_session::validate_client_heartbeat(MsgHeader* msg_h, size_t len){
   if (big_to_native(msg_h->length) != (sizeof(ClientHeartbeat)-2)){
