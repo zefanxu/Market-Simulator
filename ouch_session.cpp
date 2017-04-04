@@ -100,18 +100,26 @@ bool ouch_session::validate(MsgHeader* msg_h, size_t len){
 }
 
 bool ouch_session::validate_client_heartbeat(MsgHeader* msg_h, size_t len){
-  if (big_to_native(msg_h->length) != (sizeof(ClientHeartbeat)-2))
+  if (big_to_native(msg_h->length) != (sizeof(ClientHeartbeat)-2)){
     l->write_warning("message length mismatch: "+outbound_to_string(msg_h));
+    return false;
+  }
+  return true;
 }
 
 bool ouch_session::validate_logout_request(MsgHeader* msg_h, size_t len){
-  if (big_to_native(msg_h->length) != (sizeof(LogoutRequest)-2))
+  if (big_to_native(msg_h->length) != (sizeof(LogoutRequest)-2)){
     l->write_warning("message length mismatch: "+outbound_to_string(msg_h));
+    return false;
+  }
+  return true;
 }
 
 bool ouch_session::validate_login_request(MsgHeader* msg_h, size_t len){
-  if (big_to_native(msg_h->length) != (sizeof(LoginRequest)-2))
+  if (big_to_native(msg_h->length) != (sizeof(LoginRequest)-2)){
     l->write_warning("message length mismatch: "+outbound_to_string(msg_h));
+    return false;
+  }
   LoginRequest lr = *(reinterpret_cast<LoginRequest*>(msg_h));
   unsigned int pos = 0;
   for (pos = 0; pos < sizeof(lr.requested_seq_num); pos++){
