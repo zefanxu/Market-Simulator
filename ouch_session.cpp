@@ -100,37 +100,38 @@ bool ouch_session::validate(MsgHeader* msg_h, size_t len){
 }
 
 bool ouch_session::validate_enterOrder(ouch::MsgHeader * packet, size_t len){
-  if (big_to_native(msg_h->length) != (sizeof(EnterOrder)-2)){
-    l->write_warning("message length mismatch: "+outbound_to_string(msg_h));
+  if (big_to_native(packet->length) != (sizeof(EnterOrder)-2)){
+    l->write_warning("message length mismatch: "+outbound_to_string(packet));
     return false;
   }
-  EnterOrder eo = *(reinterpret_cast<EnterOrder*>(msg_h));
+  EnterOrder eo = *(reinterpret_cast<EnterOrder*>(packet));
   eo.from_network();
   if (eo.side != 'B' and eo.side != 'S' and eo.side != 'T' and eo.side != 'E'){
-    l->write_warning("invalide EnterOrder side: "+outbound_to_string(msg_h));
+    l->write_warning("invalide EnterOrder side: "+outbound_to_string(packet));
     return false;
+  }
   if (eo.qty <= 0 or eo.qty > 1000000){
-    l->write_warning("invalide EnterOrder qty: "+outbound_to_string(msg_h));
+    l->write_warning("invalide EnterOrder qty: "+outbound_to_string(packet));
     return false;
   }
   if (eo.display != 'A' and eo.display != 'Y' and eo.display != 'N' and eo.display != 'P'
       and eo.display != 'I' and eo.display != 'M' and eo.display != 'W' and eo.display != 'L'
       and eo.display != 'O' and eo.display != 'T' and eo.display != 'Q'){
-        l->write_warning("invalide EnterOrder display: "+outbound_to_string(msg_h));
+        l->write_warning("invalide EnterOrder display: "+outbound_to_string(packet));
         return false;
   }
   if (eo.intermarket_sweep_eligibility != 'Y' and eo.intermarket_sweep_eligibility != 'N'
       and eo.intermarket_sweep_eligibility != 'y'){
-        l->write_warning("invalide EnterOrder intermarket_sweep_eligibility: "+outbound_to_string(msg_h));
+        l->write_warning("invalide EnterOrder intermarket_sweep_eligibility: "+outbound_to_string(packet));
         return false;
   }
   if (eo.cross_type != 'N' and eo.cross_type != 'O' and eo.cross_type != 'C' and eo.cross_type != 'H'
       and eo.cross_type != 'S' and eo.cross_type != 'R'){
-        l->write_warning("invalide EnterOrder cross_type: "+outbound_to_string(msg_h));
+        l->write_warning("invalide EnterOrder cross_type: "+outbound_to_string(packet));
         return false;
   }
   if (eo.customer_type != ' ' and eo.customer_type != 'R' and eo.customer_type != 'N'){
-    l->write_warning("invalide EnterOrder customer_type: "+outbound_to_string(msg_h));
+    l->write_warning("invalide EnterOrder customer_type: "+outbound_to_string(packet));
     return false;
   }
   return true;
