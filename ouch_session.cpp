@@ -76,10 +76,10 @@ bool ouch_session::validate(MsgHeader* msg_h, size_t len){
   switch (msg_h->packet_type){
     case(static_cast<char>(PacketType::LoginRequest)):
       return validate_login_request(msg_h, len);
-    // case(static_cast<char>(PacketType::LogoutRequest)):
-    //   return validate_logout_request(msg_h, len);
-    // case(static_cast<char>(PacketType::ClientHeartbeat)):
-    //   return validate_client_heartbeat(msg_h, len);
+    case(static_cast<char>(PacketType::LogoutRequest)):
+      return validate_logout_request(msg_h, len);
+    case(static_cast<char>(PacketType::ClientHeartbeat)):
+      return validate_client_heartbeat(msg_h, len);
     // case(static_cast<char>(PacketType::UnsequencedData)):
     //   auto ouch_msg_h = reinterpret_cast<Ouch_MsgHeader*>(msg_h);
     //   switch (ouch_msg_h->msg_type) {
@@ -97,6 +97,16 @@ bool ouch_session::validate(MsgHeader* msg_h, size_t len){
     default:
       return false;
   }
+}
+
+bool ouch_session::validate_client_heartbeat(MsgHeader* msg_h, size_t len){
+  if (big_to_native(msg_h->length) != (sizeof(ClientHeartbeat)-2))
+    l->write_warning("message length mismatch: "+outbound_to_string(msg_h));
+}
+
+bool ouch_session::validate_logout_request(MsgHeader* msg_h, size_t len){
+  if (big_to_native(msg_h->length) != (sizeof(LogoutRequest)-2))
+    l->write_warning("message length mismatch: "+outbound_to_string(msg_h));
 }
 
 bool ouch_session::validate_login_request(MsgHeader* msg_h, size_t len){

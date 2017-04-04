@@ -97,6 +97,8 @@ private:
   void init();
   bool validate(ouch::MsgHeader* msg_h, size_t len);
   bool validate_login_request(ouch::MsgHeader* msg_h, size_t len);
+  bool validate_logout_request(ouch::MsgHeader* msg_h, size_t len);
+  bool validate_client_heartbeat(ouch::MsgHeader* msg_h, size_t len);
 
   void handle_login_request(ouch::MsgHeader * packet, size_t len);
   void handle_logout_request(ouch::MsgHeader * packet, size_t len);
