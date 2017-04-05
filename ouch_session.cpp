@@ -91,13 +91,9 @@ bool ouch_session::validate(MsgHeader* msg_h, size_t len){
           return validate_cancelOrder(msg_h, len);
         case(static_cast<char>(OutboundMsgType::ModifyOrder)):
           return validate_modifyOrder(msg_h, len);
-         default:
-           return false;
       }
-    default:
-      return false;
   }
-  return true;
+  return false;
 }
 
 bool ouch_session::validate_replaceOrder(MsgHeader * packet, size_t len){
