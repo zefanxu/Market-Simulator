@@ -217,9 +217,21 @@ bool ouch_session::validate_login_request(MsgHeader* msg_h, size_t len){
     return false;
   }
   LoginRequest lr = *(reinterpret_cast<LoginRequest*>(msg_h));
-
+  unsigned int pos = 0;
+  //validate seq_num left padded with white space
+  //find the position of the first digit
+  for (pos = 0; pos < sizeof(lr.requested_seq_num); pos++){
+    if (lr.requested_seq_num[pos] == ' ') continue;
+    if (lr.requested_seq_num[pos] >= '0' and lr.requested_seq_num[pos] <= '9')
+      break;
+    else{
+      l->write_warning("ill-formed login request packet: " + outbound_to_string(msg_h));
+      return false;
+    }
+  }
+  //validate it contains only decimal numbers after white space
   char * num_end = nullptr;
-  strtoll(lr.requested_seq_num, &num_end, 10);
+  strtoll((lr.requested_seq_num + pos), &num_end, 10);
   if (!num_end or num_end != &(lr.requested_seq_num[20])){
     l->write_warning("invalid login request seq_num: " + outbound_to_string(msg_h));
     return false;
