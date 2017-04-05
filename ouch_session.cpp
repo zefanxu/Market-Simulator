@@ -85,20 +85,55 @@ bool ouch_session::validate(MsgHeader* msg_h, size_t len){
       switch (ouch_msg_h->msg_type) {
         case(static_cast<char>(OutboundMsgType::EnterOrder)):
           return validate_enterOrder(msg_h, len);
-    //     case(static_cast<char>(OutboundMsgType::ReplaceOrder)):
-    //       return validate_replaceOrder(ouch_msg_h, len);
-    //     case(static_cast<char>(OutboundMsgType::CancelOrder)):
-    //       return validate_cancelOrder(ouch_msg_h, len);
-    //     case(static_cast<char>(OutboundMsgType::ModifyOrder)):
-    //       return validate_modifyOrder(ouch_msg_h, len);
-    //    default:
-    //      return false;
-    }
+        case(static_cast<char>(OutboundMsgType::ReplaceOrder)):
+          return validate_replaceOrder(ouch_msg_h, len);
+        case(static_cast<char>(OutboundMsgType::CancelOrder)):
+          return validate_cancelOrder(ouch_msg_h, len);
+        case(static_cast<char>(OutboundMsgType::ModifyOrder)):
+          return validate_modifyOrder(ouch_msg_h, len);
+         default:
+           return false;
+      }
+    default:
+      return false;
   }
   return true;
 }
 
-bool ouch_session::validate_enterOrder(ouch::MsgHeader * packet, size_t len){
+bool ouch_session::validate_replaceOrder(MsgHeader * packet, size_t len){
+  if (big_to_native(packet->length) != (sizeof(ReplaceOrder)-2)){
+    l->write_warning("message length mismatch: "+outbound_to_string(packet));
+    return false;
+  }
+  ReplaceOrder ro = *(reinterpret_cast<ReplaceOrder*>(packet));
+  ro.from_network();
+  if (ro.side != 'B' and ro.side != 'S' and ro.side != 'T' and ro.side != 'E'){
+    l->write_warning("invalide ReplaceOrder side: "+outbound_to_string(packet));
+    return false;
+  }
+  if (ro.qty <= 0 or ro.qty > 1000000){
+    l->write_warning("invalide ReplaceOrder qty: "+outbound_to_string(packet));
+    return false;
+  }
+  if (ro.display != 'A' and ro.display != 'Y' and ro.display != 'N' and ro.display != 'P'
+      and ro.display != 'I' and ro.display != 'M' and ro.display != 'W' and ro.display != 'L'
+      and ro.display != 'O' and ro.display != 'T' and ro.display != 'Q'){
+        l->write_warning("invalide ReplaceOrder display: "+outbound_to_string(packet));
+        return false;
+  }
+  if (ro.intermarket_sweep_eligibility != 'Y' and ro.intermarket_sweep_eligibility != 'N'
+      and ro.intermarket_sweep_eligibility != 'y'){
+        l->write_warning("invalide ReplaceOrder intermarket_sweep_eligibility: "+outbound_to_string(packet));
+        return false;
+  }
+  if (ro.price > 1999999900 and ro.price != 2147483647){
+    l->write_warning("invalide ReplaceOrder price: "+outbound_to_string(packet));
+    return false;
+  }
+  return true;
+}
+
+bool ouch_session::validate_enterOrder(MsgHeader * packet, size_t len){
   if (big_to_native(packet->length) != (sizeof(EnterOrder)-2)){
     l->write_warning("message length mismatch: "+outbound_to_string(packet));
     return false;
@@ -107,6 +142,10 @@ bool ouch_session::validate_enterOrder(ouch::MsgHeader * packet, size_t len){
   eo.from_network();
   if (eo.side != 'B' and eo.side != 'S' and eo.side != 'T' and eo.side != 'E'){
     l->write_warning("invalide EnterOrder side: "+outbound_to_string(packet));
+    return false;
+  }
+  if (eo.price > 1999999900 and eo.price != 2147483647){
+    l->write_warning("invalide EnterOrder price: "+outbound_to_string(packet));
     return false;
   }
   if (eo.qty <= 0 or eo.qty > 1000000){
@@ -136,6 +175,33 @@ bool ouch_session::validate_enterOrder(ouch::MsgHeader * packet, size_t len){
   return true;
 }
 
+bool ouch_session::validate_cancelOrder(MsgHeader* packet, size_t len){
+  if (big_to_native(msg_h->length) != (sizeof(CancelOrder)-2)){
+    l->write_warning("message length mismatch: "+outbound_to_string(msg_h));
+    return false;
+  }
+  CancelOrder co = *(reinterpret_cast<CancelOrder*>(packet));
+  co.from_network();
+  if (co.qty > 1000000){
+    l->write_warning("invalide CancelOrder qty: "+outbound_to_string(packet));
+    return false;
+  }
+  return true;
+}
+
+bool ouch_session::validate_modifyOrder(MsgHeader* packet, size_t len){
+  if (big_to_native(msg_h->length) != (sizeof(ModifyOrder)-2)){
+    l->write_warning("message length mismatch: "+outbound_to_string(msg_h));
+    return false;
+  }
+  ModifyOrder mo = *(reinterpret_cast<ModifyOrder*>(packet));
+  mo.from_network();
+  if (mo.qty > 1000000){
+    l->write_warning("invalide ModifyOrder qty: "+outbound_to_string(packet));
+    return false;
+  }
+  return true;
+}
 
 bool ouch_session::validate_client_heartbeat(MsgHeader* msg_h, size_t len){
   if (big_to_native(msg_h->length) != (sizeof(ClientHeartbeat)-2)){
