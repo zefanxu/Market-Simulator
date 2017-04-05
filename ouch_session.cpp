@@ -86,11 +86,11 @@ bool ouch_session::validate(MsgHeader* msg_h, size_t len){
         case(static_cast<char>(OutboundMsgType::EnterOrder)):
           return validate_enterOrder(msg_h, len);
         case(static_cast<char>(OutboundMsgType::ReplaceOrder)):
-          return validate_replaceOrder(ouch_msg_h, len);
+          return validate_replaceOrder(msg_h, len);
         case(static_cast<char>(OutboundMsgType::CancelOrder)):
-          return validate_cancelOrder(ouch_msg_h, len);
+          return validate_cancelOrder(msg_h, len);
         case(static_cast<char>(OutboundMsgType::ModifyOrder)):
-          return validate_modifyOrder(ouch_msg_h, len);
+          return validate_modifyOrder(msg_h, len);
          default:
            return false;
       }
@@ -107,10 +107,6 @@ bool ouch_session::validate_replaceOrder(MsgHeader * packet, size_t len){
   }
   ReplaceOrder ro = *(reinterpret_cast<ReplaceOrder*>(packet));
   ro.from_network();
-  if (ro.side != 'B' and ro.side != 'S' and ro.side != 'T' and ro.side != 'E'){
-    l->write_warning("invalide ReplaceOrder side: "+outbound_to_string(packet));
-    return false;
-  }
   if (ro.qty <= 0 or ro.qty > 1000000){
     l->write_warning("invalide ReplaceOrder qty: "+outbound_to_string(packet));
     return false;
@@ -176,8 +172,8 @@ bool ouch_session::validate_enterOrder(MsgHeader * packet, size_t len){
 }
 
 bool ouch_session::validate_cancelOrder(MsgHeader* packet, size_t len){
-  if (big_to_native(msg_h->length) != (sizeof(CancelOrder)-2)){
-    l->write_warning("message length mismatch: "+outbound_to_string(msg_h));
+  if (big_to_native(packet->length) != (sizeof(CancelOrder)-2)){
+    l->write_warning("message length mismatch: "+outbound_to_string(packet));
     return false;
   }
   CancelOrder co = *(reinterpret_cast<CancelOrder*>(packet));
@@ -190,8 +186,8 @@ bool ouch_session::validate_cancelOrder(MsgHeader* packet, size_t len){
 }
 
 bool ouch_session::validate_modifyOrder(MsgHeader* packet, size_t len){
-  if (big_to_native(msg_h->length) != (sizeof(ModifyOrder)-2)){
-    l->write_warning("message length mismatch: "+outbound_to_string(msg_h));
+  if (big_to_native(packet->length) != (sizeof(ModifyOrder)-2)){
+    l->write_warning("message length mismatch: "+outbound_to_string(packet));
     return false;
   }
   ModifyOrder mo = *(reinterpret_cast<ModifyOrder*>(packet));
