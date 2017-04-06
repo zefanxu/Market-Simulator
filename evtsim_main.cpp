@@ -1,17 +1,10 @@
 #include <signal.h>
 #include <stdlib.h>
-#include <time.h>
 #include <boost/program_options.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/asio.hpp>
 #include <iostream>
 #include <string>
 #include <unistd.h>
-#include <evt_server.h>
-#include <evt_util.h>
-#include "evtsim_util.h"
-#include "ouch_messages.h"
-#include "session.h"
 #include "tcp_server.h"
 
 using namespace std;
@@ -64,7 +57,6 @@ main(int argc, char** argv) {
     return 1;
   }
 
-  int boe_port_num, ouch_port_num;
   vector<unique_ptr<TCPServer>> servers;
   asio::io_service io_service;
 
@@ -74,11 +66,11 @@ main(int argc, char** argv) {
     return 2;
   }
   if (vm.count("ouchport")){
-    ouch_port_num = vm["ouchport"].as<int>();
+    int ouch_port_num = vm["ouchport"].as<int>();
     servers.push_back(unique_ptr<TCPServer>(new SoupBinTCPServer(ouch_port_num, &io_service)));
   }
   if (vm.count("boeport")){
-    boe_port_num = vm["boeport"].as<int>();
+    int boe_port_num = vm["boeport"].as<int>();
     servers.push_back(unique_ptr<TCPServer>(new BOEServer(boe_port_num, &io_service)));
   }
 
