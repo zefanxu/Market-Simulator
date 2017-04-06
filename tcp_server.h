@@ -26,7 +26,7 @@ public:
   void accept(const boost::system::error_code& error);
   virtual void read(boost::system::error_code ec, size_t bytes_received)=0;
   virtual void send()=0;
-  virtual void process();
+  virtual void process(const boost::system::error_code& error);
   virtual void reconnect();
 
 protected:
@@ -45,7 +45,6 @@ public:
   SoupBinTCPServer(unsigned int port, asio::io_service* io_service);
   virtual void read(boost::system::error_code ec, size_t bytes_received);
   virtual void send();
-
 };
 
 class BOEServer: public TCPServer{
