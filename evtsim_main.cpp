@@ -67,34 +67,23 @@ main(int argc, char** argv) {
   int boe_port_num, ouch_port_num;
   char * buf; bool any_alive = false;
   vector<unique_ptr<TCPServer>> servers;
+  asio::io_service io_service;
 
   if (!vm.count("ouchport") and !vm.count("boeport")){
-    cout << "missing port number" << endl;
+    cout << "need at least one port number" << endl;
     cout << opts << endl;
     return 2;
   }
   if (vm.count("ouchport")){
     ouch_port_num = vm["ouchport"].as<int>();
-    servers.push_back(unique_ptr<TCPServer>(new SoupBinTCPServer(ouch_port_num)));
+    servers.push_back(unique_ptr<TCPServer>(new SoupBinTCPServer(ouch_port_num, &io_service)));
   }
   if (vm.count("boeport")){
     boe_port_num = vm["boeport"].as<int>();
-    servers.push_back(unique_ptr<TCPServer>(new BOEServer(boe_port_num)));
+    servers.push_back(unique_ptr<TCPServer>(new BOEServer(boe_port_num, &io_service)));
   }
 
-  for (const auto & s : servers){
-    s->accept();
-    if (s->isAlive()) any_alive = true;
-  }
-  while (any_alive){
-    any_alive = false;
-    for (const auto & s : servers){
-      if (!s->isAlive()) continue;
-      any_alive = true;
-      size_t len = s->read(buf);
-      s->process(buf, len);
-      s->send();
-    }
-  }
+  io_service.run();
+
   return 0;
 }

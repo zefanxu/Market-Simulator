@@ -1,6 +1,8 @@
 #pragma once
 #include <boost/lexical_cast.hpp>
 #include <boost/asio.hpp>
+#include <boost/bind.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
@@ -19,49 +21,35 @@ typedef vector<char> message;
 
 class TCPServer{
 public:
-  TCPServer();
-  TCPServer(unsigned int port);
+  TCPServer(unsigned int port, asio::io_service* io_service);
   virtual ~TCPServer();
   void accept();
-  bool isAlive();
-  virtual int read(char* & buf)=0;
+  virtual void read(boost::system::error_code ec, size_t bytes_received)=0;
   virtual void send()=0;
   virtual void process(char * buf, size_t len);
 
 protected:
-  bool should_execute();
-  clock_t last_exec;
   session* market;
-  bool alive;
-  asio::io_service io_service;
+  asio::deadline_timer* _timer;
+  asio::io_service* _io_service;
   asio::ip::tcp::endpoint* _endpoint;
   asio::ip::tcp::acceptor* _acceptor;
   asio::ip::tcp::socket* _socket;
   evtsim::Logger l;
+  boost::array<char, 4096> buf;
 };
 
 class SoupBinTCPServer: public TCPServer{
 public:
-  SoupBinTCPServer();
-  SoupBinTCPServer(unsigned int port);
-  virtual int read(char* & outbuf);
+  SoupBinTCPServer(unsigned int port, asio::io_service* io_service);
+  virtual void read(boost::system::error_code ec, size_t bytes_received);
   virtual void send();
 
-private:
-  unsigned int packet_len, read_len;
-  char * read_pos;
-  boost::array<char, 4096> buf;
 };
 
 class BOEServer: public TCPServer{
 public:
-  BOEServer();
-  BOEServer(unsigned int port);
-  virtual int read(char* & outbuf);
+  BOEServer(unsigned int port, asio::io_service* io_service);
+  virtual void read(boost::system::error_code ec, size_t bytes_received);
   virtual void send();
-
-private:
-  unsigned int packet_len, read_len;
-  char * read_pos;
-  boost::array<char, 4096> buf;
 };
