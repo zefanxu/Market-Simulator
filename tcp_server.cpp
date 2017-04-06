@@ -10,7 +10,7 @@ TCPServer::TCPServer(unsigned int port, asio::io_service* io_service){
   _timer = new asio::deadline_timer(*_io_service, boost::posix_time::milliseconds(1000/MAX_EXEC_PER_SECOND));
   if (!_socket)
     throw runtime_error("Invalid socket");
-  l.write("[TCP]Accepting Connection");
+  l.write("[TCP]Accepting Connection on port " + to_string(port));
   _acceptor->async_accept(*_socket, boost::bind(&TCPServer::accept, this, asio::placeholders::error));
 }
 
@@ -48,6 +48,9 @@ void TCPServer::process(const boost::system::error_code& error){
 
 void TCPServer::reconnect(){
   l.write("[TCP]Attempt to reconnect");
+  if (_socket)
+    delete _socket;
+  _socket = new asio::ip::tcp::socket(*_io_service);
   _acceptor->async_accept(*_socket, boost::bind(&TCPServer::accept, this, asio::placeholders::error));
 }
 
