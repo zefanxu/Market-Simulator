@@ -34,15 +34,16 @@ void TCPServer::accept(const boost::system::error_code& error){
   _socket->async_read_some(asio::buffer(buf),
                 boost::bind(&TCPServer::read, this,
                 asio::placeholders::error, asio::placeholders::bytes_transferred));
-  _timer->async_wait(boost::bind(&TCPServer::process, this));
+  _timer->async_wait(boost::bind(&TCPServer::process, this, asio::placeholders::error));
 }
 
-void TCPServer::process(){
+void TCPServer::process(const boost::system::error_code& error){
+  if (error) return;
   if (!market) throw runtime_error("Uninitialized server");
   market->market_logic();
   send();
   _timer->expires_at(_timer->expires_at() + boost::posix_time::milliseconds(1000/MAX_EXEC_PER_SECOND));
-  _timer->async_wait(boost::bind(&TCPServer::process, this));
+  _timer->async_wait(boost::bind(&TCPServer::process, this, asio::placeholders::error));
 }
 
 void TCPServer::reconnect(){
