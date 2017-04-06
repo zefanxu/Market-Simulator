@@ -38,8 +38,8 @@ main(int argc, char** argv) {
   bpo::options_description opts("Available options");
   opts.add_options()
     ("help,h", "produce help message")
-    ("config,c", bpo::value<string>(), "specify configuration file")
-    ("version", "show version")
+    // ("config,c", bpo::value<string>(), "specify configuration file")
+    // ("version", "show version")
     ("ouchport,o", bpo::value<int>(), "ouch server listen port number")
     ("boeport,b", bpo::value<int>(), "boe server listen port number")
     ;
