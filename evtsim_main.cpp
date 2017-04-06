@@ -31,6 +31,7 @@ get_evtsim_version() {
 int
 main(int argc, char** argv) {
   srand(time(NULL));
+  signal(SIGINT, signal_handler);  
   bpo::options_description opts("Available options");
   opts.add_options()
     ("help,h", "produce help message")
