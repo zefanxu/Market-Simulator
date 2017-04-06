@@ -12,8 +12,11 @@ using namespace evt;
 namespace bpo = boost::program_options;
 namespace asio = boost::asio;
 
+asio::io_service io_service;
+
 void
 signal_handler(int signum) {
+  io_service.stop();
 }
 
 const char*
@@ -58,7 +61,6 @@ main(int argc, char** argv) {
   }
 
   vector<unique_ptr<TCPServer>> servers;
-  asio::io_service io_service;
 
   if (!vm.count("ouchport") and !vm.count("boeport")){
     cout << "need at least one port number" << endl;
