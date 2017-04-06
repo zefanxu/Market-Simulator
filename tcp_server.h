@@ -11,7 +11,7 @@
 #include "session.h"
 
 //maxinum number of execution per second
-#define MAX_EXEC_PER_SECOND 5;
+#define MAX_EXEC_PER_SECOND 5
 
 using namespace std;
 using namespace evt;
@@ -23,10 +23,10 @@ class TCPServer{
 public:
   TCPServer(unsigned int port, asio::io_service* io_service);
   virtual ~TCPServer();
-  void accept();
+  void accept(const boost::system::error_code& error);
   virtual void read(boost::system::error_code ec, size_t bytes_received)=0;
   virtual void send()=0;
-  virtual void process(char * buf, size_t len);
+  virtual void process();
 
 protected:
   session* market;

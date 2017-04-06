@@ -65,7 +65,6 @@ main(int argc, char** argv) {
   }
 
   int boe_port_num, ouch_port_num;
-  char * buf; bool any_alive = false;
   vector<unique_ptr<TCPServer>> servers;
   asio::io_service io_service;
 

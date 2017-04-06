@@ -7,11 +7,9 @@ TCPServer::TCPServer(unsigned int port, asio::io_service* io_service){
   _endpoint = new asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port);
   _acceptor = new asio::ip::tcp::acceptor(*_io_service, *_endpoint);
   _socket = new asio::ip::tcp::socket(*_io_service);
-  _timer = new boost::asio::deadline_timer(*_io_service, boost::posix_time::milliseconds(1000/MAX_EXEC_PER_SECOND));
   if (!_socket)
     throw runtime_error("Invalid socket");
   _acceptor->async_accept(*_socket, boost::bind(&TCPServer::accept, this, asio::placeholders::error));
-  _timer->async_wait(boost::bind(&TCPServer::process, this));
 }
 
 TCPServer::~TCPServer(){
@@ -31,9 +29,11 @@ TCPServer::~TCPServer(){
 void TCPServer::accept(const boost::system::error_code& error){
   if (error) return;
   market->setLogger(&l);
-  asio::async_read(*_socket, asio::buffer(buf),
+  _socket->async_read_some(asio::buffer(buf),
                 boost::bind(&TCPServer::read, this,
-                placeholders::error, placeholders::bytes_transferred));
+                asio::placeholders::error, asio::placeholders::bytes_transferred));
+  _timer = new asio::deadline_timer(*_io_service, boost::posix_time::milliseconds(1000/MAX_EXEC_PER_SECOND));
+  _timer->async_wait(boost::bind(&TCPServer::process, this));
 }
 
 void TCPServer::process(){
@@ -65,16 +65,16 @@ void SoupBinTCPServer::read(boost::system::error_code ec, size_t bytes_received)
     return;
   }
   while (read_pos < buf.c_array() + bytes_received){
-    l.write("[OUCH]RECV: " + ouch::to_string(reinterpret_cast<const ouch::MsgHeader*>(read_pos)));
-    packet_len = (reinterpret_cast<const ouch::MsgHeader*>(read_pos))->length + 2;
+    l.write("[OUCH]RECV: " + ouch::outbound_to_string(reinterpret_cast<const ouch::MsgHeader*>(read_pos)));
+    packet_len = big_to_native((reinterpret_cast<const ouch::MsgHeader*>(read_pos))->length) + 2;
     if (packet_len)
       market->handle_packet(read_pos, packet_len);
     read_pos += packet_len;
   }
   send();
-  asio::async_read(*_socket, asio::buffer(buf),
+  _socket->async_read_some(asio::buffer(buf),
                 boost::bind(&SoupBinTCPServer::read, this,
-                placeholders::error, placeholders::bytes_transferred));
+                asio::placeholders::error, asio::placeholders::bytes_transferred));
 }
 
 void BOEServer::send(){
@@ -105,7 +105,7 @@ void BOEServer::read(boost::system::error_code ec, size_t bytes_received){
     read_pos += packet_len;
   }
   send();
-  asio::async_read(*_socket, asio::buffer(buf),
+  _socket->async_read_some(asio::buffer(buf),
                 boost::bind(&BOEServer::read, this,
-                placeholders::error, placeholders::bytes_transferred));
+                asio::placeholders::error, asio::placeholders::bytes_transferred));
 }
