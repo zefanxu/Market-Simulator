@@ -23,6 +23,7 @@ public:
   virtual ~session(){};
   virtual void market_logic();
   virtual void handle_packet(char* packet, size_t len)=0;
+  void disconnect(){state = session_state::not_logged_in;}
   vector<vector<char>> pending_out_messages;
   void setLogger(evtsim::Logger * l);
 

@@ -47,6 +47,8 @@ void TCPServer::process(const boost::system::error_code& error){
 }
 
 void TCPServer::reconnect(){
+  _timer->cancel();
+  market->disconnect();
   l.write("[TCP]Attempt to reconnect");
   if (_socket)
     delete _socket;
@@ -72,7 +74,6 @@ void SoupBinTCPServer::read(boost::system::error_code ec, size_t bytes_received)
   size_t packet_len;
   if (ec == asio::error::eof){
     l.write("[OUCH]Connection Closed");
-    _timer->cancel();
     reconnect();
     return;
   }
@@ -107,7 +108,6 @@ void BOEServer::read(boost::system::error_code ec, size_t bytes_received){
   size_t packet_len;
   if (ec == asio::error::eof){
     l.write("[BOE]Connection Closed");
-    _timer->cancel();
     reconnect();
     return;
   }
