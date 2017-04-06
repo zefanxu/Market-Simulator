@@ -10,7 +10,7 @@ TCPServer::TCPServer(unsigned int port, asio::io_service* io_service){
   _timer = new asio::deadline_timer(*_io_service, boost::posix_time::milliseconds(1000/MAX_EXEC_PER_SECOND));
   if (!_socket)
     throw runtime_error("Invalid socket");
-  l.write()
+  l.write("[TCP]Accepting Connection");
   _acceptor->async_accept(*_socket, boost::bind(&TCPServer::accept, this, asio::placeholders::error));
 }
 
