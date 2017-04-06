@@ -2,19 +2,20 @@
 
 TCPServer::TCPServer(unsigned int port, asio::io_service* io_service){
   if (port <= 0 or port > 65535)
-    throw invalid_argument("invalid port number");
+    throw invalid_argument("Invalid port number");
   _io_service = io_service;
   _endpoint = new asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port);
   _acceptor = new asio::ip::tcp::acceptor(*_io_service, *_endpoint);
   _socket = new asio::ip::tcp::socket(*_io_service);
+  _timer = new asio::deadline_timer(*_io_service, boost::posix_time::milliseconds(1000/MAX_EXEC_PER_SECOND));
   if (!_socket)
     throw runtime_error("Invalid socket");
+  l.write()
   _acceptor->async_accept(*_socket, boost::bind(&TCPServer::accept, this, asio::placeholders::error));
 }
 
 TCPServer::~TCPServer(){
-  string text = "Server shutdown";
-  l.write(text);
+  l.write("[TCP]Server shutdown");
   if (_socket){
     delete _endpoint;
     delete _acceptor;
@@ -28,20 +29,25 @@ TCPServer::~TCPServer(){
 
 void TCPServer::accept(const boost::system::error_code& error){
   if (error) return;
+  l.write("[TCP]Connection established");
   market->setLogger(&l);
   _socket->async_read_some(asio::buffer(buf),
                 boost::bind(&TCPServer::read, this,
                 asio::placeholders::error, asio::placeholders::bytes_transferred));
-  _timer = new asio::deadline_timer(*_io_service, boost::posix_time::milliseconds(1000/MAX_EXEC_PER_SECOND));
   _timer->async_wait(boost::bind(&TCPServer::process, this));
 }
 
 void TCPServer::process(){
-  if (!market) throw runtime_error("uninitialized server");
+  if (!market) throw runtime_error("Uninitialized server");
   market->market_logic();
   send();
   _timer->expires_at(_timer->expires_at() + boost::posix_time::milliseconds(1000/MAX_EXEC_PER_SECOND));
   _timer->async_wait(boost::bind(&TCPServer::process, this));
+}
+
+void TCPServer::reconnect(){
+  l.write("[TCP]Attempt to reconnect");
+  _acceptor->async_accept(*_socket, boost::bind(&TCPServer::accept, this, asio::placeholders::error));
 }
 
 void SoupBinTCPServer::send(){
@@ -62,6 +68,8 @@ void SoupBinTCPServer::read(boost::system::error_code ec, size_t bytes_received)
   size_t packet_len;
   if (ec == asio::error::eof){
     l.write("[OUCH]Connection Closed");
+    _timer->cancel();
+    reconnect();
     return;
   }
   while (read_pos < buf.c_array() + bytes_received){
@@ -95,6 +103,8 @@ void BOEServer::read(boost::system::error_code ec, size_t bytes_received){
   size_t packet_len;
   if (ec == asio::error::eof){
     l.write("[BOE]Connection Closed");
+    _timer->cancel();
+    reconnect();
     return;
   }
   while (read_pos < buf.c_array() + bytes_received){

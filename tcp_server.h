@@ -27,6 +27,7 @@ public:
   virtual void read(boost::system::error_code ec, size_t bytes_received)=0;
   virtual void send()=0;
   virtual void process();
+  virtual void reconnect();
 
 protected:
   session* market;
