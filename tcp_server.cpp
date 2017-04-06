@@ -21,7 +21,7 @@ TCPServer::TCPServer(unsigned int port){
 }
 
 TCPServer::~TCPServer(){
-  string text = "Conenction Closed";
+  string text = "Server shutdown";
   l.write(text);
   if (_socket){
     delete _endpoint;
@@ -103,6 +103,8 @@ int SoupBinTCPServer::read(char* & outbuf){
     return 0;
   }
   else if (ec == asio::error::eof){
+    string text = "Connection Closed";
+    l.write(text);
     alive = false;
     outbuf = nullptr;
     return 0;
@@ -146,6 +148,8 @@ int BOEServer::read(char* & outbuf){
     return 0;
   }
   else if (ec == asio::error::eof){
+    string text = "Connection Closed";
+    l.write(text);
     alive = false;
     outbuf = nullptr;
     return 0;
