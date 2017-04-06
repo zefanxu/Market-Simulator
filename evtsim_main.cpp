@@ -40,7 +40,8 @@ main(int argc, char** argv) {
     ("help,h", "produce help message")
     ("config,c", bpo::value<string>(), "specify configuration file")
     ("version", "show version")
-    ("port,p", bpo::value<int>(), "simulator server listen port number")
+    ("ouchport,o", bpo::value<int>(), "ouch server listen port number")
+    ("boeport,b", bpo::value<int>(), "boe server listen port number")
     ;
 
   bpo::variables_map vm;
@@ -63,18 +64,23 @@ main(int argc, char** argv) {
     return 1;
   }
 
-  if (!vm.count("port")){
+  int boe_port_num, ouch_port_num;
+  char * buf; bool any_alive = false;
+  vector<unique_ptr<TCPServer>> servers;
+
+  if (!vm.count("ouchport") and !vm.count("boeport")){
     cout << "missing port number" << endl;
     cout << opts << endl;
     return 2;
   }
-  int port_num = vm["port"].as<int>();
-
-  char * buf; bool any_alive = false;
-
-  vector<unique_ptr<TCPServer>> servers;
-  servers.push_back(unique_ptr<TCPServer>(new SoupBinTCPServer(port_num)));
-  //servers.push_back(unique_ptr<TCPServer>(new BOEServer(port_num+1)));
+  if (vm.count("ouchport")){
+    ouch_port_num = vm["ouchport"].as<int>();
+    servers.push_back(unique_ptr<TCPServer>(new SoupBinTCPServer(ouch_port_num)));
+  }
+  if (vm.count("boeport")){
+    boe_port_num = vm["boeport"].as<int>();
+    servers.push_back(unique_ptr<TCPServer>(new BOEServer(boe_port_num)));
+  }
 
   for (const auto & s : servers){
     s->accept();
