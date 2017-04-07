@@ -414,7 +414,7 @@ bool ouch_session::validate(MsgHeader* msg_h, size_t len){
           return validate_modifyOrder(msg_h, len);
       }
   }
-  l.write_warning("unsupported message type: " + outbound_to_string(msg_h));
+  l->write_warning("unsupported message type: " + outbound_to_string(msg_h));
   return false;
 }
 
