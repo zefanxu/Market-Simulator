@@ -69,176 +69,6 @@ void ouch_session::handle_message(MsgHeader * packet, size_t len){
   }
 }
 
-bool ouch_session::validate(MsgHeader* msg_h, size_t len){
-  if (!l) throw runtime_error("evtsim::Logger has not been set");
-  if (big_to_native(msg_h->length) != (len-2))
-    l->write_warning("message length mismatch: "+outbound_to_string(msg_h));
-  switch (msg_h->packet_type){
-    case(static_cast<char>(PacketType::LoginRequest)):
-      return validate_login_request(msg_h, len);
-    case(static_cast<char>(PacketType::LogoutRequest)):
-      return validate_logout_request(msg_h, len);
-    case(static_cast<char>(PacketType::ClientHeartbeat)):
-      return validate_client_heartbeat(msg_h, len);
-    case(static_cast<char>(PacketType::UnsequencedData)):
-      auto ouch_msg_h = reinterpret_cast<Ouch_MsgHeader*>(msg_h);
-      switch (ouch_msg_h->msg_type) {
-        case(static_cast<char>(OutboundMsgType::EnterOrder)):
-          return validate_enterOrder(msg_h, len);
-        case(static_cast<char>(OutboundMsgType::ReplaceOrder)):
-          return validate_replaceOrder(msg_h, len);
-        case(static_cast<char>(OutboundMsgType::CancelOrder)):
-          return validate_cancelOrder(msg_h, len);
-        case(static_cast<char>(OutboundMsgType::ModifyOrder)):
-          return validate_modifyOrder(msg_h, len);
-      }
-  }
-  return false;
-}
-
-bool ouch_session::validate_replaceOrder(MsgHeader * packet, size_t len){
-  if (big_to_native(packet->length) != (sizeof(ReplaceOrder)-2)){
-    l->write_warning("message length mismatch: "+outbound_to_string(packet));
-    return false;
-  }
-  ReplaceOrder ro = *(reinterpret_cast<ReplaceOrder*>(packet));
-  ro.from_network();
-  if (ro.qty <= 0 or ro.qty > 1000000){
-    l->write_warning("invalide ReplaceOrder qty: "+outbound_to_string(packet));
-    return false;
-  }
-  if (ro.display != 'A' and ro.display != 'Y' and ro.display != 'N' and ro.display != 'P'
-      and ro.display != 'I' and ro.display != 'M' and ro.display != 'W' and ro.display != 'L'
-      and ro.display != 'O' and ro.display != 'T' and ro.display != 'Q'){
-        l->write_warning("invalide ReplaceOrder display: "+outbound_to_string(packet));
-        return false;
-  }
-  if (ro.intermarket_sweep_eligibility != 'Y' and ro.intermarket_sweep_eligibility != 'N'
-      and ro.intermarket_sweep_eligibility != 'y'){
-        l->write_warning("invalide ReplaceOrder intermarket_sweep_eligibility: "+outbound_to_string(packet));
-        return false;
-  }
-  if (ro.price > 1999999900 and ro.price != 2147483647){
-    l->write_warning("invalide ReplaceOrder price: "+outbound_to_string(packet));
-    return false;
-  }
-  return true;
-}
-
-bool ouch_session::validate_enterOrder(MsgHeader * packet, size_t len){
-  if (big_to_native(packet->length) != (sizeof(EnterOrder)-2)){
-    l->write_warning("message length mismatch: "+outbound_to_string(packet));
-    return false;
-  }
-  EnterOrder eo = *(reinterpret_cast<EnterOrder*>(packet));
-  eo.from_network();
-  if (eo.side != 'B' and eo.side != 'S' and eo.side != 'T' and eo.side != 'E'){
-    l->write_warning("invalide EnterOrder side: "+outbound_to_string(packet));
-    return false;
-  }
-  if (eo.price > 1999999900 and eo.price != 2147483647){
-    l->write_warning("invalide EnterOrder price: "+outbound_to_string(packet));
-    return false;
-  }
-  if (eo.qty <= 0 or eo.qty > 1000000){
-    l->write_warning("invalide EnterOrder qty: "+outbound_to_string(packet));
-    return false;
-  }
-  if (eo.display != 'A' and eo.display != 'Y' and eo.display != 'N' and eo.display != 'P'
-      and eo.display != 'I' and eo.display != 'M' and eo.display != 'W' and eo.display != 'L'
-      and eo.display != 'O' and eo.display != 'T' and eo.display != 'Q'){
-        l->write_warning("invalide EnterOrder display: "+outbound_to_string(packet));
-        return false;
-  }
-  if (eo.intermarket_sweep_eligibility != 'Y' and eo.intermarket_sweep_eligibility != 'N'
-      and eo.intermarket_sweep_eligibility != 'y'){
-        l->write_warning("invalide EnterOrder intermarket_sweep_eligibility: "+outbound_to_string(packet));
-        return false;
-  }
-  if (eo.cross_type != 'N' and eo.cross_type != 'O' and eo.cross_type != 'C' and eo.cross_type != 'H'
-      and eo.cross_type != 'S' and eo.cross_type != 'R'){
-        l->write_warning("invalide EnterOrder cross_type: "+outbound_to_string(packet));
-        return false;
-  }
-  if (eo.customer_type != ' ' and eo.customer_type != 'R' and eo.customer_type != 'N'){
-    l->write_warning("invalide EnterOrder customer_type: "+outbound_to_string(packet));
-    return false;
-  }
-  return true;
-}
-
-bool ouch_session::validate_cancelOrder(MsgHeader* packet, size_t len){
-  if (big_to_native(packet->length) != (sizeof(CancelOrder)-2)){
-    l->write_warning("message length mismatch: "+outbound_to_string(packet));
-    return false;
-  }
-  CancelOrder co = *(reinterpret_cast<CancelOrder*>(packet));
-  co.from_network();
-  if (co.qty > 1000000){
-    l->write_warning("invalide CancelOrder qty: "+outbound_to_string(packet));
-    return false;
-  }
-  return true;
-}
-
-bool ouch_session::validate_modifyOrder(MsgHeader* packet, size_t len){
-  if (big_to_native(packet->length) != (sizeof(ModifyOrder)-2)){
-    l->write_warning("message length mismatch: "+outbound_to_string(packet));
-    return false;
-  }
-  ModifyOrder mo = *(reinterpret_cast<ModifyOrder*>(packet));
-  mo.from_network();
-  if (mo.qty > 1000000){
-    l->write_warning("invalide ModifyOrder qty: "+outbound_to_string(packet));
-    return false;
-  }
-  return true;
-}
-
-bool ouch_session::validate_client_heartbeat(MsgHeader* msg_h, size_t len){
-  if (big_to_native(msg_h->length) != (sizeof(ClientHeartbeat)-2)){
-    l->write_warning("message length mismatch: "+outbound_to_string(msg_h));
-    return false;
-  }
-  return true;
-}
-
-bool ouch_session::validate_logout_request(MsgHeader* msg_h, size_t len){
-  if (big_to_native(msg_h->length) != (sizeof(LogoutRequest)-2)){
-    l->write_warning("message length mismatch: "+outbound_to_string(msg_h));
-    return false;
-  }
-  return true;
-}
-
-bool ouch_session::validate_login_request(MsgHeader* msg_h, size_t len){
-  if (big_to_native(msg_h->length) != (sizeof(LoginRequest)-2)){
-    l->write_warning("message length mismatch: "+outbound_to_string(msg_h));
-    return false;
-  }
-  LoginRequest lr = *(reinterpret_cast<LoginRequest*>(msg_h));
-  unsigned int pos = 0;
-  //validate seq_num left padded with white space
-  //find the position of the first digit
-  for (pos = 0; pos < sizeof(lr.requested_seq_num); pos++){
-    if (lr.requested_seq_num[pos] == ' ') continue;
-    if (lr.requested_seq_num[pos] >= '0' and lr.requested_seq_num[pos] <= '9')
-      break;
-    else{
-      l->write_warning("ill-formed login request packet: " + outbound_to_string(msg_h));
-      return false;
-    }
-  }
-  //validate it contains only decimal numbers after white space
-  char * num_end = nullptr;
-  strtoll((lr.requested_seq_num + pos), &num_end, 10);
-  if (!num_end or num_end != &(lr.requested_seq_num[20])){
-    l->write_warning("invalid login request seq_num: " + outbound_to_string(msg_h));
-    return false;
-  }
-  return true;
-}
-
 void ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
   EnterOrder * eo = reinterpret_cast<EnterOrder*>(msg);
   eo->from_network();
@@ -558,4 +388,175 @@ void ouch_session::constructOrderReplaced(const Ouch_ReplaceOrderReq & ro, const
   _or.to_network();
   auto packet = vector<char>(reinterpret_cast<const char*>(&_or), reinterpret_cast<const char*>(&_or)+sizeof(_or));
   pending_out_messages.push_back(packet);
+}
+
+bool ouch_session::validate(MsgHeader* msg_h, size_t len){
+  if (!l) throw runtime_error("evtsim::Logger has not been set");
+  if (big_to_native(msg_h->length) != (len-2))
+    l->write_warning("message length mismatch: "+outbound_to_string(msg_h));
+  switch (msg_h->packet_type){
+    case(static_cast<char>(PacketType::LoginRequest)):
+      return validate_login_request(msg_h, len);
+    case(static_cast<char>(PacketType::LogoutRequest)):
+      return validate_logout_request(msg_h, len);
+    case(static_cast<char>(PacketType::ClientHeartbeat)):
+      return validate_client_heartbeat(msg_h, len);
+    case(static_cast<char>(PacketType::UnsequencedData)):
+      auto ouch_msg_h = reinterpret_cast<Ouch_MsgHeader*>(msg_h);
+      switch (ouch_msg_h->msg_type) {
+        case(static_cast<char>(OutboundMsgType::EnterOrder)):
+          return validate_enterOrder(msg_h, len);
+        case(static_cast<char>(OutboundMsgType::ReplaceOrder)):
+          return validate_replaceOrder(msg_h, len);
+        case(static_cast<char>(OutboundMsgType::CancelOrder)):
+          return validate_cancelOrder(msg_h, len);
+        case(static_cast<char>(OutboundMsgType::ModifyOrder)):
+          return validate_modifyOrder(msg_h, len);
+      }
+  }
+  l.write_warning("unsupported message type: " + outbound_to_string(msg_h));
+  return false;
+}
+
+bool ouch_session::validate_replaceOrder(MsgHeader * packet, size_t len){
+  if (big_to_native(packet->length) != (sizeof(ReplaceOrder)-2)){
+    l->write_warning("message length mismatch: "+outbound_to_string(packet));
+    return false;
+  }
+  ReplaceOrder ro = *(reinterpret_cast<ReplaceOrder*>(packet));
+  ro.from_network();
+  if (ro.qty <= 0 or ro.qty > 1000000){
+    l->write_warning("invalide ReplaceOrder qty: "+outbound_to_string(packet));
+    return false;
+  }
+  if (ro.display != 'A' and ro.display != 'Y' and ro.display != 'N' and ro.display != 'P'
+      and ro.display != 'I' and ro.display != 'M' and ro.display != 'W' and ro.display != 'L'
+      and ro.display != 'O' and ro.display != 'T' and ro.display != 'Q'){
+        l->write_warning("invalide ReplaceOrder display: "+outbound_to_string(packet));
+        return false;
+  }
+  if (ro.intermarket_sweep_eligibility != 'Y' and ro.intermarket_sweep_eligibility != 'N'
+      and ro.intermarket_sweep_eligibility != 'y'){
+        l->write_warning("invalide ReplaceOrder intermarket_sweep_eligibility: "+outbound_to_string(packet));
+        return false;
+  }
+  if (ro.price > 1999999900 and ro.price != 2147483647){
+    l->write_warning("invalide ReplaceOrder price: "+outbound_to_string(packet));
+    return false;
+  }
+  return true;
+}
+
+bool ouch_session::validate_enterOrder(MsgHeader * packet, size_t len){
+  if (big_to_native(packet->length) != (sizeof(EnterOrder)-2)){
+    l->write_warning("message length mismatch: "+outbound_to_string(packet));
+    return false;
+  }
+  EnterOrder eo = *(reinterpret_cast<EnterOrder*>(packet));
+  eo.from_network();
+  if (eo.side != 'B' and eo.side != 'S' and eo.side != 'T' and eo.side != 'E'){
+    l->write_warning("invalide EnterOrder side: "+outbound_to_string(packet));
+    return false;
+  }
+  if (eo.price > 1999999900 and eo.price != 2147483647){
+    l->write_warning("invalide EnterOrder price: "+outbound_to_string(packet));
+    return false;
+  }
+  if (eo.qty <= 0 or eo.qty > 1000000){
+    l->write_warning("invalide EnterOrder qty: "+outbound_to_string(packet));
+    return false;
+  }
+  if (eo.display != 'A' and eo.display != 'Y' and eo.display != 'N' and eo.display != 'P'
+      and eo.display != 'I' and eo.display != 'M' and eo.display != 'W' and eo.display != 'L'
+      and eo.display != 'O' and eo.display != 'T' and eo.display != 'Q'){
+        l->write_warning("invalide EnterOrder display: "+outbound_to_string(packet));
+        return false;
+  }
+  if (eo.intermarket_sweep_eligibility != 'Y' and eo.intermarket_sweep_eligibility != 'N'
+      and eo.intermarket_sweep_eligibility != 'y'){
+        l->write_warning("invalide EnterOrder intermarket_sweep_eligibility: "+outbound_to_string(packet));
+        return false;
+  }
+  if (eo.cross_type != 'N' and eo.cross_type != 'O' and eo.cross_type != 'C' and eo.cross_type != 'H'
+      and eo.cross_type != 'S' and eo.cross_type != 'R'){
+        l->write_warning("invalide EnterOrder cross_type: "+outbound_to_string(packet));
+        return false;
+  }
+  if (eo.customer_type != ' ' and eo.customer_type != 'R' and eo.customer_type != 'N'){
+    l->write_warning("invalide EnterOrder customer_type: "+outbound_to_string(packet));
+    return false;
+  }
+  return true;
+}
+
+bool ouch_session::validate_cancelOrder(MsgHeader* packet, size_t len){
+  if (big_to_native(packet->length) != (sizeof(CancelOrder)-2)){
+    l->write_warning("message length mismatch: "+outbound_to_string(packet));
+    return false;
+  }
+  CancelOrder co = *(reinterpret_cast<CancelOrder*>(packet));
+  co.from_network();
+  if (co.qty > 1000000){
+    l->write_warning("invalide CancelOrder qty: "+outbound_to_string(packet));
+    return false;
+  }
+  return true;
+}
+
+bool ouch_session::validate_modifyOrder(MsgHeader* packet, size_t len){
+  if (big_to_native(packet->length) != (sizeof(ModifyOrder)-2)){
+    l->write_warning("message length mismatch: "+outbound_to_string(packet));
+    return false;
+  }
+  ModifyOrder mo = *(reinterpret_cast<ModifyOrder*>(packet));
+  mo.from_network();
+  if (mo.qty > 1000000){
+    l->write_warning("invalide ModifyOrder qty: "+outbound_to_string(packet));
+    return false;
+  }
+  return true;
+}
+
+bool ouch_session::validate_client_heartbeat(MsgHeader* msg_h, size_t len){
+  if (big_to_native(msg_h->length) != (sizeof(ClientHeartbeat)-2)){
+    l->write_warning("message length mismatch: "+outbound_to_string(msg_h));
+    return false;
+  }
+  return true;
+}
+
+bool ouch_session::validate_logout_request(MsgHeader* msg_h, size_t len){
+  if (big_to_native(msg_h->length) != (sizeof(LogoutRequest)-2)){
+    l->write_warning("message length mismatch: "+outbound_to_string(msg_h));
+    return false;
+  }
+  return true;
+}
+
+bool ouch_session::validate_login_request(MsgHeader* msg_h, size_t len){
+  if (big_to_native(msg_h->length) != (sizeof(LoginRequest)-2)){
+    l->write_warning("message length mismatch: "+outbound_to_string(msg_h));
+    return false;
+  }
+  LoginRequest lr = *(reinterpret_cast<LoginRequest*>(msg_h));
+  unsigned int pos = 0;
+  //validate seq_num left padded with white space
+  //find the position of the first digit
+  for (pos = 0; pos < sizeof(lr.requested_seq_num); pos++){
+    if (lr.requested_seq_num[pos] == ' ') continue;
+    if (lr.requested_seq_num[pos] >= '0' and lr.requested_seq_num[pos] <= '9')
+      break;
+    else{
+      l->write_warning("ill-formed login request packet: " + outbound_to_string(msg_h));
+      return false;
+    }
+  }
+  //validate it contains only decimal numbers after white space
+  char * num_end = nullptr;
+  strtoll((lr.requested_seq_num + pos), &num_end, 10);
+  if (!num_end or num_end != &(lr.requested_seq_num[20])){
+    l->write_warning("invalid login request seq_num: " + outbound_to_string(msg_h));
+    return false;
+  }
+  return true;
 }
