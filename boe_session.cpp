@@ -275,6 +275,6 @@ void boe_session::constructOrderExecuted(Boe_Order & curr_order){
 }
 
 uint64_t boe_session::get_timestamp(){
-  chrono::milliseconds ms = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch());
-  return ms.count() * 1000;
+  chrono::nanoseconds ms = chrono::duration_cast<chrono::nanoseconds>(chrono::system_clock::now().time_since_epoch());
+  return ms.count();
 }
