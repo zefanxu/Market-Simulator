@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <stdlib.h>
 #include <time.h>
+#include <regex>
 #include <chrono>
 #include "evtsim_util.h"
 #include "ouch_messages.h"
