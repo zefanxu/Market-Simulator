@@ -3,17 +3,11 @@ using namespace evt::boe;
 
 boe_session::boe_session(){
   init();
-  this->random_reject_rate = 0.3333;
 }
 
 boe_session::~boe_session(){
-  this->random_reject_rate = 0.3333;
 }
 
-boe_session::boe_session(double random_reject_rate){
-  init();
-  this->random_reject_rate = random_reject_rate;
-}
 
 void boe_session::init(){
   seq_num = 0;
@@ -83,8 +77,6 @@ void boe_session::enterOrder(MsgHeader * hdr, size_t len){
   string t = no->token._str_();
   if (active_orders.find(t) != active_orders.end())
     constructOrderRejected(no);
-  else if (order_random_reject())
-    constructOrderRejected(no);
   else{
     Boe_Order new_order = Boe_Order(no);
     active_orders[t] = new_order;
@@ -104,10 +96,8 @@ void boe_session::execution_logic(){
   for (auto & order_pair : active_orders){
     Boe_Order & each_order = order_pair.second;
     const string & each_token = order_pair.first;
-    if (each_order.still_live()){
-      if (order_random_reject()) continue;
+    if (each_order.still_live())
       constructOrderExecuted(each_order);
-    }
     else{
       finished_orders[each_token] = each_order;
       done_tokens.push_back(each_token);

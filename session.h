@@ -38,16 +38,13 @@ protected:
   time_t last_send_heartbeat;
   time_t last_recv_heartbeat;
 
-  bool order_random_reject();
   char state;
-  double random_reject_rate; //0 <= x <= 1, default to 0.3333
   evtsim::Logger * l;
 };
 
 class boe_session : public session{
 public:
   boe_session();
-  boe_session(double random_reject_rate);
   virtual ~boe_session();
   virtual void market_logic();
   virtual void handle_packet(char * packet, size_t len);
@@ -91,7 +88,6 @@ private:
 class ouch_session : public session{
 public:
   ouch_session();
-  ouch_session(double random_reject_rate);
   virtual ~ouch_session();
   virtual void handle_packet(char * packet, size_t len);
 

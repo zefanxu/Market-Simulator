@@ -72,9 +72,7 @@ void ouch_session::handle_message(MsgHeader * packet, size_t len){
 void ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
   EnterOrder * eo = reinterpret_cast<EnterOrder*>(msg);
   eo->from_network();
-  if (order_random_reject())
-    constructOrderRejected('O', eo->token);
-  else if (eo->qty > MAX_SHARES)
+  if (eo->qty > MAX_SHARES)
     constructOrderRejected('Z', eo->token);
   else if ((state != session_state::logged_in))
     constructOrderRejected('O', eo->token);
@@ -98,8 +96,6 @@ void ouch_session::modifyOrder(Ouch_MsgHeader * msg, size_t len){
 void ouch_session::replaceOrder(Ouch_MsgHeader * msg, size_t len){
   ReplaceOrder * ro_msg = reinterpret_cast<ReplaceOrder*>(msg);
   ro_msg->from_network();
-  if (order_random_reject())
-    constructOrderRejected('O', ro_msg->token);
   Ouch_ReplaceOrderReq ro = Ouch_ReplaceOrderReq(ro_msg);
   pending_replace.push_back(ro);
   return;
@@ -218,18 +214,13 @@ void ouch_session::execution_logic(){
       continue;
     }
     if (!each_order.time_in_force){
-      if (!order_random_reject()){
-        constructOrderExecuted(each_order);
-      }
       if (each_order.remaining_qty)
         constructOrderCanceled(each_order.remaining_qty, 'I', each_order.token);
       done_tokens.push_back(each_token);
       continue;
     }
-    else if (each_order.still_live()){
-      if (order_random_reject()) continue;
+    else if (each_order.still_live())
       constructOrderExecuted(each_order);
-    }
     else{
       finished_orders[each_token] = each_order;
       done_tokens.push_back(each_token);
@@ -256,18 +247,7 @@ uint64_t ouch_session::get_timestamp(){
   return diff.count();
 }
 
-bool session::order_random_reject(){
-  double x = (double)(rand()%100)/(double)100;
-  return (x <= random_reject_rate);
-}
-
 ouch_session::ouch_session(){
-  random_reject_rate = 0.3333;
-  init();
-}
-
-ouch_session::ouch_session(double random_reject_rate){
-  this->random_reject_rate = random_reject_rate;
   init();
 }
 
