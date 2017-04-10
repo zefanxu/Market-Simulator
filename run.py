@@ -26,9 +26,12 @@ if (evts_proc.poll() != None):
     print "Fail to run evts"
 
 if ((evtsim_proc.poll() == None) or (admin_proc.poll() == None) or (evts_proc.poll() == None)):
-    admin_proc.kill()
-    evtsim_proc.kill()
-    evts_proc.kill()
+    try:
+        admin_proc.kill()
+        evtsim_proc.kill()
+        evts_proc.kill()
+    except:
+        pass
     exit()
 
 admin_proc.stdin.write(text1)
