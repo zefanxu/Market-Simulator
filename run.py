@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 import subprocess, time
-text1 = 'om send_order B 90000 SPY.ARCX 234.56 BATS\n'
-text2 = 'om cancel 9100\n'
+command = []
+command.append('om send_order B 90000 SPY.ARCX 234.56 BATS\n')
+command.append('om cancel_down 9100 30000\n')
+command.append('om cancel_down 9100 25000\n')
+command.append('om cancel 9100\n')
+command.append('om send_order B 3000 SPY.ARCX 234.00 BATS\n')
+command.append('om replace 9101 3000 233.00')
 
 evtsim_proc = subprocess.Popen(
     ['./evtsim','-b', '11035'])
@@ -25,7 +30,7 @@ if (admin_proc.poll() != None):
 if (evts_proc.poll() != None):
     print "Fail to run evts"
 
-if ((evtsim_proc.poll() == None) or (admin_proc.poll() == None) or (evts_proc.poll() == None)):
+if ((evtsim_proc.poll() != None) or (admin_proc.poll()!= None) or (evts_proc.poll() != None)):
     try:
         admin_proc.kill()
         evtsim_proc.kill()
@@ -34,15 +39,14 @@ if ((evtsim_proc.poll() == None) or (admin_proc.poll() == None) or (evts_proc.po
         pass
     exit()
 
-admin_proc.stdin.write(text1)
-time.sleep(3)
-admin_proc.stdin.write(text2)
-time.sleep(1)
-
+for each_command in command:
+    admin_proc.stdin.write(each_command)
+    time.sleep(2)
 
 
 admin_proc.kill()
 evtsim_proc.kill()
 evts_proc.kill()
 
-#print admin_proc.stdout.read()
+#print out admin console output
+print admin_proc.stdout.read()

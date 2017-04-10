@@ -17,7 +17,8 @@ string evtsim::Logger::get_time_string(){
 }
 
 evtsim::Logger::Logger(){
-  string file_name = "log_" + get_datetime_string() + ".txt";
+  system("mkdir logs");
+  string file_name = "./logs/" + get_datetime_string() + ".txt";
   file.open(file_name, ofstream::out);
   also_print = true;
 }
