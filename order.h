@@ -15,9 +15,9 @@ public:
 
   time_t recv_order_time;
   char time_in_force;
-  uint32_t remaining_qty;
+  int64_t remaining_qty;
   uint64_t orderID;
-  uint64_t executed_qty;
+  int64_t executed_qty;
   char symbol[8];
   char side;
   char firm[4];

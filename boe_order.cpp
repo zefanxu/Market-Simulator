@@ -26,7 +26,7 @@ void Boe_Order::parse_order(NewOrder* no){
 }
 
 bool Boe_Order::still_live(){
-  return (remaining_qty > 0);
+  return (remaining_qty > 0 and remaining_qty <= 1000000);
 }
 
 Boe_CancelOrderReq::Boe_CancelOrderReq(){
