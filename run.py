@@ -16,14 +16,19 @@ admin_proc = subprocess.Popen(
     stdin=subprocess.PIPE)
 time.sleep(3)
 
-if (evtsim_proc.poll() == None):
+if (evtsim_proc.poll() != None):
     print "Fail to run evtsim"
-    exit()
-if (admin_proc.poll() == None):
+
+if (admin_proc.poll() != None):
     print "Fail to run admin console"
-    exit()
-if (evts_proc.poll() == None):
+
+if (evts_proc.poll() != None):
     print "Fail to run evts"
+
+if ((evtsim_proc.poll() == None) or (admin_proc.poll() == None) or (evts_proc.poll() == None)):
+    admin_proc.kill()
+    evtsim_proc.kill()
+    evts_proc.kill()
     exit()
 
 admin_proc.stdin.write(text1)
