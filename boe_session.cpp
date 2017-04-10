@@ -260,7 +260,7 @@ void boe_session::constructOrderExecuted(Boe_Order & curr_order){
   oe.transaction_time = get_timestamp();
   oe.token = curr_order.token;
   oe.exec_id = rand() * rand();
-  uint32_t exe_qty = (2 + rand() % 10) * 100;
+  int64_t exe_qty = (rand() % 10) * 100;
   exe_qty = min(exe_qty, curr_order.remaining_qty);
   oe.last_shares = exe_qty;
   curr_order.remaining_qty -= exe_qty;
