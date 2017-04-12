@@ -254,13 +254,13 @@ void boe_session::construct_login_response(LoginResponseStatus status, LoginRequ
   free(buf);
 }
 
-void boe_session::construct_order_executed(Boe_Order & curr_order){
+void boe_session::construct_order_executed(Boe_Order & curr_order, int64_t exe_qty=0){
   OrderExecution oe;
   oe.seq_num = ++seq_num;
   oe.transaction_time = get_timestamp();
   oe.token = curr_order.token;
   oe.exec_id = rand() * rand();
-  int64_t exe_qty = (rand() % 10) * 100;
+  if (!exe_qty) exe_qty = (1 + rand() % 10) * 100;
   exe_qty = min(exe_qty, curr_order.remaining_qty);
   oe.last_shares = exe_qty;
   curr_order.remaining_qty -= exe_qty;
