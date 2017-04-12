@@ -27,13 +27,13 @@ void boe_session::handle_packet(char * packet, size_t len){
       handle_client_heartbeat(hdr,len);
       break;
     case static_cast<char>(MsgType::NewOrder):
-      enterOrder(hdr, len);
+      enter_order(hdr, len);
       break;
     case static_cast<char>(MsgType::CancelOrder):
-      cancelOrder(hdr, len);
+      cancel_order(hdr, len);
       break;
     case static_cast<char>(MsgType::ModifyOrder):
-      modifyOrder(hdr, len);
+      modify_order(hdr, len);
       break;
   }
 }
@@ -44,43 +44,43 @@ void boe_session::handle_client_heartbeat(MsgHeader* hdr, size_t len){
 
 void boe_session::handle_login_request(MsgHeader* hdr, size_t len){
   LoginRequest * req = reinterpret_cast<LoginRequest*>(hdr);
-  if (state != session_state::not_logged_in) constructLoginResponse(LoginResponseStatus::SessionInUse, req);
-  else constructLoginResponse(LoginResponseStatus::Accepted, req);
+  if (state != session_state::not_logged_in) construct_login_response(LoginResponseStatus::SessionInUse, req);
+  else construct_login_response(LoginResponseStatus::Accepted, req);
   state = session_state::logged_in;
 }
 
-void boe_session::modifyOrder(MsgHeader * msg, size_t len){
+void boe_session::modify_order(MsgHeader * msg, size_t len){
   ModifyOrder * mo = reinterpret_cast<ModifyOrder*>(msg);
   string t = mo->orig_token._str_();
   if (active_orders.find(t) == active_orders.end() and finished_orders.find(t) == finished_orders.end()){
-    constructModifyRejected(mo->orig_token, Reason::ClordidDoesntMatchAKnownOrder);
+    construct_modify_rejected(mo->orig_token, Reason::ClordidDoesntMatchAKnownOrder);
     return;
   }
   Boe_ModifyOrderReq modify_req = Boe_ModifyOrderReq(mo);
   pending_modify.push_back(modify_req);
 }
 
-void boe_session::cancelOrder(MsgHeader * msg, size_t len){
+void boe_session::cancel_order(MsgHeader * msg, size_t len){
   CancelOrder* co = reinterpret_cast<CancelOrder*>(msg);
   string t = co->orig_token._str_();
   if (active_orders.find(t) != active_orders.end()){
     pending_cancel.push_back(Boe_CancelOrderReq(co));
   }
   else if (active_orders[t].remaining_qty <= 0 or finished_orders.find(t) != finished_orders.end()){
-    constructCancelRejected(co->orig_token, Reason::TooLateToCancel);
+    construct_cancel_rejected(co->orig_token, Reason::TooLateToCancel);
   }
-  else constructCancelRejected(co->orig_token, Reason::ClordidDoesntMatchAKnownOrder);
+  else construct_cancel_rejected(co->orig_token, Reason::ClordidDoesntMatchAKnownOrder);
 }
 
-void boe_session::enterOrder(MsgHeader * hdr, size_t len){
+void boe_session::enter_order(MsgHeader * hdr, size_t len){
   NewOrder * no = reinterpret_cast<NewOrder*>(hdr);
   string t = no->token._str_();
   if (active_orders.find(t) != active_orders.end())
-    constructOrderRejected(no);
+    construct_order_rejected(no);
   else{
     Boe_Order new_order = Boe_Order(no);
     active_orders[t] = new_order;
-    constructOrderAccpeted(new_order);
+    construct_order_accepted(new_order);
   }
 }
 
@@ -97,7 +97,7 @@ void boe_session::execution_logic(){
     Boe_Order & each_order = order_pair.second;
     const string & each_token = order_pair.first;
     if (each_order.still_live())
-      constructOrderExecuted(each_order);
+      construct_order_executed(each_order);
     else{
       finished_orders[each_token] = each_order;
       done_tokens.push_back(each_token);
@@ -126,7 +126,7 @@ void boe_session::modify_logic(){
     //change the key in the map
     swap(active_orders[mo.token._str_()], active_orders[mo.orig_token._str_()]);
     active_orders.erase(mo.orig_token._str_());
-    constructOrderModified(active_orders[mo.token._str_()]);
+    construct_order_modified(active_orders[mo.token._str_()]);
   }
   for (const auto & each_token : done_tokens)
     active_orders.erase(each_token);
@@ -136,11 +136,11 @@ void boe_session::cancel_logic(){
   vector<string> done_tokens;
   for (const auto & co : pending_cancel){
     if (active_orders.find(co.token._str_()) == active_orders.end()){
-      constructCancelRejected(co.token, Reason::TooLateToCancel);
+      construct_cancel_rejected(co.token, Reason::TooLateToCancel);
       continue;
     }
     done_tokens.push_back(co.token._str_());
-    constructOrderCanceled(co.token);
+    construct_order_canceled(co.token);
   }
   pending_cancel.clear();
   for (const auto & each_token : done_tokens)
@@ -158,7 +158,7 @@ void boe_session::heartbeat_logic(){
   }
 }
 
-void boe_session::constructModifyRejected(Token t, Reason r){
+void boe_session::construct_modify_rejected(Token t, Reason r){
   ModifyRejected mr;
   mr.transaction_time = get_timestamp();
   mr.token = t;
@@ -169,7 +169,7 @@ void boe_session::constructModifyRejected(Token t, Reason r){
   pending_out_messages.push_back(packet);
 }
 
-void boe_session::constructOrderModified(const Boe_Order & bo){
+void boe_session::construct_order_modified(const Boe_Order & bo){
   OrderModified om;
   //price, OrderQty, LeavesQty
   om.bitfield[0] = 4;
@@ -187,7 +187,7 @@ void boe_session::constructOrderModified(const Boe_Order & bo){
   pending_out_messages.push_back(packet);
 }
 
-void boe_session::constructOrderCanceled(Token t){
+void boe_session::construct_order_canceled(Token t){
   OrderCanceled oc;
   oc.transaction_time = get_timestamp();
   oc.token = t;
@@ -198,7 +198,7 @@ void boe_session::constructOrderCanceled(Token t){
   pending_out_messages.push_back(packet);
 }
 
-void boe_session::constructCancelRejected(Token t, Reason r){
+void boe_session::construct_cancel_rejected(Token t, Reason r){
   CancelRejected cr;
   cr.transaction_time = get_timestamp();
   cr.token = t;
@@ -209,7 +209,7 @@ void boe_session::constructCancelRejected(Token t, Reason r){
   pending_out_messages.push_back(packet);
 }
 
-void boe_session::constructOrderRejected(NewOrder * no){
+void boe_session::construct_order_rejected(NewOrder * no){
   OrderRejected oj;
   oj.token = no->token;
   oj.reason = 'D';
@@ -218,7 +218,7 @@ void boe_session::constructOrderRejected(NewOrder * no){
   pending_out_messages.push_back(packet);
 }
 
-void boe_session::constructOrderAccpeted(Boe_Order & new_order){
+void boe_session::construct_order_accepted(Boe_Order & new_order){
   OrderAck ack;
   ack.seq_num = ++seq_num;
   ack.transaction_time = get_timestamp();
@@ -232,7 +232,7 @@ void boe_session::constructOrderAccpeted(Boe_Order & new_order){
   pending_out_messages.push_back(packet);
 }
 
-void boe_session::constructLoginResponse(LoginResponseStatus status, LoginRequest * req){
+void boe_session::construct_login_response(LoginResponseStatus status, LoginRequest * req){
   char * buf = (char*)calloc(300, sizeof(char));
   LoginResponse lr;
   lr.status = static_cast<uint8_t>(status);
@@ -254,7 +254,7 @@ void boe_session::constructLoginResponse(LoginResponseStatus status, LoginReques
   free(buf);
 }
 
-void boe_session::constructOrderExecuted(Boe_Order & curr_order){
+void boe_session::construct_order_executed(Boe_Order & curr_order){
   OrderExecution oe;
   oe.seq_num = ++seq_num;
   oe.transaction_time = get_timestamp();

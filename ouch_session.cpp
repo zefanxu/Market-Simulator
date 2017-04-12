@@ -53,38 +53,38 @@ void ouch_session::handle_message(MsgHeader * packet, size_t len){
   Ouch_MsgHeader * ouch_msg_h = reinterpret_cast<Ouch_MsgHeader*>(packet);
   switch (ouch_msg_h->msg_type) {
     case(static_cast<char>(OutboundMsgType::EnterOrder)):
-      enterOrder(ouch_msg_h, len);
+      enter_order(ouch_msg_h, len);
       break;
     case(static_cast<char>(OutboundMsgType::ReplaceOrder)):
-      replaceOrder(ouch_msg_h, len);
+      replace_order(ouch_msg_h, len);
       break;
     case(static_cast<char>(OutboundMsgType::CancelOrder)):
-      cancelOrder(ouch_msg_h, len);
+      cancel_order(ouch_msg_h, len);
       break;
     case(static_cast<char>(OutboundMsgType::ModifyOrder)):
-      modifyOrder(ouch_msg_h, len);
+      modify_order(ouch_msg_h, len);
       break;
     default:
       return;
   }
 }
 
-void ouch_session::enterOrder(Ouch_MsgHeader * msg, size_t len){
+void ouch_session::enter_order(Ouch_MsgHeader * msg, size_t len){
   EnterOrder * eo = reinterpret_cast<EnterOrder*>(msg);
   eo->from_network();
   if (eo->qty > MAX_SHARES)
-    constructOrderRejected('Z', eo->token);
+    construct_order_rejected('Z', eo->token);
   else if ((state != session_state::logged_in))
-    constructOrderRejected('O', eo->token);
+    construct_order_rejected('O', eo->token);
   else if((active_orders.find(eo->token._str_()) == active_orders.end()) and
       (finished_orders.find(eo->token._str_()) == finished_orders.end())){
     Ouch_Order new_order = Ouch_Order(eo);
     active_orders[eo->token._str_()] = new_order;
-    constructOrderAccpeted(new_order);
+    construct_order_accepted(new_order);
   }
 }
 
-void ouch_session::modifyOrder(Ouch_MsgHeader * msg, size_t len){
+void ouch_session::modify_order(Ouch_MsgHeader * msg, size_t len){
   ModifyOrder * mo_msg = reinterpret_cast<ModifyOrder*>(msg);
   mo_msg -> from_network();
   if (active_orders.find(mo_msg->token._str_()) == active_orders.end())
@@ -93,7 +93,7 @@ void ouch_session::modifyOrder(Ouch_MsgHeader * msg, size_t len){
   pending_modify.push_back(mo);
 }
 
-void ouch_session::replaceOrder(Ouch_MsgHeader * msg, size_t len){
+void ouch_session::replace_order(Ouch_MsgHeader * msg, size_t len){
   ReplaceOrder * ro_msg = reinterpret_cast<ReplaceOrder*>(msg);
   ro_msg->from_network();
   Ouch_ReplaceOrderReq ro = Ouch_ReplaceOrderReq(ro_msg);
@@ -101,7 +101,7 @@ void ouch_session::replaceOrder(Ouch_MsgHeader * msg, size_t len){
   return;
 }
 
-void ouch_session::cancelOrder(Ouch_MsgHeader * msg, size_t len){
+void ouch_session::cancel_order(Ouch_MsgHeader * msg, size_t len){
   CancelOrder * co_msg = reinterpret_cast<CancelOrder*>(msg);
   co_msg->from_network();
   if (active_orders.find(co_msg->token._str_()) == active_orders.end())
@@ -118,7 +118,7 @@ void session::market_logic(){
   execution_logic();
 }
 
-void session::setLogger(evtsim::Logger * l){
+void session::set_logger(evtsim::Logger * l){
   this->l = l;
 }
 
@@ -131,7 +131,7 @@ void ouch_session::replace_logic(){
       continue;
     if (ro.qty > MAX_SHARES or ro.qty <= target_order.executed_qty){
       done_tokens.push_back(t);
-      constructOrderCanceled(active_orders[t].remaining_qty, 'Z', ro.existing_token);
+      construct_order_canceled(active_orders[t].remaining_qty, 'Z', ro.existing_token);
       continue;
     }
     target_order.token = ro.new_token;
@@ -140,7 +140,7 @@ void ouch_session::replace_logic(){
     target_order.remain_time_in_force = ro.time_in_force;
     target_order.price = ro.price;
     target_order.intermarket_sweep_eligibility = ro.intermarket_sweep_eligibility;
-    constructOrderReplaced(ro, target_order);
+    construct_order_replaced(ro, target_order);
     //update the key in the map
     swap(active_orders[ro.existing_token._str_()], active_orders[ro.new_token._str_()]);
     active_orders.erase(ro.existing_token._str_());
@@ -171,12 +171,12 @@ void ouch_session::modify_logic(){
     }
     if (target_order.executed_qty >= mo.req_qty){
       done_tokens.push_back(target_order.token._str_());
-      constructOrderModified(0, mo);
+      construct_order_modified(0, mo);
       continue;
     }
     target_order.side = mo.new_side;
     target_order.remaining_qty = mo.req_qty - target_order.executed_qty;
-    constructOrderModified(target_order.remaining_qty, mo);
+    construct_order_modified(target_order.remaining_qty, mo);
   }
   for (const auto & each_token : done_tokens)
     active_orders.erase(each_token);
@@ -196,7 +196,7 @@ void ouch_session::cancel_logic(){
         dec_qty = curr_qty - co.qty;
         active_orders[co.token._str_()].remaining_qty = co.qty;
       }
-      constructOrderCanceled(dec_qty, 'U', co.token);
+      construct_order_canceled(dec_qty, 'U', co.token);
   }
   pending_cancel.clear();
   for (const auto & each_token : done_tokens)
@@ -209,18 +209,18 @@ void ouch_session::execution_logic(){
     Ouch_Order & each_order = order_pair.second;
     const string & each_token = order_pair.first;
     if (each_order.expired()){
-      constructOrderCanceled(each_order.remaining_qty, 'T', each_order.token);
+      construct_order_canceled(each_order.remaining_qty, 'T', each_order.token);
       done_tokens.push_back(each_token);
       continue;
     }
     if (!each_order.time_in_force){
       if (each_order.remaining_qty)
-        constructOrderCanceled(each_order.remaining_qty, 'I', each_order.token);
+        construct_order_canceled(each_order.remaining_qty, 'I', each_order.token);
       done_tokens.push_back(each_token);
       continue;
     }
     else if (each_order.still_live())
-      constructOrderExecuted(each_order);
+      construct_order_executed(each_order);
     else{
       finished_orders[each_token] = each_order;
       done_tokens.push_back(each_token);
@@ -273,7 +273,7 @@ void ouch_session::init(){
   start_of_day = chrono::system_clock::from_time_t(t1);
 }
 
-void ouch_session::constructOrderAccpeted(const Ouch_Order & o){
+void ouch_session::construct_order_accepted(const Ouch_Order & o){
   OrderAccepted oa;
   oa.timestamp = get_timestamp();
   oa.token = o.token;
@@ -298,7 +298,7 @@ void ouch_session::constructOrderAccpeted(const Ouch_Order & o){
   pending_out_messages.push_back(packet);
 }
 
-void ouch_session::constructOrderRejected(char reason, Token t){
+void ouch_session::construct_order_rejected(char reason, Token t){
   OrderRejected oj;
   oj.token = t;
   oj.timestamp = get_timestamp();
@@ -308,7 +308,7 @@ void ouch_session::constructOrderRejected(char reason, Token t){
   pending_out_messages.push_back(packet);
 }
 
-void ouch_session::constructOrderCanceled(uint32_t dec_qty, char reason, Token t){
+void ouch_session::construct_order_canceled(uint32_t dec_qty, char reason, Token t){
   OrderCanceled oc;
   oc.timestamp = get_timestamp();
   oc.token = t;
@@ -319,7 +319,7 @@ void ouch_session::constructOrderCanceled(uint32_t dec_qty, char reason, Token t
   pending_out_messages.push_back(packet);
 }
 
-void ouch_session::constructOrderModified(uint32_t remaining_qty, const Ouch_ModifyOrderReq & mo){
+void ouch_session::construct_order_modified(uint32_t remaining_qty, const Ouch_ModifyOrderReq & mo){
   OrderModified m;
   m.timestamp = get_timestamp();
   m.token = mo.token;
@@ -330,7 +330,7 @@ void ouch_session::constructOrderModified(uint32_t remaining_qty, const Ouch_Mod
   pending_out_messages.push_back(packet);
 }
 
-void ouch_session::constructOrderExecuted(Ouch_Order & o){
+void ouch_session::construct_order_executed(Ouch_Order & o){
   int64_t exe_qty = (1+rand() % 10) * 100; //execute at least 100 shares
   exe_qty = min(exe_qty, o.remaining_qty);
   if (o.min_qty and exe_qty > o.min_qty)
@@ -349,7 +349,7 @@ void ouch_session::constructOrderExecuted(Ouch_Order & o){
   pending_out_messages.push_back(packet);
 }
 
-void ouch_session::constructOrderReplaced(const Ouch_ReplaceOrderReq & ro, const Ouch_Order & new_order){
+void ouch_session::construct_order_replaced(const Ouch_ReplaceOrderReq & ro, const Ouch_Order & new_order){
   OrderReplaced _or;
   _or.timestamp = get_timestamp();
   _or.token = new_order.token;
@@ -385,20 +385,20 @@ bool ouch_session::validate(MsgHeader* msg_h, size_t len){
       auto ouch_msg_h = reinterpret_cast<Ouch_MsgHeader*>(msg_h);
       switch (ouch_msg_h->msg_type) {
         case(static_cast<char>(OutboundMsgType::EnterOrder)):
-          return validate_enterOrder(msg_h, len);
+          return validate_enter_order(msg_h, len);
         case(static_cast<char>(OutboundMsgType::ReplaceOrder)):
-          return validate_replaceOrder(msg_h, len);
+          return validate_replace_order(msg_h, len);
         case(static_cast<char>(OutboundMsgType::CancelOrder)):
-          return validate_cancelOrder(msg_h, len);
+          return validate_cancel_order(msg_h, len);
         case(static_cast<char>(OutboundMsgType::ModifyOrder)):
-          return validate_modifyOrder(msg_h, len);
+          return validate_modify_order(msg_h, len);
       }
   }
   l->write_warning("unsupported message type: " + outbound_to_string(msg_h));
   return false;
 }
 
-bool ouch_session::validate_replaceOrder(MsgHeader * packet, size_t len){
+bool ouch_session::validate_replace_order(MsgHeader * packet, size_t len){
   if (big_to_native(packet->length) != (sizeof(ReplaceOrder)-2)){
     l->write_warning("message length mismatch: "+outbound_to_string(packet));
     return false;
@@ -427,7 +427,7 @@ bool ouch_session::validate_replaceOrder(MsgHeader * packet, size_t len){
   return true;
 }
 
-bool ouch_session::validate_enterOrder(MsgHeader * packet, size_t len){
+bool ouch_session::validate_enter_order(MsgHeader * packet, size_t len){
   if (big_to_native(packet->length) != (sizeof(EnterOrder)-2)){
     l->write_warning("message length mismatch: "+outbound_to_string(packet));
     return false;
@@ -469,7 +469,7 @@ bool ouch_session::validate_enterOrder(MsgHeader * packet, size_t len){
   return true;
 }
 
-bool ouch_session::validate_cancelOrder(MsgHeader* packet, size_t len){
+bool ouch_session::validate_cancel_order(MsgHeader* packet, size_t len){
   if (big_to_native(packet->length) != (sizeof(CancelOrder)-2)){
     l->write_warning("message length mismatch: "+outbound_to_string(packet));
     return false;
@@ -483,7 +483,7 @@ bool ouch_session::validate_cancelOrder(MsgHeader* packet, size_t len){
   return true;
 }
 
-bool ouch_session::validate_modifyOrder(MsgHeader* packet, size_t len){
+bool ouch_session::validate_modify_order(MsgHeader* packet, size_t len){
   if (big_to_native(packet->length) != (sizeof(ModifyOrder)-2)){
     l->write_warning("message length mismatch: "+outbound_to_string(packet));
     return false;

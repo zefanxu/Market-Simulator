@@ -30,7 +30,7 @@ TCPServer::~TCPServer(){
 void TCPServer::accept(const boost::system::error_code& error){
   if (error) return;
   l.write("[TCP]Connection established");
-  market->setLogger(&l);
+  market->set_logger(&l);
   _socket->async_read_some(asio::buffer(buf),
                 boost::bind(&TCPServer::read, this,
                 asio::placeholders::error, asio::placeholders::bytes_transferred));
