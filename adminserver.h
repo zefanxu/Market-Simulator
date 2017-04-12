@@ -22,8 +22,8 @@ namespace evt {
 
     typedef std::shared_ptr<std::string> StringRP;
 
-  AdminSession(AdminServer* server, IOServiceRP iosvc, Logger* logger) :
-    _server(server), _state(SessionState::Initial), socket(*iosvc), _logger(logger), _fd(-1) {}
+  AdminSession(AdminServer* server, boost::asio::io_service * _iosvc, Logger* logger) :
+    _server(server), _state(SessionState::Initial), socket(*_iosvc), _logger(logger), _fd(-1) {}
     void start();
     void set_state(const SessionState& state);
     void arm_read();
@@ -65,7 +65,7 @@ namespace evt {
     typedef std::shared_ptr<AdminSession> AdminSessionRP;
 
   public:
-    void register_admin(cstr& cmd, cstr& args, cstr& help, admin_callback callback);
+    void register_admin(string& cmd, string& args, string& help, admin_callback callback);
 
   private:
     void handle_accept(AdminSessionRP session, const boost::system::error_code& ec);

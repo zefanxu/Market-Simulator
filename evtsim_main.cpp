@@ -64,7 +64,7 @@ main(int argc, char** argv) {
 
   vector<unique_ptr<TCPServer>> servers;
   AdminServer as;
-  Logger admin_logger;
+  evtsim::Logger admin_logger;
 
   int as_port = 10001;
   if (vm.count("adminserver")){
