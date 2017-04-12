@@ -10,7 +10,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/enum.hpp>
 
-#include "evts_types.h"
+#include "evtsim_util.h"
 
 namespace evt {
   struct AdminSession : std::enable_shared_from_this<AdminSession> {
@@ -22,7 +22,7 @@ namespace evt {
 
     typedef std::shared_ptr<std::string> StringRP;
 
-  AdminSession(AdminServer* server, IOServiceRP iosvc, LoggerRP logger) : 
+  AdminSession(AdminServer* server, IOServiceRP iosvc, Logger* logger) :
     _server(server), _state(SessionState::Initial), socket(*iosvc), _logger(logger), _fd(-1) {}
     void start();
     void set_state(const SessionState& state);
@@ -38,7 +38,7 @@ namespace evt {
     class AdminServer* _server;
     SessionState _state;
     boost::asio::ip::tcp::socket socket;
-    LoggerRP _logger;
+    Logger* _logger;
     std::string _name;
     boost::asio::streambuf _input;
     int _fd;
@@ -58,7 +58,7 @@ namespace evt {
 
   public:
   AdminServer() : _acceptor(0) {}
-    void init(StrategyManager* sm, ConfigRP config);
+    void init(boost::asio::io_service * iosvc, Logger * l, int port, string name);
 
   public:
     typedef boost::function<void (AdminContext& ctx)> admin_callback;
@@ -66,11 +66,11 @@ namespace evt {
 
   public:
     void register_admin(cstr& cmd, cstr& args, cstr& help, admin_callback callback);
-    
+
   private:
     void handle_accept(AdminSessionRP session, const boost::system::error_code& ec);
     void recalculate_limits();
-    
+
   protected:
     struct AdminCmd {
       std::string ctx;
@@ -81,11 +81,11 @@ namespace evt {
       std::string key() const { return ctx+" "+cmd; }
     };
 
-    IOServiceRP _iosvc;
+    boost::asio::io_service _iosvc;
     std::vector<AdminCmd> _command_list;
     boost::asio::ip::tcp::acceptor* _acceptor;
     std::string _name;
-    LoggerRP _logger;
+    Logger* _logger;
     std::vector<size_t> _limits;
   };
 }
