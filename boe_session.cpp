@@ -254,7 +254,7 @@ void boe_session::construct_login_response(LoginResponseStatus status, LoginRequ
   free(buf);
 }
 
-void boe_session::construct_order_executed(Boe_Order & curr_order, int64_t exe_qty=0){
+void boe_session::construct_order_executed(Boe_Order & curr_order, int64_t exe_qty/*=0*/){
   OrderExecution oe;
   oe.seq_num = ++seq_num;
   oe.transaction_time = get_timestamp();
