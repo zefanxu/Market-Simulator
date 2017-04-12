@@ -219,8 +219,9 @@ void ouch_session::execution_logic(){
       done_tokens.push_back(each_token);
       continue;
     }
-    else if (each_order.still_live())
+    else if (each_order.still_live()){
       construct_order_executed(each_order);
+    }
     else{
       finished_orders[each_token] = each_order;
       done_tokens.push_back(each_token);
@@ -330,8 +331,10 @@ void ouch_session::construct_order_modified(uint32_t remaining_qty, const Ouch_M
   pending_out_messages.push_back(packet);
 }
 
-void ouch_session::construct_order_executed(Ouch_Order & o){
-  int64_t exe_qty = (1+rand() % 10) * 100; //execute at least 100 shares
+void ouch_session::construct_order_executed(Ouch_Order & o, int64_t exe_qty=0){
+  if (!exe_qty){
+    exe_qty = (1+rand() % 10) * 100; //execute at least 100 shares
+  }
   exe_qty = min(exe_qty, o.remaining_qty);
   if (o.min_qty and exe_qty > o.min_qty)
     return;
