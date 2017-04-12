@@ -68,7 +68,7 @@ private:
   void construct_login_response(boe::LoginResponseStatus status, boe::LoginRequest * req);
   void construct_order_accepted(Boe_Order & new_order);
   void construct_order_rejected(boe::NewOrder * no);
-  void construct_order_executed(Boe_Order & curr_order);
+  void construct_order_executed(Boe_Order & curr_order, int64_t exe_qty=0);
   void construct_cancel_rejected(boe::Token t, boe::Reason r);
   void construct_order_canceled(boe::Token t);
   void construct_modify_rejected(boe::Token t, boe::Reason r);
@@ -122,7 +122,7 @@ private:
   void construct_order_rejected(char reason, ouch::Token t);
   void construct_order_canceled(uint32_t dec_qty, char reason, ouch::Token t);
   void construct_order_modified(uint32_t remaining_qty, const Ouch_ModifyOrderReq & mo);
-  void construct_order_executed(Ouch_Order & o);
+  void construct_order_executed(Ouch_Order & o, int64_t exe_qty=0);
   void construct_order_replaced(const Ouch_ReplaceOrderReq & ro, const Ouch_Order & new_order);
 
   uint64_t get_timestamp();
