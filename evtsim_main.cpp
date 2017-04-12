@@ -70,7 +70,7 @@ main(int argc, char** argv) {
   if (vm.count("adminserver")){
     as_port = vm["adminserver"].as<int>();
   }
-  as.init(&io_service, &admin_logger, as_port, "test");
+  as.init(&io_service, &admin_logger, as_port, string("test"));
 
   if (!vm.count("ouchport") and !vm.count("boeport")){
     cout << "need at least one port number" << endl;

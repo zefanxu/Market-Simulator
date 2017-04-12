@@ -162,7 +162,7 @@ AdminSession::set_state(const AdminSession::SessionState& state) {
 }
 
 void
-AdminServer::init(boost::asio::io_service * iosvc, Logger * l, int port, string name) {
+AdminServer::init(boost::asio::io_service * iosvc, evtsim::Logger * l, int port, string name) {
   _iosvc = iosvc;
   _logger = l;
   _name = name;
@@ -189,7 +189,7 @@ AdminServer::handle_accept(AdminSessionRP session, const boost::system::error_co
 }
 
 void
-AdminServer::register_admin(cstr& cmd, cstr& args, cstr& help, admin_callback callback) {
+AdminServer::register_admin(string& cmd, string& args, string& help, admin_callback callback) {
   string::size_type spacesep = cmd.find(' ');
   if(spacesep==string::npos || spacesep>(cmd.size()-1))
     throw evt_error("register_admin: malformed command="+cmd);

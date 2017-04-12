@@ -22,7 +22,7 @@ namespace evt {
 
     typedef std::shared_ptr<std::string> StringRP;
 
-  AdminSession(AdminServer* server, boost::asio::io_service * _iosvc, Logger* logger) :
+  AdminSession(class AdminServer* server, boost::asio::io_service * _iosvc, evtsim::Logger* logger) :
     _server(server), _state(SessionState::Initial), socket(*_iosvc), _logger(logger), _fd(-1) {}
     void start();
     void set_state(const SessionState& state);
@@ -33,12 +33,12 @@ namespace evt {
     void handle_help();
     void send(const std::string msg, bool raw=false);
     void handle_command(const std::vector<std::string>& tokens);
-    AdminSessionRP get_ptr() { return shared_from_this(); }
+    std::shared_ptr<AdminSession> get_ptr() { return shared_from_this(); }
 
     class AdminServer* _server;
     SessionState _state;
     boost::asio::ip::tcp::socket socket;
-    Logger* _logger;
+    evtsim::Logger* _logger;
     std::string _name;
     boost::asio::streambuf _input;
     int _fd;
@@ -58,7 +58,7 @@ namespace evt {
 
   public:
   AdminServer() : _acceptor(0) {}
-    void init(boost::asio::io_service * iosvc, Logger * l, int port, string name);
+    void init(boost::asio::io_service * iosvc, evtsim::Logger * l, int port, string name);
 
   public:
     typedef boost::function<void (AdminContext& ctx)> admin_callback;
@@ -81,11 +81,11 @@ namespace evt {
       std::string key() const { return ctx+" "+cmd; }
     };
 
-    boost::asio::io_service _iosvc;
+    boost::asio::io_service* _iosvc;
     std::vector<AdminCmd> _command_list;
     boost::asio::ip::tcp::acceptor* _acceptor;
     std::string _name;
-    Logger* _logger;
+    evtsim::Logger* _logger;
     std::vector<size_t> _limits;
   };
 }
