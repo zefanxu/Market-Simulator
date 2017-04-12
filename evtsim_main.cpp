@@ -6,7 +6,7 @@
 #include <string>
 #include <unistd.h>
 #include "tcp_server.h"
-
+#include "adminserver.h"
 using namespace std;
 using namespace evt;
 namespace bpo = boost::program_options;
@@ -31,12 +31,13 @@ get_evtsim_version() {
 int
 main(int argc, char** argv) {
   srand(time(NULL));
-  signal(SIGINT, signal_handler);  
+  signal(SIGINT, signal_handler);
   bpo::options_description opts("Available options");
   opts.add_options()
     ("help,h", "produce help message")
     // ("config,c", bpo::value<string>(), "specify configuration file")
     // ("version", "show version")
+    ("adminserver,a", bpo::value<int>(), "admin server listen port number")
     ("ouchport,o", bpo::value<int>(), "ouch server listen port number")
     ("boeport,b", bpo::value<int>(), "boe server listen port number")
     ;
@@ -62,6 +63,14 @@ main(int argc, char** argv) {
   }
 
   vector<unique_ptr<TCPServer>> servers;
+  AdminServer as;
+  Logger admin_logger;
+
+  int as_port = 10001;
+  if (vm.count("adminserver")){
+    as_port = vm["adminserver"].as<int>();
+  }
+  as.init(&io_service, &admin_logger, as_port, "test");
 
   if (!vm.count("ouchport") and !vm.count("boeport")){
     cout << "need at least one port number" << endl;
