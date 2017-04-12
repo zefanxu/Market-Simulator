@@ -11,7 +11,7 @@
 #include "session.h"
 
 //maxinum number of execution per second
-#define MAX_EXEC_PER_SECOND 5
+#define MAX_EXEC_PER_SECOND 3
 
 using namespace std;
 using namespace evt;
