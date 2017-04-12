@@ -331,7 +331,7 @@ void ouch_session::constructOrderModified(uint32_t remaining_qty, const Ouch_Mod
 }
 
 void ouch_session::constructOrderExecuted(Ouch_Order & o){
-  int64_t exe_qty = (rand() % 10) * 100;
+  int64_t exe_qty = (1+rand() % 10) * 100; //execute at least 100 shares
   exe_qty = min(exe_qty, o.remaining_qty);
   if (o.min_qty and exe_qty > o.min_qty)
     return;

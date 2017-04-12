@@ -7,8 +7,11 @@ command.append('om cancel 9100')
 command.append('om send_order B 3000 SPY.ARCX 234.00 BATS')
 command.append('om replace 9101 3000 233.00')
 
+evtsim_port = 11035
+admin_port = 12014
+
 evtsim_proc = subprocess.Popen(
-    ['./evtsim','-b', '11035'])
+    ['./evtsim','-b', str(evtsim_port)])
 
 evts_proc = subprocess.Popen(
     ['../evts/evts', '-c', 'evts.config'])
@@ -16,7 +19,7 @@ evts_proc = subprocess.Popen(
 time.sleep(3)
 
 admin_proc = subprocess.Popen(
-    ['/evt/apps/infra/prod/bin/admin', 'localhost:12014'],stdout=subprocess.PIPE,
+    ['/evt/apps/infra/prod/bin/admin', 'localhost:'+str(admin_port)],stdout=subprocess.PIPE,
     stdin=subprocess.PIPE)
 time.sleep(2)
 
@@ -32,7 +35,13 @@ if (evts_proc.poll() != None):
 if ((evtsim_proc.poll() != None) or (admin_proc.poll()!= None) or (evts_proc.poll() != None)):
     try:
         admin_proc.kill()
+    except:
+        pass
+    try:
         evtsim_proc.kill()
+    except:
+        pass
+    try:
         evts_proc.kill()
     except:
         pass
@@ -42,6 +51,7 @@ for each_command in command:
     admin_proc.stdin.write(each_command+'\n')
     time.sleep(2)
 
+time.sleep(3)
 
 admin_proc.kill()
 evtsim_proc.kill()
