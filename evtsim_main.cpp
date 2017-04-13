@@ -65,14 +65,12 @@ main(int argc, char** argv) {
   }
 
   vector<unique_ptr<TCPServer>> servers;
-  AdminServer as;
-
 
   int as_port = 10001;
   if (vm.count("adminserver")){
     as_port = vm["adminserver"].as<int>();
   }
-  as.init(&io_service, &logger, as_port, string("AdminConsole"));
+  BehaviorManager bm = BehaviorManager(&io_service, &logger, as_port);
 
   if (!vm.count("ouchport") and !vm.count("boeport")){
     cout << "need at least one port number" << endl;
