@@ -42,14 +42,14 @@ protected:
 
 class SoupBinTCPServer: public TCPServer{
 public:
-  SoupBinTCPServer(unsigned int port, asio::io_service* io_service);
+  SoupBinTCPServer(unsigned int port, asio::io_service* io_service, evtsim::Logger * logger);
   virtual void read(boost::system::error_code ec, size_t bytes_received);
   virtual void send();
 };
 
 class BOEServer: public TCPServer{
 public:
-  BOEServer(unsigned int port, asio::io_service* io_service);
+  BOEServer(unsigned int port, asio::io_service* io_service, evtsim::Logger * logger);
   virtual void read(boost::system::error_code ec, size_t bytes_received);
   virtual void send();
 };

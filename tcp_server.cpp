@@ -66,7 +66,8 @@ void SoupBinTCPServer::send(){
   market->pending_out_messages.clear();
 }
 
-SoupBinTCPServer::SoupBinTCPServer(unsigned int port, asio::io_service* io_service):TCPServer(port, io_service){
+SoupBinTCPServer::SoupBinTCPServer(unsigned int port, asio::io_service* io_service, evtsim::Logger * logger):
+  TCPServer(port, io_service, logger){
   market = new ouch_session();
 }
 
@@ -100,7 +101,8 @@ void BOEServer::send(){
   market->pending_out_messages.clear();
 }
 
-BOEServer::BOEServer(unsigned int port, asio::io_service* io_service):TCPServer(port, io_service){
+BOEServer::BOEServer(unsigned int port, asio::io_service* io_service, evtsim::Logger * logger):
+  TCPServer(port, io_service, logger){
   market = new boe_session();
 }
 
