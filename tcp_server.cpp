@@ -1,6 +1,6 @@
 #include "tcp_server.h"
 
-TCPServer::TCPServer(unsigned int port, asio::io_service* io_service){
+TCPServer::TCPServer(unsigned int port, asio::io_service* io_service, evtsim::Logger * logger){
   if (port <= 0 or port > 65535)
     throw invalid_argument("Invalid port number");
   _io_service = io_service;
@@ -10,12 +10,13 @@ TCPServer::TCPServer(unsigned int port, asio::io_service* io_service){
   _timer = new asio::deadline_timer(*_io_service, boost::posix_time::milliseconds(1000/MAX_EXEC_PER_SECOND));
   if (!_socket)
     throw runtime_error("Invalid socket");
-  l.write("[TCP]Accepting Connection on port " + to_string(port));
+  l = logger;
+  l->write("[TCP]Accepting Connection on port " + to_string(port));
   _acceptor->async_accept(*_socket, boost::bind(&TCPServer::accept, this, asio::placeholders::error));
 }
 
 TCPServer::~TCPServer(){
-  l.write("[TCP]Server shutdown");
+  l->write("[TCP]Server shutdown");
   if (_socket){
     delete _endpoint;
     delete _acceptor;
@@ -29,8 +30,8 @@ TCPServer::~TCPServer(){
 
 void TCPServer::accept(const boost::system::error_code& error){
   if (error) return;
-  l.write("[TCP]Connection established");
-  market->set_logger(&l);
+  l->write("[TCP]Connection established");
+  market->set_logger(l);
   _socket->async_read_some(asio::buffer(buf),
                 boost::bind(&TCPServer::read, this,
                 asio::placeholders::error, asio::placeholders::bytes_transferred));
@@ -49,7 +50,7 @@ void TCPServer::process(const boost::system::error_code& error){
 void TCPServer::reconnect(){
   _timer->cancel();
   market->disconnect();
-  l.write("[TCP]Attempt to reconnect");
+  l->write("[TCP]Attempt to reconnect");
   if (_socket)
     delete _socket;
   _socket = new asio::ip::tcp::socket(*_io_service);
@@ -59,7 +60,7 @@ void TCPServer::reconnect(){
 void SoupBinTCPServer::send(){
   boost::system::error_code ec;
   for (const auto & msg : market->pending_out_messages){
-    l.write("[OUCH]SEND: "+ouch::inbound_to_string(reinterpret_cast<const ouch::MsgHeader*>(&msg[0])));
+    l->write("[OUCH]SEND: "+ouch::inbound_to_string(reinterpret_cast<const ouch::MsgHeader*>(&msg[0])));
     asio::write(*_socket, asio::buffer(&msg[0], msg.size()), asio::transfer_all(), ec);
   }
   market->pending_out_messages.clear();
@@ -73,12 +74,12 @@ void SoupBinTCPServer::read(boost::system::error_code ec, size_t bytes_received)
   char * read_pos = buf.c_array();
   size_t packet_len;
   if (ec == asio::error::eof){
-    l.write("[OUCH]Connection Closed");
+    l->write("[OUCH]Connection Closed");
     reconnect();
     return;
   }
   while (read_pos < buf.c_array() + bytes_received){
-    l.write("[OUCH]RECV: " + ouch::outbound_to_string(reinterpret_cast<const ouch::MsgHeader*>(read_pos)));
+    l->write("[OUCH]RECV: " + ouch::outbound_to_string(reinterpret_cast<const ouch::MsgHeader*>(read_pos)));
     packet_len = big_to_native((reinterpret_cast<const ouch::MsgHeader*>(read_pos))->length) + 2;
     if (packet_len)
       market->handle_packet(read_pos, packet_len);
@@ -93,7 +94,7 @@ void SoupBinTCPServer::read(boost::system::error_code ec, size_t bytes_received)
 void BOEServer::send(){
   boost::system::error_code ec;
   for (const auto & msg : market->pending_out_messages){
-    l.write("[BOE]SEND: "+boe::to_string(reinterpret_cast<const boe::MsgHeader*>(&msg[0])));
+    l->write("[BOE]SEND: "+boe::to_string(reinterpret_cast<const boe::MsgHeader*>(&msg[0])));
     asio::write(*_socket, asio::buffer(&msg[0], msg.size()), asio::transfer_all(), ec);
   }
   market->pending_out_messages.clear();
@@ -107,12 +108,12 @@ void BOEServer::read(boost::system::error_code ec, size_t bytes_received){
   char * read_pos = buf.c_array();
   size_t packet_len;
   if (ec == asio::error::eof){
-    l.write("[BOE]Connection Closed");
+    l->write("[BOE]Connection Closed");
     reconnect();
     return;
   }
   while (read_pos < buf.c_array() + bytes_received){
-    l.write("[BOE]RECV: " + boe::to_string(reinterpret_cast<const boe::MsgHeader*>(read_pos)));
+    l->write("[BOE]RECV: " + boe::to_string(reinterpret_cast<const boe::MsgHeader*>(read_pos)));
     packet_len = (reinterpret_cast<const boe::MsgHeader*>(read_pos))->length + 2;
     if (packet_len)
       market->handle_packet(read_pos, packet_len);

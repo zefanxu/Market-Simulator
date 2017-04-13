@@ -21,7 +21,7 @@ typedef vector<char> message;
 
 class TCPServer{
 public:
-  TCPServer(unsigned int port, asio::io_service* io_service);
+  TCPServer(unsigned int port, asio::io_service* io_service, evtsim::Logger * logger);
   virtual ~TCPServer();
   void accept(const boost::system::error_code& error);
   virtual void read(boost::system::error_code ec, size_t bytes_received)=0;
@@ -36,7 +36,7 @@ protected:
   asio::ip::tcp::endpoint* _endpoint;
   asio::ip::tcp::acceptor* _acceptor;
   asio::ip::tcp::socket* _socket;
-  evtsim::Logger l;
+  evtsim::Logger* l;
   boost::array<char, 4096> buf;
 };
 

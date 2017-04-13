@@ -13,9 +13,11 @@ namespace bpo = boost::program_options;
 namespace asio = boost::asio;
 
 asio::io_service io_service;
+evtsim::Logger logger;
 
 void
 signal_handler(int signum) {
+  logger.write("\ninterrupt signal");
   io_service.stop();
 }
 
@@ -64,13 +66,13 @@ main(int argc, char** argv) {
 
   vector<unique_ptr<TCPServer>> servers;
   AdminServer as;
-  evtsim::Logger admin_logger;
+
 
   int as_port = 10001;
   if (vm.count("adminserver")){
     as_port = vm["adminserver"].as<int>();
   }
-  as.init(&io_service, &admin_logger, as_port, string("test"));
+  as.init(&io_service, &logger, as_port, string("AdminConsole"));
 
   if (!vm.count("ouchport") and !vm.count("boeport")){
     cout << "need at least one port number" << endl;
@@ -79,11 +81,11 @@ main(int argc, char** argv) {
   }
   if (vm.count("ouchport")){
     int ouch_port_num = vm["ouchport"].as<int>();
-    servers.push_back(unique_ptr<TCPServer>(new SoupBinTCPServer(ouch_port_num, &io_service)));
+    servers.push_back(unique_ptr<TCPServer>(new SoupBinTCPServer(ouch_port_num, &io_service, &logger)));
   }
   if (vm.count("boeport")){
     int boe_port_num = vm["boeport"].as<int>();
-    servers.push_back(unique_ptr<TCPServer>(new BOEServer(boe_port_num, &io_service)));
+    servers.push_back(unique_ptr<TCPServer>(new BOEServer(boe_port_num, &io_service, &logger)));
   }
 
   io_service.run();
