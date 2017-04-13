@@ -49,7 +49,9 @@ AdminSession::send(string msg, bool raw) {
 void
 AdminSession::handle_write(const boost::system::error_code& ec, StringRP srp, size_t bytes_sent) {
   if(ec) {
-    //_logger->write(Log::WARN, "%s handle_write ec=%s", _name.c_str(), ec.message().c_str());
+    char text[100];
+    sprintf(text, "%s handle_write ec=%s", _name.c_str(), ec.message().c_str());
+    _logger->write_warning(string(text));
     return;
   }
 }
@@ -74,7 +76,9 @@ AdminSession::handle_read(const boost::system::error_code& ec) {
   string input;
   getline(is, input);
   boost::trim(input);
-  //_logger->write(Log::INFO, "%s fd=%d input=%s", _name.c_str(), _fd, input.c_str());
+  char text[100];
+  sprintf(text, "%s fd=%d input=%s", _name.c_str(), _fd, input.c_str());
+  _logger->write(string(text));
 
   typedef boost::char_separator<char> Separator;
   typedef boost::tokenizer<Separator> btok;
@@ -92,7 +96,9 @@ AdminSession::handle_read(const boost::system::error_code& ec) {
     handle_help();
 
   } else if(tokens.size()==1 && tokens[0]=="quit") {
-    //_logger->write(Log::INFO, "%s fd=%d quit", _name.c_str(), _fd);
+    char text[100];
+    sprintf(text, "%s fd=%d quit", _name.c_str(), _fd);
+    _logger->write(string(text));
     socket.close();
     return;
 
@@ -127,7 +133,9 @@ AdminSession::handle_command(const vector<string>& tokens) {
 
       string response = context.response.str();
       send(response);
-      //_logger->write(Log::INFO, "%s fd=%d response len=%d", _name.c_str(), _fd, (int)response.size());
+      char text[100];
+      sprintf(text, "%s fd=%d response len=%d", _name.c_str(), _fd, (int)response.size());
+      _logger->write(string(text));
       return;
     }
   }
@@ -159,7 +167,9 @@ AdminSession::handle_help() {
 
 void
 AdminSession::set_state(const AdminSession::SessionState& state) {
-  //_logger->write(Log::INFO, "%s fd=%d set_state=%s", _name.c_str(), _fd, state.str());
+  char text[100];
+  sprintf(text, "%s fd=%d set_state=%s", _name.c_str(), _fd, state.str());
+  _logger->write(string(text));
   _state = state;
 }
 
