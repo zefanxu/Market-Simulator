@@ -64,7 +64,7 @@ void
 AdminSession::handle_read(const boost::system::error_code& ec) {
   if(ec || !_input.size()) {
     char tmp[100];
-    snprintf(tmp, "%s fd=%d disconnect ec=%s", .c_str(), _fd, ec.message().c_str());
+    snprintf(tmp, "%s fd=%d disconnect ec=%s", _name.c_str(), _fd, ec.message().c_str());
     _logger->write(string(tmp));
     socket.close();
     return;
