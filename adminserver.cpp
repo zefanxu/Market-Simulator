@@ -49,7 +49,7 @@ AdminSession::send(string msg, bool raw) {
 void
 AdminSession::handle_write(const boost::system::error_code& ec, StringRP srp, size_t bytes_sent) {
   if(ec) {
-    _logger->write(Log::WARN, "%s handle_write ec=%s", _name.c_str(), ec.message().c_str());
+    //_logger->write(Log::WARN, "%s handle_write ec=%s", _name.c_str(), ec.message().c_str());
     return;
   }
 }
