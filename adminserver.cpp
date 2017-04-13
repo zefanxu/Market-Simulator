@@ -49,7 +49,7 @@ AdminSession::send(string msg, bool raw) {
 void
 AdminSession::handle_write(const boost::system::error_code& ec, StringRP srp, size_t bytes_sent) {
   if(ec) {
-    //_logger->log(Log::WARN, "%s handle_write ec=%s", _name.c_str(), ec.message().c_str());
+    _logger->write(Log::WARN, "%s handle_write ec=%s", _name.c_str(), ec.message().c_str());
     return;
   }
 }
@@ -63,7 +63,9 @@ AdminSession::arm_read() {
 void
 AdminSession::handle_read(const boost::system::error_code& ec) {
   if(ec || !_input.size()) {
-    //_logger->log(Log::INFO, "%s fd=%d disconnect ec=%s", _name.c_str(), _fd, ec.message().c_str());
+    char tmp[100];
+    snprintf(tmp, "%s fd=%d disconnect ec=%s", .c_str(), _fd, ec.message().c_str());
+    _logger->write(string(tmp));
     socket.close();
     return;
   }
@@ -72,7 +74,7 @@ AdminSession::handle_read(const boost::system::error_code& ec) {
   string input;
   getline(is, input);
   boost::trim(input);
-  //_logger->log(Log::INFO, "%s fd=%d input=%s", _name.c_str(), _fd, input.c_str());
+  //_logger->write(Log::INFO, "%s fd=%d input=%s", _name.c_str(), _fd, input.c_str());
 
   typedef boost::char_separator<char> Separator;
   typedef boost::tokenizer<Separator> btok;
@@ -90,7 +92,7 @@ AdminSession::handle_read(const boost::system::error_code& ec) {
     handle_help();
 
   } else if(tokens.size()==1 && tokens[0]=="quit") {
-    //_logger->log(Log::INFO, "%s fd=%d quit", _name.c_str(), _fd);
+    //_logger->write(Log::INFO, "%s fd=%d quit", _name.c_str(), _fd);
     socket.close();
     return;
 
@@ -125,7 +127,7 @@ AdminSession::handle_command(const vector<string>& tokens) {
 
       string response = context.response.str();
       send(response);
-      //_logger->log(Log::INFO, "%s fd=%d response len=%d", _name.c_str(), _fd, (int)response.size());
+      //_logger->write(Log::INFO, "%s fd=%d response len=%d", _name.c_str(), _fd, (int)response.size());
       return;
     }
   }
@@ -157,7 +159,7 @@ AdminSession::handle_help() {
 
 void
 AdminSession::set_state(const AdminSession::SessionState& state) {
-  //_logger->log(Log::INFO, "%s fd=%d set_state=%s", _name.c_str(), _fd, state.str());
+  //_logger->write(Log::INFO, "%s fd=%d set_state=%s", _name.c_str(), _fd, state.str());
   _state = state;
 }
 
@@ -176,7 +178,7 @@ AdminServer::init(boost::asio::io_service * iosvc, evtsim::Logger * l, int port,
   AdminSessionRP session = std::make_shared<AdminSession>(this, _iosvc, _logger);
   _acceptor->async_accept(session->socket, boost::bind(&AdminServer::handle_accept, this, session, boost::asio::placeholders::error));
   _acceptor->listen();
-  cout << _name << " listening on port=" << port << endl;
+  _logger->write(_name + " listening on port="+ to_string(port));;
 }
 
 void
