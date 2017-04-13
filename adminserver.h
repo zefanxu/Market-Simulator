@@ -65,7 +65,7 @@ namespace evt {
     typedef std::shared_ptr<AdminSession> AdminSessionRP;
 
   public:
-    void register_admin(string& cmd, string& args, string& help, admin_callback callback);
+    void register_admin(string cmd, string args, string help, admin_callback callback);
 
   private:
     void handle_accept(AdminSessionRP session, const boost::system::error_code& ec);

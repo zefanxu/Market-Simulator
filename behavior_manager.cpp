@@ -5,8 +5,8 @@ using namespace evt;
 BehaviorManager::BehaviorManager(asio::io_service * io_service, evtsim::Logger * logger, int admin_port){
   l = logger;
   _admin.init(io_service, logger, admin_port, string("AdminServer"));
-  _admin.register_admin("bm login default", "", "", boost::bind(&BehaviorManager::set_login_to_default, this, _1));
-  _admin.register_admin("bm login random", "[prob]", "", boost::bind(&BehaviorManager::set_login_to_random, this, _1))
+  _admin.register_admin("bm login_default", "", "", boost::bind(&BehaviorManager::set_login_to_default, this, _1));
+  _admin.register_admin("bm login_random", "[prob]", "", boost::bind(&BehaviorManager::set_login_to_random, this, _1));
   login_behavior = &db;
   logout_behavior = &db;
   neworder_behavior = &db;

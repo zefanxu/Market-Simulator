@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include "tcp_server.h"
 #include "adminserver.h"
+#include "behavior_manager.h"
+
 using namespace std;
 using namespace evt;
 namespace bpo = boost::program_options;

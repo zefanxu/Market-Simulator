@@ -201,7 +201,7 @@ AdminServer::handle_accept(AdminSessionRP session, const boost::system::error_co
 }
 
 void
-AdminServer::register_admin(string& cmd, string& args, string& help, admin_callback callback) {
+AdminServer::register_admin(string cmd, string args, string help, admin_callback callback) {
   string::size_type spacesep = cmd.find(' ');
   if(spacesep==string::npos || spacesep>(cmd.size()-1))
     throw evt_error("register_admin: malformed command="+cmd);
