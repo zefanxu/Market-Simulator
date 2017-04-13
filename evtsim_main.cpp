@@ -81,11 +81,11 @@ main(int argc, char** argv) {
   }
   if (vm.count("ouchport")){
     int ouch_port_num = vm["ouchport"].as<int>();
-    servers.push_back(unique_ptr<TCPServer>(new SoupBinTCPServer(ouch_port_num, &io_service, &logger)));
+    servers.push_back(unique_ptr<TCPServer>(new SoupBinTCPServer(ouch_port_num, &io_service, &logger, &bm)));
   }
   if (vm.count("boeport")){
     int boe_port_num = vm["boeport"].as<int>();
-    servers.push_back(unique_ptr<TCPServer>(new BOEServer(boe_port_num, &io_service, &logger)));
+    servers.push_back(unique_ptr<TCPServer>(new BOEServer(boe_port_num, &io_service, &logger, &bm)));
   }
 
   io_service.run();

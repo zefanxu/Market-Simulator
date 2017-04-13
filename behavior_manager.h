@@ -1,6 +1,7 @@
+#ifndef _B_MANAGER
+#define _B_MANAGER
 #include "adminserver.h"
 #include <boost/asio.hpp>
-#include "tcp_server.h"
 #include <string>
 #include <random>
 #include <iostream>
@@ -92,5 +93,6 @@ private:
   Behavior * cancel_order_behavior;
   Behavior * execution_behavior;
 };
+#endif
 
 

@@ -7,9 +7,9 @@
 #include <iostream>
 #include <vector>
 #include "evtsim_util.h"
-#include "behavior_manager.h"
 #include "ouch_messages.h"
 #include "session.h"
+#include "behavior_manager.h"
 
 //maxinum number of execution per second
 #define MAX_EXEC_PER_SECOND 3

@@ -46,7 +46,7 @@ void boe_session::handle_client_heartbeat(MsgHeader* hdr, size_t len){
 void boe_session::handle_login_request(MsgHeader* hdr, size_t len){
   LoginRequest * req = reinterpret_cast<LoginRequest*>(hdr);
   if (!_behavior->login())
-    construct_login_response(LoginResponseStatus::SessionDisabled, req)
+    construct_login_response(LoginResponseStatus::SessionDisabled, req);
   else if (state != session_state::not_logged_in)
     construct_login_response(LoginResponseStatus::SessionInUse, req);
   else construct_login_response(LoginResponseStatus::Accepted, req);
