@@ -1,6 +1,9 @@
 #include "tcp_server.h"
 
-TCPServer::TCPServer(unsigned int port, asio::io_service* io_service, evtsim::Logger * logger){
+TCPServer::TCPServer(unsigned int port, asio::io_service* io_service, evtsim::Logger * logger, BehaviorManager * behavior){
+  if (!behavior or !logger or !io_service)
+    throw runtime_error("nullptr");
+  _behavior = behavior;
   if (port <= 0 or port > 65535)
     throw invalid_argument("Invalid port number");
   _io_service = io_service;
@@ -68,7 +71,7 @@ void SoupBinTCPServer::send(){
 
 SoupBinTCPServer::SoupBinTCPServer(unsigned int port, asio::io_service* io_service, evtsim::Logger * logger):
   TCPServer(port, io_service, logger){
-  market = new ouch_session();
+  market = new ouch_session(_behavior);
 }
 
 void SoupBinTCPServer::read(boost::system::error_code ec, size_t bytes_received){
@@ -103,7 +106,7 @@ void BOEServer::send(){
 
 BOEServer::BOEServer(unsigned int port, asio::io_service* io_service, evtsim::Logger * logger):
   TCPServer(port, io_service, logger){
-  market = new boe_session();
+  market = new boe_session(_behavior);
 }
 
 void BOEServer::read(boost::system::error_code ec, size_t bytes_received){

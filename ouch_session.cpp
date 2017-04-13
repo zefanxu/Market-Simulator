@@ -2,7 +2,7 @@
 using namespace evt::ouch;
 //SoupBinTCP functions
 void ouch_session::handle_login_request(MsgHeader * packet, size_t len){
-  if (state == session_state::not_logged_in){
+  if (state == session_state::not_logged_in and _behavior->login()){
     state = session_state::logged_in;
     LoginAccepted la;
     strncpy(la.session, "         0", sizeof(la.session));
@@ -248,7 +248,8 @@ uint64_t ouch_session::get_timestamp(){
   return diff.count();
 }
 
-ouch_session::ouch_session(){
+ouch_session::ouch_session(BehaviorManager * bm){
+  _behavior = bm;
   init();
 }
 

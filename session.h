@@ -12,6 +12,7 @@
 #include "ouch_messages.h"
 #include "boe_messages.h"
 #include "order.h"
+#include "behavior_manager.h"
 
 using namespace evt;
 namespace session_state{
@@ -38,13 +39,14 @@ protected:
   time_t last_send_heartbeat;
   time_t last_recv_heartbeat;
 
+  BehaviorManager * _behavior;
   char state;
   evtsim::Logger * l;
 };
 
 class boe_session : public session{
 public:
-  boe_session();
+  boe_session(BehaviorManager * bm);
   virtual ~boe_session();
   virtual void market_logic();
   virtual void handle_packet(char * packet, size_t len);
@@ -87,7 +89,7 @@ private:
 
 class ouch_session : public session{
 public:
-  ouch_session();
+  ouch_session(BehaviorManager * bm);
   virtual ~ouch_session();
   virtual void handle_packet(char * packet, size_t len);
 
