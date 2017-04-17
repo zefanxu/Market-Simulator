@@ -63,8 +63,10 @@ void BehaviorManager::set_logout_to_random(AdminContext& ctx){
   }
   try{
     double prob = stod(ctx.args[0]);
-    if (prob > 1 or prob < 0)
+    if (prob > 1 or prob < 0){
       ctx.response << "invalid probability" << endl;
+      return;
+    }
     rb.set_logout_prob(prob);
     logout_behavior = &rb;
     ctx.response << "set to random, prob=" << prob << endl;
@@ -80,8 +82,10 @@ void BehaviorManager::set_neworder_to_random(AdminContext& ctx){
   }
   try{
     double prob = stod(ctx.args[0]);
-    if (prob > 1 or prob < 0)
+    if (prob > 1 or prob < 0){
       ctx.response << "invalid probability" << endl;
+      return;
+    }
     rb.set_neworder_prob(prob);
     neworder_behavior = &rb;
     ctx.response << "set to random, prob=" << prob << endl;
@@ -97,8 +101,10 @@ void BehaviorManager::set_modify_order_to_random(AdminContext& ctx){
   }
   try{
     double prob = stod(ctx.args[0]);
-    if (prob > 1 or prob < 0)
+    if (prob > 1 or prob < 0){
       ctx.response << "invalid probability" << endl;
+      return;
+    }
     rb.set_modify_order_prob(prob);
     modify_order_behavior = &rb;
     ctx.response << "set to random, prob=" << prob << endl;
@@ -114,8 +120,10 @@ void BehaviorManager::set_replace_order_to_random(AdminContext& ctx){
   }
   try{
     double prob = stod(ctx.args[0]);
-    if (prob > 1 or prob < 0)
+    if (prob > 1 or prob < 0){
       ctx.response << "invalid probability" << endl;
+      return;
+    }
     rb.set_replace_order_prob(prob);
     replace_order_behavior = &rb;
     ctx.response << "set to random, prob=" << prob << endl;
@@ -131,8 +139,10 @@ void BehaviorManager::set_cancel_order_to_random(AdminContext& ctx){
   }
   try{
     double prob = stod(ctx.args[0]);
-    if (prob > 1 or prob < 0)
+    if (prob > 1 or prob < 0){
       ctx.response << "invalid probability" << endl;
+      return;
+    }
     rb.set_cancel_order_prob(prob);
     cancel_order_behavior = &rb;
     ctx.response << "set to random, prob=" << prob << endl;
@@ -148,8 +158,10 @@ void BehaviorManager::set_execution_to_random(AdminContext& ctx){
   }
   try{
     double prob = stod(ctx.args[0]);
-    if (prob > 1 or prob < 0)
+    if (prob > 1 or prob < 0){
       ctx.response << "invalid probability" << endl;
+      return;
+    }
     rb.set_execution_prob(prob);
     execution_behavior = &rb;
     ctx.response << "set to random, prob=" << prob << endl;
@@ -166,8 +178,10 @@ void BehaviorManager::set_login_to_random(AdminContext& ctx){
   }
   try{
     double prob = stod(ctx.args[0]);
-    if (prob > 1 or prob < 0)
+    if (prob > 1 or prob < 0){
       ctx.response << "invalid probability" << endl;
+      return;
+    }
     rb.set_login_prob(prob);
     login_behavior = &rb;
     ctx.response << "set to random, prob=" << prob << endl;
