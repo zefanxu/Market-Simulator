@@ -13,6 +13,12 @@ BehaviorManager::BehaviorManager(asio::io_service * io_service, evtsim::Logger *
   _admin.register_admin("bm cancel_order_default", "", "", boost::bind(&BehaviorManager::set_cancel_order_to_default, this, _1));
   _admin.register_admin("bm execution_default", "", "", boost::bind(&BehaviorManager::set_execution_to_default, this, _1));
   _admin.register_admin("bm login_random", "[prob]", "", boost::bind(&BehaviorManager::set_login_to_random, this, _1));
+  _admin.register_admin("bm logout_random", "[prob]", "", boost::bind(&BehaviorManager::set_logout_to_random, this, _1));
+  _admin.register_admin("bm neworder_random", "[prob]", "", boost::bind(&BehaviorManager::set_neworder_to_random, this, _1));
+  _admin.register_admin("bm modify_order_random", "[prob]", "", boost::bind(&BehaviorManager::set_modify_order_to_random, this, _1));
+  _admin.register_admin("bm replace_order_random", "[prob]", "", boost::bind(&BehaviorManager::set_replace_order_to_random, this, _1));
+  _admin.register_admin("bm cancel_order_random", "[prob]", "", boost::bind(&BehaviorManager::set_cancel_order_to_random, this, _1));
+  _admin.register_admin("bm execution_random", "[prob]", "", boost::bind(&BehaviorManager::set_execution_to_random, this, _1));
   login_behavior = &db;
   logout_behavior = &db;
   neworder_behavior = &db;
