@@ -56,9 +56,9 @@ void BehaviorManager::set_neworder_to_random(AdminContext& ctx){
 }
 void BehaviorManager::set_modify_order_to_random(AdminContext& ctx){
 }
-void BehaviorManager::set_replace_to_random(AdminContext& ctx){
+void BehaviorManager::set_replace_order_to_random(AdminContext& ctx){
 }
-void BehaviorManager::set_cancel_to_random(AdminContext& ctx){
+void BehaviorManager::set_cancel_order_to_random(AdminContext& ctx){
 }
 void BehaviorManager::set_execution_to_random(AdminContext& ctx){
 }
@@ -74,7 +74,7 @@ void BehaviorManager::set_login_to_random(AdminContext& ctx){
     login_behavior = &rb;
     ctx.response << "set to random, prob=" << prob << endl;
   }catch(exception& e){
-    ctx.response << "failed" << prob << endl;
+    ctx.response << "failed" << endl;
     l->write_warning(e.what());
   }
 }
