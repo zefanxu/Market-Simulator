@@ -51,16 +51,94 @@ void BehaviorManager::set_execution_to_default(AdminContext& ctx){
   ctx.response << "set to default\n";
 }
 void BehaviorManager::set_logout_to_random(AdminContext& ctx){
+  if (ctx.args.size() != 1){
+    ctx.response << "need a probability parameter" << endl;
+    return;
+  }
+  try{
+    double prob = stod(ctx.args[0]);
+    rb.set_logout_prob(prob);
+    logout_behavior = &rb;
+    ctx.response << "set to random, prob=" << prob << endl;
+  }catch(exception& e){
+    ctx.response << "failed" << endl;
+    l->write_warning(e.what());
+  }
 }
 void BehaviorManager::set_neworder_to_random(AdminContext& ctx){
+  if (ctx.args.size() != 1){
+    ctx.response << "need a probability parameter" << endl;
+    return;
+  }
+  try{
+    double prob = stod(ctx.args[0]);
+    rb.set_neworder_prob(prob);
+    neworder_behavior = &rb;
+    ctx.response << "set to random, prob=" << prob << endl;
+  }catch(exception& e){
+    ctx.response << "failed" << endl;
+    l->write_warning(e.what());
+  }
 }
 void BehaviorManager::set_modify_order_to_random(AdminContext& ctx){
+  if (ctx.args.size() != 1){
+    ctx.response << "need a probability parameter" << endl;
+    return;
+  }
+  try{
+    double prob = stod(ctx.args[0]);
+    rb.set_modify_order_prob(prob);
+    modify_order_behavior = &rb;
+    ctx.response << "set to random, prob=" << prob << endl;
+  }catch(exception& e){
+    ctx.response << "failed" << endl;
+    l->write_warning(e.what());
+  }
 }
 void BehaviorManager::set_replace_order_to_random(AdminContext& ctx){
+  if (ctx.args.size() != 1){
+    ctx.response << "need a probability parameter" << endl;
+    return;
+  }
+  try{
+    double prob = stod(ctx.args[0]);
+    rb.set_replace_order_prob(prob);
+    replace_order_behavior = &rb;
+    ctx.response << "set to random, prob=" << prob << endl;
+  }catch(exception& e){
+    ctx.response << "failed" << endl;
+    l->write_warning(e.what());
+  }
 }
 void BehaviorManager::set_cancel_order_to_random(AdminContext& ctx){
+  if (ctx.args.size() != 1){
+    ctx.response << "need a probability parameter" << endl;
+    return;
+  }
+  try{
+    double prob = stod(ctx.args[0]);
+    rb.set_cancel_order_prob(prob);
+    cancel_order_behavior = &rb;
+    ctx.response << "set to random, prob=" << prob << endl;
+  }catch(exception& e){
+    ctx.response << "failed" << endl;
+    l->write_warning(e.what());
+  }
 }
 void BehaviorManager::set_execution_to_random(AdminContext& ctx){
+  if (ctx.args.size() != 1){
+    ctx.response << "need a probability parameter" << endl;
+    return;
+  }
+  try{
+    double prob = stod(ctx.args[0]);
+    rb.set_execution_prob(prob);
+    execution_behavior = &rb;
+    ctx.response << "set to random, prob=" << prob << endl;
+  }catch(exception& e){
+    ctx.response << "failed" << endl;
+    l->write_warning(e.what());
+  }
 }
 
 void BehaviorManager::set_login_to_random(AdminContext& ctx){
