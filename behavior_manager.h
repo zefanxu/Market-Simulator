@@ -79,7 +79,20 @@ public:
   bool execution(){return execution_behavior->execution_behavior();};
 
   void set_login_to_default(AdminContext& ctx);
+  void set_logout_to_default(AdminContext& ctx);
+  void set_neworder_to_default(AdminContext& ctx);
+  void set_modify_order_to_default(AdminContext& ctx);
+  void set_replace_order_to_default(AdminContext& ctx);
+  void set_cancel_to_default(AdminContext& ctx);
+  void set_execution_to_default(AdminContext& ctx);
+
   void set_login_to_random(AdminContext& ctx);
+  void set_logout_to_random(AdminContext& ctx);
+  void set_neworder_to_random(AdminContext& ctx);
+  void set_modify_order_to_random(AdminContext& ctx);
+  void set_replace_to_random(AdminContext& ctx);
+  void set_cancel_to_random(AdminContext& ctx);
+  void set_execution_to_random(AdminContext& ctx);
 private:
   AdminServer _admin;
   evtsim::Logger * l;
@@ -94,5 +107,3 @@ private:
   Behavior * execution_behavior;
 };
 #endif
-
-
