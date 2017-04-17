@@ -5,20 +5,20 @@ using namespace evt;
 BehaviorManager::BehaviorManager(asio::io_service * io_service, evtsim::Logger * logger, int admin_port){
   l = logger;
   _admin.init(io_service, logger, admin_port, string("AdminServer"));
-  _admin.register_admin("bm login_default", "", "", boost::bind(&BehaviorManager::set_login_to_default, this, _1));
-  _admin.register_admin("bm logout_default", "", "", boost::bind(&BehaviorManager::set_logout_to_default, this, _1));
-  _admin.register_admin("bm neworder_default", "", "", boost::bind(&BehaviorManager::set_neworder_to_default, this, _1));
-  _admin.register_admin("bm modify_order_default", "", "", boost::bind(&BehaviorManager::set_modify_order_to_default, this, _1));
-  _admin.register_admin("bm replace_order_default", "", "", boost::bind(&BehaviorManager::set_replace_order_to_default, this, _1));
-  _admin.register_admin("bm cancel_order_default", "", "", boost::bind(&BehaviorManager::set_cancel_order_to_default, this, _1));
-  _admin.register_admin("bm execution_default", "", "", boost::bind(&BehaviorManager::set_execution_to_default, this, _1));
-  _admin.register_admin("bm login_random", "[prob]", "", boost::bind(&BehaviorManager::set_login_to_random, this, _1));
-  _admin.register_admin("bm logout_random", "[prob]", "", boost::bind(&BehaviorManager::set_logout_to_random, this, _1));
-  _admin.register_admin("bm neworder_random", "[prob]", "", boost::bind(&BehaviorManager::set_neworder_to_random, this, _1));
-  _admin.register_admin("bm modify_order_random", "[prob]", "", boost::bind(&BehaviorManager::set_modify_order_to_random, this, _1));
-  _admin.register_admin("bm replace_order_random", "[prob]", "", boost::bind(&BehaviorManager::set_replace_order_to_random, this, _1));
-  _admin.register_admin("bm cancel_order_random", "[prob]", "", boost::bind(&BehaviorManager::set_cancel_order_to_random, this, _1));
-  _admin.register_admin("bm execution_random", "[prob]", "", boost::bind(&BehaviorManager::set_execution_to_random, this, _1));
+  _admin.register_admin("bm login_default", "", "", bind(&BehaviorManager::set_login_to_default, this, _1));
+  _admin.register_admin("bm logout_default", "", "", bind(&BehaviorManager::set_logout_to_default, this, _1));
+  _admin.register_admin("bm neworder_default", "", "", bind(&BehaviorManager::set_neworder_to_default, this, _1));
+  _admin.register_admin("bm modify_order_default", "", "", bind(&BehaviorManager::set_modify_order_to_default, this, _1));
+  _admin.register_admin("bm replace_order_default", "", "", bind(&BehaviorManager::set_replace_order_to_default, this, _1));
+  _admin.register_admin("bm cancel_order_default", "", "", bind(&BehaviorManager::set_cancel_order_to_default, this, _1));
+  _admin.register_admin("bm execution_default", "", "", bind(&BehaviorManager::set_execution_to_default, this, _1));
+  _admin.register_admin("bm login_random", "[prob]", "", bind(&BehaviorManager::set_login_to_random, this, _1));
+  _admin.register_admin("bm logout_random", "[prob]", "", bind(&BehaviorManager::set_logout_to_random, this, _1));
+  _admin.register_admin("bm neworder_random", "[prob]", "", bind(&BehaviorManager::set_neworder_to_random, this, _1));
+  _admin.register_admin("bm modify_order_random", "[prob]", "", bind(&BehaviorManager::set_modify_order_to_random, this, _1));
+  _admin.register_admin("bm replace_order_random", "[prob]", "", bind(&BehaviorManager::set_replace_order_to_random, this, _1));
+  _admin.register_admin("bm cancel_order_random", "[prob]", "", bind(&BehaviorManager::set_cancel_order_to_random, this, _1));
+  _admin.register_admin("bm execution_random", "[prob]", "", bind(&BehaviorManager::set_execution_to_random, this, _1));
   login_behavior = &db;
   logout_behavior = &db;
   neworder_behavior = &db;
@@ -63,6 +63,8 @@ void BehaviorManager::set_logout_to_random(AdminContext& ctx){
   }
   try{
     double prob = stod(ctx.args[0]);
+    if (prob > 1 or prob < 0)
+      ctx.response << "invalid probability" << endl;
     rb.set_logout_prob(prob);
     logout_behavior = &rb;
     ctx.response << "set to random, prob=" << prob << endl;
@@ -78,6 +80,8 @@ void BehaviorManager::set_neworder_to_random(AdminContext& ctx){
   }
   try{
     double prob = stod(ctx.args[0]);
+    if (prob > 1 or prob < 0)
+      ctx.response << "invalid probability" << endl;
     rb.set_neworder_prob(prob);
     neworder_behavior = &rb;
     ctx.response << "set to random, prob=" << prob << endl;
@@ -93,6 +97,8 @@ void BehaviorManager::set_modify_order_to_random(AdminContext& ctx){
   }
   try{
     double prob = stod(ctx.args[0]);
+    if (prob > 1 or prob < 0)
+      ctx.response << "invalid probability" << endl;
     rb.set_modify_order_prob(prob);
     modify_order_behavior = &rb;
     ctx.response << "set to random, prob=" << prob << endl;
@@ -108,6 +114,8 @@ void BehaviorManager::set_replace_order_to_random(AdminContext& ctx){
   }
   try{
     double prob = stod(ctx.args[0]);
+    if (prob > 1 or prob < 0)
+      ctx.response << "invalid probability" << endl;
     rb.set_replace_order_prob(prob);
     replace_order_behavior = &rb;
     ctx.response << "set to random, prob=" << prob << endl;
@@ -123,6 +131,8 @@ void BehaviorManager::set_cancel_order_to_random(AdminContext& ctx){
   }
   try{
     double prob = stod(ctx.args[0]);
+    if (prob > 1 or prob < 0)
+      ctx.response << "invalid probability" << endl;
     rb.set_cancel_order_prob(prob);
     cancel_order_behavior = &rb;
     ctx.response << "set to random, prob=" << prob << endl;
@@ -138,6 +148,8 @@ void BehaviorManager::set_execution_to_random(AdminContext& ctx){
   }
   try{
     double prob = stod(ctx.args[0]);
+    if (prob > 1 or prob < 0)
+      ctx.response << "invalid probability" << endl;
     rb.set_execution_prob(prob);
     execution_behavior = &rb;
     ctx.response << "set to random, prob=" << prob << endl;
@@ -154,6 +166,8 @@ void BehaviorManager::set_login_to_random(AdminContext& ctx){
   }
   try{
     double prob = stod(ctx.args[0]);
+    if (prob > 1 or prob < 0)
+      ctx.response << "invalid probability" << endl;
     rb.set_login_prob(prob);
     login_behavior = &rb;
     ctx.response << "set to random, prob=" << prob << endl;

@@ -78,6 +78,7 @@ public:
   bool cancel_order(){return cancel_order_behavior->cancel_order_behavior();};
   bool execution(){return execution_behavior->execution_behavior();};
 
+private:
   void set_login_to_default(AdminContext& ctx);
   void set_logout_to_default(AdminContext& ctx);
   void set_neworder_to_default(AdminContext& ctx);
@@ -93,7 +94,6 @@ public:
   void set_replace_order_to_random(AdminContext& ctx);
   void set_cancel_order_to_random(AdminContext& ctx);
   void set_execution_to_random(AdminContext& ctx);
-private:
   AdminServer _admin;
   evtsim::Logger * l;
   DefaultBehavior db;
