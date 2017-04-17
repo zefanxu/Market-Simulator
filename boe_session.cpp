@@ -49,8 +49,10 @@ void boe_session::handle_login_request(MsgHeader* hdr, size_t len){
     construct_login_response(LoginResponseStatus::SessionDisabled, req);
   else if (state != session_state::not_logged_in)
     construct_login_response(LoginResponseStatus::SessionInUse, req);
-  else construct_login_response(LoginResponseStatus::Accepted, req);
-  state = session_state::logged_in;
+  else{
+    construct_login_response(LoginResponseStatus::Accepted, req);
+    state = session_state::logged_in;
+  }
 }
 
 void boe_session::modify_order(MsgHeader * msg, size_t len){
@@ -60,6 +62,10 @@ void boe_session::modify_order(MsgHeader * msg, size_t len){
     construct_modify_rejected(mo->orig_token, Reason::ClordidDoesntMatchAKnownOrder);
     return;
   }
+  if (!_behavior->modify_order()){
+    construct_modify_rejected(mo->orig_token, Reason::UnforeseenReason);
+    return;
+  }
   Boe_ModifyOrderReq modify_req = Boe_ModifyOrderReq(mo);
   pending_modify.push_back(modify_req);
 }
@@ -67,19 +73,22 @@ void boe_session::modify_order(MsgHeader * msg, size_t len){
 void boe_session::cancel_order(MsgHeader * msg, size_t len){
   CancelOrder* co = reinterpret_cast<CancelOrder*>(msg);
   string t = co->orig_token._str_();
-  if (active_orders.find(t) != active_orders.end()){
+  if (active_orders.find(t) != active_orders.end() and active_orders[t].remaining_qty > 0){
     pending_cancel.push_back(Boe_CancelOrderReq(co));
   }
   else if (active_orders[t].remaining_qty <= 0 or finished_orders.find(t) != finished_orders.end()){
     construct_cancel_rejected(co->orig_token, Reason::TooLateToCancel);
   }
-  else construct_cancel_rejected(co->orig_token, Reason::ClordidDoesntMatchAKnownOrder);
+  else if (active_orders.find(t) == active_orders.end())
+    construct_cancel_rejected(co->orig_token, Reason::ClordidDoesntMatchAKnownOrder);
+  else if (!_behavior->cancel_order())
+    construct_cancel_rejected(co->orig_token, Reason::UnforeseenReason);
 }
 
 void boe_session::enter_order(MsgHeader * hdr, size_t len){
   NewOrder * no = reinterpret_cast<NewOrder*>(hdr);
   string t = no->token._str_();
-  if (active_orders.find(t) != active_orders.end())
+  if (active_orders.find(t) != active_orders.end() or !_behavior->neworder())
     construct_order_rejected(no);
   else{
     Boe_Order new_order = Boe_Order(no);
@@ -100,6 +109,8 @@ void boe_session::execution_logic(){
   for (auto & order_pair : active_orders){
     Boe_Order & each_order = order_pair.second;
     const string & each_token = order_pair.first;
+    if (!_behavior->execution())
+      continue;
     if (each_order.still_live())
       construct_order_executed(each_order);
     else{

@@ -74,7 +74,7 @@ void ouch_session::enter_order(Ouch_MsgHeader * msg, size_t len){
   eo->from_network();
   if (eo->qty > MAX_SHARES)
     construct_order_rejected('Z', eo->token);
-  else if ((state != session_state::logged_in))
+  else if ((state != session_state::logged_in) or !_behavior->neworder())
     construct_order_rejected('O', eo->token);
   else if((active_orders.find(eo->token._str_()) == active_orders.end()) and
       (finished_orders.find(eo->token._str_()) == finished_orders.end())){
@@ -89,11 +89,14 @@ void ouch_session::modify_order(Ouch_MsgHeader * msg, size_t len){
   mo_msg -> from_network();
   if (active_orders.find(mo_msg->token._str_()) == active_orders.end())
     return;
+  if (!_behavior->modify_order())
+    return;
   Ouch_ModifyOrderReq mo = Ouch_ModifyOrderReq(mo_msg);
   pending_modify.push_back(mo);
 }
 
 void ouch_session::replace_order(Ouch_MsgHeader * msg, size_t len){
+  if (!_behavior->replace_order()) return;
   ReplaceOrder * ro_msg = reinterpret_cast<ReplaceOrder*>(msg);
   ro_msg->from_network();
   Ouch_ReplaceOrderReq ro = Ouch_ReplaceOrderReq(ro_msg);
@@ -105,6 +108,8 @@ void ouch_session::cancel_order(Ouch_MsgHeader * msg, size_t len){
   CancelOrder * co_msg = reinterpret_cast<CancelOrder*>(msg);
   co_msg->from_network();
   if (active_orders.find(co_msg->token._str_()) == active_orders.end())
+    return;
+  if (!_behavior->cancel_order())
     return;
   Ouch_CancelOrderReq co = Ouch_CancelOrderReq(co_msg);
   pending_cancel.push_back(co);
@@ -208,6 +213,8 @@ void ouch_session::execution_logic(){
   for (auto & order_pair : active_orders){
     Ouch_Order & each_order = order_pair.second;
     const string & each_token = order_pair.first;
+    if (!_behavior->execution())
+      continue;
     if (each_order.expired()){
       construct_order_canceled(each_order.remaining_qty, 'T', each_order.token);
       done_tokens.push_back(each_token);
