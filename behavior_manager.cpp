@@ -40,7 +40,7 @@ void BehaviorManager::reset_to_default(){
   cancel_order_behavior = &db;
   execution_behavior = &db;
 }
-void BehaviorManager::set_login_to_default(AdminContext& ctx){
+void BehaviorManager::reset(AdminContext& ctx){
   reset_to_default();
   ctx.response << "all set to default" << endl;
 }
