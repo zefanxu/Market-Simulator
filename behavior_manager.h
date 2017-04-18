@@ -56,15 +56,66 @@ private:
   double execution_prob = 1;
 };
 
-class CustomBehavior : public Behavior{
+//allow neworder/modify_order/execution... x times
+class XTimesBehavior : public Behavior{
 public:
-  virtual bool login_behavior();
-  virtual bool logout_behavior();
-  virtual bool neworder_behavior();
-  virtual bool modify_order_behavior();
-  virtual bool replace_order_behavior();
-  virtual bool cancel_order_behavior();
-  virtual bool execution_behavior();
+  virtual bool login_behavior(){
+    if (login_times > 0){
+      login_times--; return true;
+    }
+    else return false;
+  };
+  virtual bool logout_behavior(){
+    if (logout_times > 0){
+      logout_times--; return true;
+    }
+    else return false;
+  };
+  virtual bool neworder_behavior(){
+    if (neworder_times > 0){
+      neworder_times--; return true;
+    }
+    else return false;
+  };
+  virtual bool modify_order_behavior(){
+    if (modify_order_times > 0){
+      modify_order_times--; return true;
+    }
+    else return false;
+  };
+  virtual bool replace_order_behavior(){
+    if (replace_order_times > 0){
+      replace_order_times--; return true;
+    }
+    else return false;
+  };
+  virtual bool cancel_order_behavior(){
+    if (cancel_order_times > 0){
+      cancel_order_times--; return true;
+    }
+    else return false;
+  };
+  virtual bool execution_behavior(){
+    if (execution_times > 0){
+      execution_times--; return true;
+    }
+    else return false;
+  };
+  void set_login_times(int x){login_times = x;};
+  void set_logout_times(int x){logout_times = x;};
+  void set_neworder_times(int x){neworder_times = x;};
+  void set_modify_order_times(int x){modify_order_times = x;};
+  void set_replace_order_times(int x){replace_order_times = x;};
+  void set_cancel_order_times(int x){cancel_order_times = x;};
+  void set_execution_times(int x){execution_times = x;};
+private:
+  int login_times = 0;
+  int logout_times = 0;
+  int neworder_times = 0;
+  int modify_order_times = 0;
+  int replace_order_times = 0;
+  int cancel_order_times = 0;
+  int execution_times = 0;
 };
 
 class BehaviorManager{
@@ -98,6 +149,7 @@ private:
   evtsim::Logger * l;
   DefaultBehavior db;
   RandomBehavior rb;
+  XTimesBehavior xtb;
   Behavior * login_behavior;
   Behavior * logout_behavior;
   Behavior * neworder_behavior;

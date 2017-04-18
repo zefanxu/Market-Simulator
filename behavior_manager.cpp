@@ -19,6 +19,13 @@ BehaviorManager::BehaviorManager(asio::io_service * io_service, evtsim::Logger *
   _admin.register_admin("bm replace_order_random", "[prob]", "", bind(&BehaviorManager::set_replace_order_to_random, this, _1));
   _admin.register_admin("bm cancel_order_random", "[prob]", "", bind(&BehaviorManager::set_cancel_order_to_random, this, _1));
   _admin.register_admin("bm execution_random", "[prob]", "", bind(&BehaviorManager::set_execution_to_random, this, _1));
+  _admin.register_admin("bm login_x", "[x]", "", bind(&BehaviorManager::set_login_times, this, _1));
+  _admin.register_admin("bm logout_x", "[x]", "", bind(&BehaviorManager::set_logout_times, this, _1));
+  _admin.register_admin("bm neworder_x", "[x]", "", bind(&BehaviorManager::set_neworder_times, this, _1));
+  _admin.register_admin("bm modify_order_x", "[x]", "", bind(&BehaviorManager::set_modify_order_times, this, _1));
+  _admin.register_admin("bm replace_order_x", "[x]", "", bind(&BehaviorManager::set_replace_order_times, this, _1));
+  _admin.register_admin("bm cancel_order_x", "[x]", "", bind(&BehaviorManager::set_cancel_order_times, this, _1));
+  _admin.register_admin("bm execution_x", "[x]", "", bind(&BehaviorManager::set_execution_times, this, _1));
   login_behavior = &db;
   logout_behavior = &db;
   neworder_behavior = &db;
@@ -56,15 +63,150 @@ void BehaviorManager::set_execution_to_default(AdminContext& ctx){
   execution_behavior = &db;
   ctx.response << "set to default\n";
 }
+
+
+void BehaviorManager::set_login_times(AdminContext& ctx){
+  if (ctx.args.size() != 1){
+    ctx.response << "need a integer parameter > 0" << endl;
+    return;
+  }
+  try{
+    int x = stoi(ctx.args[0]);
+    if (x < 0){
+      ctx.response << "need a integer parameter > 0" << endl;
+      return;
+    }
+    xtb.set_login_times(x);
+    login_behavior = &xtb;
+    ctx.response << "login times=" << prob << endl;
+  }catch(exception& e){
+    ctx.response << "failed" << endl;
+    l->write_warning(e.what());
+  }
+}
+void BehaviorManager::set_logout_times(AdminContext& ctx){
+  if (ctx.args.size() != 1){
+    ctx.response << "need a integer parameter > 0" << endl;
+    return;
+  }
+  try{
+    int x = stoi(ctx.args[0]);
+    if (x < 0){
+      ctx.response << "need a integer parameter > 0" << endl;
+      return;
+    }
+    xtb.set_logout_times(x);
+    logout_behavior = &xtb;
+    ctx.response << "logout times=" << prob << endl;
+  }catch(exception& e){
+    ctx.response << "failed" << endl;
+    l->write_warning(e.what());
+  }
+}
+void BehaviorManager::set_neworder_times(AdminContext& ctx){
+  if (ctx.args.size() != 1){
+    ctx.response << "need a integer parameter > 0" << endl;
+    return;
+  }
+  try{
+    int x = stoi(ctx.args[0]);
+    if (x < 0){
+      ctx.response << "need a integer parameter > 0" << endl;
+      return;
+    }
+    xtb.set_neworder_times(x);
+    neworder_behavior = &xtb;
+    ctx.response << "neworder times=" << prob << endl;
+  }catch(exception& e){
+    ctx.response << "failed" << endl;
+    l->write_warning(e.what());
+  }
+}
+void BehaviorManager::set_modify_order_times(AdminContext& ctx){
+  if (ctx.args.size() != 1){
+    ctx.response << "need a integer parameter > 0" << endl;
+    return;
+  }
+  try{
+    int x = stoi(ctx.args[0]);
+    if (x < 0){
+      ctx.response << "need a integer parameter > 0" << endl;
+      return;
+    }
+    xtb.set_modify_order_times(x);
+    modify_order_behavior = &xtb;
+    ctx.response << "modify_order times=" << prob << endl;
+  }catch(exception& e){
+    ctx.response << "failed" << endl;
+    l->write_warning(e.what());
+  }
+}
+void BehaviorManager::set_replace_order_times(AdminContext& ctx){
+  if (ctx.args.size() != 1){
+    ctx.response << "need a integer parameter > 0" << endl;
+    return;
+  }
+  try{
+    int x = stoi(ctx.args[0]);
+    if (x < 0){
+      ctx.response << "need a integer parameter > 0" << endl;
+      return;
+    }
+    xtb.set_logout_times(x);
+    logout_behavior = &xtb;
+    ctx.response << "logout times=" << prob << endl;
+  }catch(exception& e){
+    ctx.response << "failed" << endl;
+    l->write_warning(e.what());
+  }
+}
+void BehaviorManager::set_cancel_order_times(AdminContext& ctx){
+  if (ctx.args.size() != 1){
+    ctx.response << "need a integer parameter > 0" << endl;
+    return;
+  }
+  try{
+    int x = stoi(ctx.args[0]);
+    if (x < 0){
+      ctx.response << "need a integer parameter > 0" << endl;
+      return;
+    }
+    xtb.set_cancel_order_times(x);
+    cancel_order_behavior = &xtb;
+    ctx.response << "cancel_order times=" << prob << endl;
+  }catch(exception& e){
+    ctx.response << "failed" << endl;
+    l->write_warning(e.what());
+  }
+}
+void BehaviorManager::set_execution_times(AdminContext& ctx){
+  if (ctx.args.size() != 1){
+    ctx.response << "need a integer parameter > 0" << endl;
+    return;
+  }
+  try{
+    int x = stoi(ctx.args[0]);
+    if (x < 0){
+      ctx.response << "need a integer parameter > 0" << endl;
+      return;
+    }
+    xtb.set_execution_times(x);
+    execution_behavior = &xtb;
+    ctx.response << "execution times=" << prob << endl;
+  }catch(exception& e){
+    ctx.response << "failed" << endl;
+    l->write_warning(e.what());
+  }
+}
 void BehaviorManager::set_logout_to_random(AdminContext& ctx){
   if (ctx.args.size() != 1){
-    ctx.response << "need a probability parameter" << endl;
+    ctx.response << "need a probability parameter(0<=x<=1)" << endl;
     return;
   }
   try{
     double prob = stod(ctx.args[0]);
     if (prob > 1 or prob < 0){
-      ctx.response << "invalid probability" << endl;
+      ctx.response << "invalid probability(0<=x<=1)" << endl;
       return;
     }
     rb.set_logout_prob(prob);
@@ -77,13 +219,13 @@ void BehaviorManager::set_logout_to_random(AdminContext& ctx){
 }
 void BehaviorManager::set_neworder_to_random(AdminContext& ctx){
   if (ctx.args.size() != 1){
-    ctx.response << "need a probability parameter" << endl;
+    ctx.response << "need a probability parameter(0<=x<=1)" << endl;
     return;
   }
   try{
     double prob = stod(ctx.args[0]);
     if (prob > 1 or prob < 0){
-      ctx.response << "invalid probability" << endl;
+      ctx.response << "invalid probability(0<=x<=1)" << endl;
       return;
     }
     rb.set_neworder_prob(prob);
@@ -96,13 +238,13 @@ void BehaviorManager::set_neworder_to_random(AdminContext& ctx){
 }
 void BehaviorManager::set_modify_order_to_random(AdminContext& ctx){
   if (ctx.args.size() != 1){
-    ctx.response << "need a probability parameter" << endl;
+    ctx.response << "need a probability parameter(0<=x<=1)" << endl;
     return;
   }
   try{
     double prob = stod(ctx.args[0]);
     if (prob > 1 or prob < 0){
-      ctx.response << "invalid probability" << endl;
+      ctx.response << "invalid probability(0<=x<=1)" << endl;
       return;
     }
     rb.set_modify_order_prob(prob);
@@ -115,13 +257,13 @@ void BehaviorManager::set_modify_order_to_random(AdminContext& ctx){
 }
 void BehaviorManager::set_replace_order_to_random(AdminContext& ctx){
   if (ctx.args.size() != 1){
-    ctx.response << "need a probability parameter" << endl;
+    ctx.response << "need a probability parameter(0<=x<=1)" << endl;
     return;
   }
   try{
     double prob = stod(ctx.args[0]);
     if (prob > 1 or prob < 0){
-      ctx.response << "invalid probability" << endl;
+      ctx.response << "invalid probability(0<=x<=1)" << endl;
       return;
     }
     rb.set_replace_order_prob(prob);
@@ -134,13 +276,13 @@ void BehaviorManager::set_replace_order_to_random(AdminContext& ctx){
 }
 void BehaviorManager::set_cancel_order_to_random(AdminContext& ctx){
   if (ctx.args.size() != 1){
-    ctx.response << "need a probability parameter" << endl;
+    ctx.response << "need a probability parameter(0<=x<=1)" << endl;
     return;
   }
   try{
     double prob = stod(ctx.args[0]);
     if (prob > 1 or prob < 0){
-      ctx.response << "invalid probability" << endl;
+      ctx.response << "invalid probability(0<=x<=1)" << endl;
       return;
     }
     rb.set_cancel_order_prob(prob);
@@ -153,13 +295,13 @@ void BehaviorManager::set_cancel_order_to_random(AdminContext& ctx){
 }
 void BehaviorManager::set_execution_to_random(AdminContext& ctx){
   if (ctx.args.size() != 1){
-    ctx.response << "need a probability parameter" << endl;
+    ctx.response << "need a probability parameter(0<=x<=1)" << endl;
     return;
   }
   try{
     double prob = stod(ctx.args[0]);
     if (prob > 1 or prob < 0){
-      ctx.response << "invalid probability" << endl;
+      ctx.response << "invalid probability(0<=x<=1)" << endl;
       return;
     }
     rb.set_execution_prob(prob);
@@ -173,13 +315,13 @@ void BehaviorManager::set_execution_to_random(AdminContext& ctx){
 
 void BehaviorManager::set_login_to_random(AdminContext& ctx){
   if (ctx.args.size() != 1){
-    ctx.response << "need a probability parameter" << endl;
+    ctx.response << "need a probability parameter(0<=x<=1)" << endl;
     return;
   }
   try{
     double prob = stod(ctx.args[0]);
     if (prob > 1 or prob < 0){
-      ctx.response << "invalid probability" << endl;
+      ctx.response << "invalid probability(0<=x<=1)" << endl;
       return;
     }
     rb.set_login_prob(prob);
