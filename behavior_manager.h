@@ -129,6 +129,7 @@ public:
   bool cancel_order(){return cancel_order_behavior->cancel_order_behavior();};
   bool execution(){return execution_behavior->execution_behavior();};
   long long execution_qty(){
+    if (exe_qty == -1) return -1;
     long long ret = exe_qty;
     exe_qty = 0;
     return ret;
