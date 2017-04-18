@@ -112,7 +112,7 @@ void boe_session::execution_logic(){
     if (!_behavior->execution())
       continue;
     if (each_order.still_live())
-      construct_order_executed(each_order);
+      construct_order_executed(each_order, _behavior->execution_qty());
     else{
       finished_orders[each_token] = each_order;
       done_tokens.push_back(each_token);
@@ -269,13 +269,14 @@ void boe_session::construct_login_response(LoginResponseStatus status, LoginRequ
   free(buf);
 }
 
-void boe_session::construct_order_executed(Boe_Order & curr_order, int64_t exe_qty/*=0*/){
+void boe_session::construct_order_executed(Boe_Order & curr_order, int64_t exe_qty/*=-1*/){
+  if (!exe_qty) return;
   OrderExecution oe;
   oe.seq_num = ++seq_num;
   oe.transaction_time = get_timestamp();
   oe.token = curr_order.token;
   oe.exec_id = rand() * rand();
-  if (!exe_qty) exe_qty = (1 + rand() % 10) * 100;
+  if (exe_qty < 0) exe_qty = (1 + rand() % 10) * 100;
   exe_qty = min(exe_qty, curr_order.remaining_qty);
   oe.last_shares = exe_qty;
   curr_order.remaining_qty -= exe_qty;

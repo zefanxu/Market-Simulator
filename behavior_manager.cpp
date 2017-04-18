@@ -26,6 +26,7 @@ BehaviorManager::BehaviorManager(asio::io_service * io_service, evtsim::Logger *
   _admin.register_admin("bm replace_order_x", "[x]", "", bind(&BehaviorManager::set_replace_order_times, this, _1));
   _admin.register_admin("bm cancel_order_x", "[x]", "", bind(&BehaviorManager::set_cancel_order_times, this, _1));
   _admin.register_admin("bm execution_x", "[x]", "", bind(&BehaviorManager::set_execution_times, this, _1));
+  _admin.register_admin("bm execution_qty", "[qty]", "", bind(&BehaviorManager::set_execution_qty, this, _1));
   login_behavior = &db;
   logout_behavior = &db;
   neworder_behavior = &db;
@@ -62,6 +63,7 @@ void BehaviorManager::set_cancel_order_to_default(AdminContext& ctx){
 void BehaviorManager::set_execution_to_default(AdminContext& ctx){
   execution_behavior = &db;
   ctx.response << "set to default\n";
+  execute_qty = -1;
 }
 
 
@@ -192,7 +194,27 @@ void BehaviorManager::set_execution_times(AdminContext& ctx){
     }
     xtb.set_execution_times(x);
     execution_behavior = &xtb;
+    execute_qty = -1;
     ctx.response << "execution times=" << x << endl;
+  }catch(exception& e){
+    ctx.response << "failed" << endl;
+    l->write_warning(e.what());
+  }
+}
+void BehaviorManager::set_execution_qty(AdminContext& ctx){
+  if (ctx.args.size() != 1){
+    ctx.response << "need a integer qty > 0" << endl;
+    return;
+  }
+  try{
+    int qty = stoi(ctx.args[0]);
+    if (qty <= 0){
+      ctx.response << "need a integer qty > 0" << endl;
+      return;
+    }
+    execution_behavior = &db;
+    execute_qty = qty;
+    ctx.response << "execution qty=" << qty << endl;
   }catch(exception& e){
     ctx.response << "failed" << endl;
     l->write_warning(e.what());
@@ -306,6 +328,7 @@ void BehaviorManager::set_execution_to_random(AdminContext& ctx){
     }
     rb.set_execution_prob(prob);
     execution_behavior = &rb;
+    execute_qty = -1;
     ctx.response << "set to random, prob=" << prob << endl;
   }catch(exception& e){
     ctx.response << "failed" << endl;

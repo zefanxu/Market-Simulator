@@ -339,8 +339,9 @@ void ouch_session::construct_order_modified(uint32_t remaining_qty, const Ouch_M
   pending_out_messages.push_back(packet);
 }
 
-void ouch_session::construct_order_executed(Ouch_Order & o, int64_t exe_qty/*=0*/){
-  if (!exe_qty){
+void ouch_session::construct_order_executed(Ouch_Order & o, int64_t exe_qty/*=-1*/){
+  if (!exe_qty) return;
+  if (exe_qty < 0){
     exe_qty = (1+rand() % 10) * 100; //execute at least 100 shares
   }
   exe_qty = min(exe_qty, o.remaining_qty);

@@ -128,6 +128,7 @@ public:
   bool replace_order(){return replace_order_behavior->replace_order_behavior();};
   bool cancel_order(){return cancel_order_behavior->cancel_order_behavior();};
   bool execution(){return execution_behavior->execution_behavior();};
+  int execution_qty(){return execution_qty;};
 
 private:
   void set_login_to_default(AdminContext& ctx);
@@ -153,11 +154,16 @@ private:
   void set_replace_order_to_random(AdminContext& ctx);
   void set_cancel_order_to_random(AdminContext& ctx);
   void set_execution_to_random(AdminContext& ctx);
+
+  void set_execution_qty(AdminContext& ctx);
+
   AdminServer _admin;
   evtsim::Logger * l;
+
   DefaultBehavior db;
   RandomBehavior rb;
   XTimesBehavior xtb;
+
   Behavior * login_behavior;
   Behavior * logout_behavior;
   Behavior * neworder_behavior;
@@ -165,5 +171,7 @@ private:
   Behavior * replace_order_behavior;
   Behavior * cancel_order_behavior;
   Behavior * execution_behavior;
+
+  long long execute_qty = -1;
 };
 #endif
