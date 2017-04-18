@@ -128,7 +128,7 @@ public:
   bool replace_order(){return replace_order_behavior->replace_order_behavior();};
   bool cancel_order(){return cancel_order_behavior->cancel_order_behavior();};
   bool execution(){return execution_behavior->execution_behavior();};
-  long long execution_qty(){return execution_qty;};
+  long long execution_qty(){return exe_qty;};
 
 private:
   void set_login_to_default(AdminContext& ctx);
@@ -172,6 +172,6 @@ private:
   Behavior * cancel_order_behavior;
   Behavior * execution_behavior;
 
-  long long execute_qty = -1;
+  long long exe_qty = -1;
 };
 #endif

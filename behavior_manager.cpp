@@ -63,7 +63,7 @@ void BehaviorManager::set_cancel_order_to_default(AdminContext& ctx){
 void BehaviorManager::set_execution_to_default(AdminContext& ctx){
   execution_behavior = &db;
   ctx.response << "set to default\n";
-  execute_qty = -1;
+  exe_qty = -1;
 }
 
 
@@ -194,7 +194,7 @@ void BehaviorManager::set_execution_times(AdminContext& ctx){
     }
     xtb.set_execution_times(x);
     execution_behavior = &xtb;
-    execute_qty = -1;
+    exe_qty = -1;
     ctx.response << "execution times=" << x << endl;
   }catch(exception& e){
     ctx.response << "failed" << endl;
@@ -213,7 +213,7 @@ void BehaviorManager::set_execution_qty(AdminContext& ctx){
       return;
     }
     execution_behavior = &db;
-    execute_qty = qty;
+    exe_qty = qty;
     ctx.response << "execution qty=" << qty << endl;
   }catch(exception& e){
     ctx.response << "failed" << endl;
@@ -328,7 +328,7 @@ void BehaviorManager::set_execution_to_random(AdminContext& ctx){
     }
     rb.set_execution_prob(prob);
     execution_behavior = &rb;
-    execute_qty = -1;
+    exe_qty = -1;
     ctx.response << "set to random, prob=" << prob << endl;
   }catch(exception& e){
     ctx.response << "failed" << endl;
