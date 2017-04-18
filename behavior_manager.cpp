@@ -78,7 +78,7 @@ void BehaviorManager::set_login_times(AdminContext& ctx){
     }
     xtb.set_login_times(x);
     login_behavior = &xtb;
-    ctx.response << "login times=" << prob << endl;
+    ctx.response << "login times=" << x << endl;
   }catch(exception& e){
     ctx.response << "failed" << endl;
     l->write_warning(e.what());
@@ -97,7 +97,7 @@ void BehaviorManager::set_logout_times(AdminContext& ctx){
     }
     xtb.set_logout_times(x);
     logout_behavior = &xtb;
-    ctx.response << "logout times=" << prob << endl;
+    ctx.response << "logout times=" << x << endl;
   }catch(exception& e){
     ctx.response << "failed" << endl;
     l->write_warning(e.what());
@@ -116,7 +116,7 @@ void BehaviorManager::set_neworder_times(AdminContext& ctx){
     }
     xtb.set_neworder_times(x);
     neworder_behavior = &xtb;
-    ctx.response << "neworder times=" << prob << endl;
+    ctx.response << "neworder times=" << x << endl;
   }catch(exception& e){
     ctx.response << "failed" << endl;
     l->write_warning(e.what());
@@ -135,7 +135,7 @@ void BehaviorManager::set_modify_order_times(AdminContext& ctx){
     }
     xtb.set_modify_order_times(x);
     modify_order_behavior = &xtb;
-    ctx.response << "modify_order times=" << prob << endl;
+    ctx.response << "modify_order times=" << x << endl;
   }catch(exception& e){
     ctx.response << "failed" << endl;
     l->write_warning(e.what());
@@ -154,7 +154,7 @@ void BehaviorManager::set_replace_order_times(AdminContext& ctx){
     }
     xtb.set_logout_times(x);
     logout_behavior = &xtb;
-    ctx.response << "logout times=" << prob << endl;
+    ctx.response << "logout times=" << x << endl;
   }catch(exception& e){
     ctx.response << "failed" << endl;
     l->write_warning(e.what());
@@ -173,7 +173,7 @@ void BehaviorManager::set_cancel_order_times(AdminContext& ctx){
     }
     xtb.set_cancel_order_times(x);
     cancel_order_behavior = &xtb;
-    ctx.response << "cancel_order times=" << prob << endl;
+    ctx.response << "cancel_order times=" << x << endl;
   }catch(exception& e){
     ctx.response << "failed" << endl;
     l->write_warning(e.what());
@@ -192,7 +192,7 @@ void BehaviorManager::set_execution_times(AdminContext& ctx){
     }
     xtb.set_execution_times(x);
     execution_behavior = &xtb;
-    ctx.response << "execution times=" << prob << endl;
+    ctx.response << "execution times=" << x << endl;
   }catch(exception& e){
     ctx.response << "failed" << endl;
     l->write_warning(e.what());
