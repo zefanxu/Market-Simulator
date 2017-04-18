@@ -27,6 +27,11 @@ BehaviorManager::BehaviorManager(asio::io_service * io_service, evtsim::Logger *
   _admin.register_admin("bm cancel_order_x", "[x]", "", bind(&BehaviorManager::set_cancel_order_times, this, _1));
   _admin.register_admin("bm execution_x", "[x]", "", bind(&BehaviorManager::set_execution_times, this, _1));
   _admin.register_admin("bm execution_qty", "[qty]", "", bind(&BehaviorManager::set_execution_qty, this, _1));
+  _admin.register_admin("bm reset", "", "", bind(&BehaviorManager::reset, this, _1));
+  reset_to_default();
+}
+
+void BehaviorManager::reset_to_default(){
   login_behavior = &db;
   logout_behavior = &db;
   neworder_behavior = &db;
@@ -34,6 +39,10 @@ BehaviorManager::BehaviorManager(asio::io_service * io_service, evtsim::Logger *
   replace_order_behavior = &db;
   cancel_order_behavior = &db;
   execution_behavior = &db;
+}
+void BehaviorManager::set_login_to_default(AdminContext& ctx){
+  reset_to_default();
+  ctx.response << "all set to default" << endl;
 }
 
 void BehaviorManager::set_login_to_default(AdminContext& ctx){

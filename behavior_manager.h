@@ -136,6 +136,9 @@ public:
   };
 
 private:
+  void reset_to_default();
+  void reset(AdminContext& ctx);
+
   void set_login_to_default(AdminContext& ctx);
   void set_logout_to_default(AdminContext& ctx);
   void set_neworder_to_default(AdminContext& ctx);
