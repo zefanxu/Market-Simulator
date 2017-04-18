@@ -128,7 +128,7 @@ public:
   bool replace_order(){return replace_order_behavior->replace_order_behavior();};
   bool cancel_order(){return cancel_order_behavior->cancel_order_behavior();};
   bool execution(){return execution_behavior->execution_behavior();};
-  int execution_qty(){return execution_qty;};
+  long long execution_qty(){return execution_qty;};
 
 private:
   void set_login_to_default(AdminContext& ctx);
