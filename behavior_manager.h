@@ -57,7 +57,7 @@ private:
 };
 
 //allow new_order/modify_order/execution... x times
-class XTimesBehavior : public Behavior{
+class CountBehavior : public Behavior{
 public:
   virtual bool login_behavior(){
     if (login_times > 0){
@@ -149,9 +149,9 @@ private:
   AdminServer _admin;
   evtsim::Logger * l;
 
-  DefaultBehavior db;
-  RandomBehavior rb;
-  XTimesBehavior xtb;
+  DefaultBehavior _db;
+  RandomBehavior _rb;
+  CountBehavior _cb;
 
   Behavior * login_behavior;
   Behavior * logout_behavior;

@@ -27,13 +27,13 @@ void BehaviorManager::set_action(AdminContext& ctx){
 }
 
 void BehaviorManager::reset_to_default(){
-  login_behavior = &db;
-  logout_behavior = &db;
-  new_order_behavior = &db;
-  modify_order_behavior = &db;
-  replace_order_behavior = &db;
-  cancel_order_behavior = &db;
-  execution_behavior = &db;
+  login_behavior = &_db;
+  logout_behavior = &_db;
+  new_order_behavior = &_db;
+  modify_order_behavior = &_db;
+  replace_order_behavior = &_db;
+  cancel_order_behavior = &_db;
+  execution_behavior = &_db;
 }
 
 void BehaviorManager::reset(AdminContext& ctx){
@@ -47,19 +47,19 @@ void BehaviorManager::set_to_default(AdminContext& ctx){
     return;
   }
   if (ctx.args[1] == "login")
-    login_behavior = &db;
+    login_behavior = &_db;
   else if (ctx.args[1] == "logout")
-    logout_behavior = &db;
+    logout_behavior = &_db;
   else if (ctx.args[1] == "new_order")
-    new_order_behavior = &db;
+    new_order_behavior = &_db;
   else if (ctx.args[1] == "modify_order")
-    modify_order_behavior = &db;
+    modify_order_behavior = &_db;
   else if (ctx.args[1] == "replace_order")
-    replace_order_behavior = &db;
+    replace_order_behavior = &_db;
   else if (ctx.args[1] == "cancel_order")
-    cancel_order_behavior = &db;
+    cancel_order_behavior = &_db;
   else if (ctx.args[1] == "execution"){
-      execution_behavior = &db;
+      execution_behavior = &_db;
       exe_qty = -1;
   }
   else{
@@ -88,32 +88,32 @@ void BehaviorManager::set_count(AdminContext& ctx){
     return;
   }
   if (ctx.args[1] == "login"){
-    xtb.set_login_times(x);
-    login_behavior = &xtb;
+    _cb.set_login_times(x);
+    login_behavior = &_cb;
   }
   else if (ctx.args[1] == "logout"){
-    xtb.set_logout_times(x);
-    logout_behavior = &xtb;
+    _cb.set_logout_times(x);
+    logout_behavior = &_cb;
   }
   else if (ctx.args[1] == "new_order"){
-    xtb.set_new_order_times(x);
-    new_order_behavior = &xtb;
+    _cb.set_new_order_times(x);
+    new_order_behavior = &_cb;
   }
   else if (ctx.args[1] == "modify_order"){
-    xtb.set_modify_order_times(x);
-    modify_order_behavior = &xtb;
+    _cb.set_modify_order_times(x);
+    modify_order_behavior = &_cb;
   }
   else if (ctx.args[1] == "replace_order"){
-    xtb.set_replace_order_times(x);
-    replace_order_behavior = &xtb;
+    _cb.set_replace_order_times(x);
+    replace_order_behavior = &_cb;
   }
   else if (ctx.args[1] == "cancel_order"){
-    xtb.set_cancel_order_times(x);
-    cancel_order_behavior = &xtb;
+    _cb.set_cancel_order_times(x);
+    cancel_order_behavior = &_cb;
   }
   else if (ctx.args[1] == "execution"){
-    xtb.set_execution_times(x);
-    execution_behavior = &xtb;
+    _cb.set_execution_times(x);
+    execution_behavior = &_cb;
     exe_qty = -1;
   }
   else{
@@ -142,32 +142,32 @@ void BehaviorManager::set_random(AdminContext& ctx){
     return;
   }
   if (ctx.args[1] == "login"){
-    rb.set_login_prob(x);
-    login_behavior = &rb;
+    _rb.set_login_prob(x);
+    login_behavior = &_rb;
   }
   else if (ctx.args[1] == "logout"){
-    rb.set_logout_prob(x);
-    logout_behavior = &rb;
+    _rb.set_logout_prob(x);
+    logout_behavior = &_rb;
   }
   else if (ctx.args[1] == "new_order"){
-    rb.set_new_order_prob(x);
-    new_order_behavior = &rb;
+    _rb.set_new_order_prob(x);
+    new_order_behavior = &_rb;
   }
   else if (ctx.args[1] == "modify_order"){
-    rb.set_modify_order_prob(x);
-    modify_order_behavior = &rb;
+    _rb.set_modify_order_prob(x);
+    modify_order_behavior = &_rb;
   }
   else if (ctx.args[1] == "replace_order"){
-    rb.set_replace_order_prob(x);
-    replace_order_behavior = &rb;
+    _rb.set_replace_order_prob(x);
+    replace_order_behavior = &_rb;
   }
   else if (ctx.args[1] == "cancel_order"){
-    rb.set_cancel_order_prob(x);
-    cancel_order_behavior = &rb;
+    _rb.set_cancel_order_prob(x);
+    cancel_order_behavior = &_rb;
   }
   else if (ctx.args[1] == "execution"){
-    rb.set_execution_prob(x);
-    execution_behavior = &rb;
+    _rb.set_execution_prob(x);
+    execution_behavior = &_rb;
     exe_qty = -1;
   }
   else{
@@ -188,7 +188,7 @@ void BehaviorManager::set_execution_qty(AdminContext& ctx){
       ctx.response << "need a integer qty > 0" << endl;
       return;
     }
-    execution_behavior = &db;
+    execution_behavior = &_db;
     exe_qty = qty;
     ctx.response << "execution qty=" << qty << endl;
   }catch(exception& e){
