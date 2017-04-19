@@ -142,22 +142,7 @@ private:
 
   void set_to_default(AdminContext& ctx);
   void set_count(AdminContext& ctx);
-
-  void set_login_times(AdminContext& ctx);
-  void set_logout_times(AdminContext& ctx);
-  void set_new_order_times(AdminContext& ctx);
-  void set_modify_order_times(AdminContext& ctx);
-  void set_replace_order_times(AdminContext& ctx);
-  void set_cancel_order_times(AdminContext& ctx);
-  void set_execution_times(AdminContext& ctx);
-
-  void set_login_to_random(AdminContext& ctx);
-  void set_logout_to_random(AdminContext & ctx);
-  void set_new_order_to_random(AdminContext& ctx);
-  void set_modify_order_to_random(AdminContext& ctx);
-  void set_replace_order_to_random(AdminContext& ctx);
-  void set_cancel_order_to_random(AdminContext& ctx);
-  void set_execution_to_random(AdminContext& ctx);
+  void set_random(AdminContext& ctx);
 
   void set_execution_qty(AdminContext& ctx);
 
