@@ -174,7 +174,7 @@ void BehaviorManager::set_random(AdminContext& ctx){
       ctx.response << "invalid parameters" << endl;
       return;
   }
-  ctx.response << "set to random, prob=" << x << endl;
+  ctx.response << ctx.args[1] << " set to random, prob=" << x << endl;
 }
 
 void BehaviorManager::set_execution_qty(AdminContext& ctx){
