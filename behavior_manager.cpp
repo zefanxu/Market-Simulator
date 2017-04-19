@@ -65,30 +65,23 @@ void BehaviorManager::set_to_default(AdminContext& ctx){
     ctx.response << "need two parameters to set to default" << endl;
     return;
   }
-  switch (ctx.args[1]) {
-    case "login":
-      login_behavior = &db;
-      break;
-    case "logout":
-      logout_behavior = &db;
-      break;
-    case "new_order":
-      new_order_behavior = &db;
-      break;
-    case "modify_order":
-      modify_order_behavior = &db;
-      break;
-    case "replace_order":
-      replace_order_behavior = &db;
-      break;
-    case "cancel_order":
-      cancel_order_behavior = &db;
-      break;
-    case "execution":
+  if (ctx.args[1] == "login")
+    login_behavior = &db;
+  else if (ctx.args[1] == "logout")
+    logout_behavior = &db;
+  else if (ctx.args[1] == "new_order")
+    new_order_behavior = &db;
+  else if (ctx.args[1] == "modify_order")
+    modify_order_behavior = &db;
+  else if (ctx.args[1] == "replace_order")
+    replace_order_behavior = &db;
+  else if (ctx.args[1] == "cancel_order")
+    cancel_order_behavior = &db;
+  else if (ctx.args[1] == "execution"){
       execution_behavior = &db;
       exe_qty = -1;
-      break;
-    default:
+  }
+  else{
       ctx.response << "invalid parameters" << endl;
       return;
   }
@@ -114,36 +107,36 @@ void BehaviorManager::set_count(AdminContext& ctx){
     l->write_warning(e.what());
     return;
   }
-  switch (ctx.args[1]) {
-    case "login":
-      xtb.set_login_times(x);
-      login_behavior = &xtb;
-      break;
-    case "logout":
-      xtb.set_logout_times(x);
-      logout_behavior = &xtb;
-      break;
-    case "new_order":
-      xtb.set_new_order_times(x);
-      new_order_behavior = &xtb;
-      break;
-    case "modify_order":
-      xtb.set_modify_order_times(x);
-      modify_order_behavior = &xtb;
-      break;
-    case "replace_order":
-      xtb.set_replace_order_times(x);
-      replace_order_behavior = &xtb;
-      break;
-    case "cancel_order":
-      xtb.set_cancel_order_times(x);
-      cancel_order_behavior = &xtb;
-      break;
-    case "execution":
-      xtb.set_execution_times(x);
-      logout_behavior = &xtb;
-      break;
-    default:
+  if (ctx.args[1] == "login"){
+    xtb.set_login_times(x);
+    login_behavior = &xtb;
+  }
+  else if (ctx.args[1] == "logout"){
+    xtb.set_logout_times(x);
+    logout_behavior = &xtb;
+  }
+  else if (ctx.args[1] == "new_order"){
+    xtb.set_new_order_times(x);
+    new_order_behavior = &xtb;
+  }
+  else if (ctx.args[1] == "modify_order"){
+    xtb.set_modify_order_times(x);
+    modify_order_behavior = &xtb;
+  }
+  else if (ctx.args[1] == "replace_order"){
+    xtb.set_replace_order_times(x);
+    replace_order_behavior = &xtb;
+  }
+  else if (ctx.args[1] == "cancel_order"){
+    xtb.set_cancel_order_times(x);
+    cancel_order_behavior = &xtb;
+  }
+  else if (ctx.args[1] == "execution"){
+    xtb.set_execution_times(x);
+    logout_behavior = &xtb;
+    exe_qty = -1;
+  }
+  else{
       ctx.response << "invalid parameters" << endl;
       return;
   }
