@@ -74,7 +74,7 @@ void ouch_session::enter_order(Ouch_MsgHeader * msg, size_t len){
   eo->from_network();
   if (eo->qty > MAX_SHARES)
     construct_order_rejected('Z', eo->token);
-  else if ((state != session_state::logged_in) or !_behavior->neworder())
+  else if ((state != session_state::logged_in) or !_behavior->new_order())
     construct_order_rejected('O', eo->token);
   else if((active_orders.find(eo->token._str_()) == active_orders.end()) and
       (finished_orders.find(eo->token._str_()) == finished_orders.end())){

@@ -88,7 +88,7 @@ void boe_session::cancel_order(MsgHeader * msg, size_t len){
 void boe_session::enter_order(MsgHeader * hdr, size_t len){
   NewOrder * no = reinterpret_cast<NewOrder*>(hdr);
   string t = no->token._str_();
-  if (active_orders.find(t) != active_orders.end() or !_behavior->neworder())
+  if (active_orders.find(t) != active_orders.end() or !_behavior->new_order())
     construct_order_rejected(no);
   else{
     Boe_Order new_order = Boe_Order(no);

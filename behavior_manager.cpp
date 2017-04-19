@@ -5,23 +5,24 @@ using namespace evt;
 BehaviorManager::BehaviorManager(asio::io_service * io_service, evtsim::Logger * logger, int admin_port){
   l = logger;
   _admin.init(io_service, logger, admin_port, string("AdminServer"));
+  _admin.register_admin("bm set", "[action] [params...]", "", bind(&BehaviorManager::set_action, this, _1));
   _admin.register_admin("bm login_default", "", "", bind(&BehaviorManager::set_login_to_default, this, _1));
   _admin.register_admin("bm logout_default", "", "", bind(&BehaviorManager::set_logout_to_default, this, _1));
-  _admin.register_admin("bm neworder_default", "", "", bind(&BehaviorManager::set_neworder_to_default, this, _1));
+  _admin.register_admin("bm new_order_default", "", "", bind(&BehaviorManager::set_new_order_to_default, this, _1));
   _admin.register_admin("bm modify_order_default", "", "", bind(&BehaviorManager::set_modify_order_to_default, this, _1));
   _admin.register_admin("bm replace_order_default", "", "", bind(&BehaviorManager::set_replace_order_to_default, this, _1));
   _admin.register_admin("bm cancel_order_default", "", "", bind(&BehaviorManager::set_cancel_order_to_default, this, _1));
   _admin.register_admin("bm execution_default", "", "", bind(&BehaviorManager::set_execution_to_default, this, _1));
   _admin.register_admin("bm login_random", "[prob]", "", bind(&BehaviorManager::set_login_to_random, this, _1));
   _admin.register_admin("bm logout_random", "[prob]", "", bind(&BehaviorManager::set_logout_to_random, this, _1));
-  _admin.register_admin("bm neworder_random", "[prob]", "", bind(&BehaviorManager::set_neworder_to_random, this, _1));
+  _admin.register_admin("bm new_order_random", "[prob]", "", bind(&BehaviorManager::set_new_order_to_random, this, _1));
   _admin.register_admin("bm modify_order_random", "[prob]", "", bind(&BehaviorManager::set_modify_order_to_random, this, _1));
   _admin.register_admin("bm replace_order_random", "[prob]", "", bind(&BehaviorManager::set_replace_order_to_random, this, _1));
   _admin.register_admin("bm cancel_order_random", "[prob]", "", bind(&BehaviorManager::set_cancel_order_to_random, this, _1));
   _admin.register_admin("bm execution_random", "[prob]", "", bind(&BehaviorManager::set_execution_to_random, this, _1));
   _admin.register_admin("bm login_x", "[x]", "", bind(&BehaviorManager::set_login_times, this, _1));
   _admin.register_admin("bm logout_x", "[x]", "", bind(&BehaviorManager::set_logout_times, this, _1));
-  _admin.register_admin("bm neworder_x", "[x]", "", bind(&BehaviorManager::set_neworder_times, this, _1));
+  _admin.register_admin("bm new_order_x", "[x]", "", bind(&BehaviorManager::set_new_order_times, this, _1));
   _admin.register_admin("bm modify_order_x", "[x]", "", bind(&BehaviorManager::set_modify_order_times, this, _1));
   _admin.register_admin("bm replace_order_x", "[x]", "", bind(&BehaviorManager::set_replace_order_times, this, _1));
   _admin.register_admin("bm cancel_order_x", "[x]", "", bind(&BehaviorManager::set_cancel_order_times, this, _1));
@@ -31,185 +32,124 @@ BehaviorManager::BehaviorManager(asio::io_service * io_service, evtsim::Logger *
   reset_to_default();
 }
 
+void BehaviorManager::set_action(AdminContext& ctx){
+  if (ctx.args.size() < 1){
+    ctx.response << "need at least one parameter" << endl;
+    return;
+  }
+  if (ctx.args[0] == "reset")
+    reset(ctx);
+  else if (ctx.args[0] == "default")
+    set_to_default(ctx);
+  else if (ctx.args[0] == "count")
+    set_count(ctx);
+}
+
 void BehaviorManager::reset_to_default(){
   login_behavior = &db;
   logout_behavior = &db;
-  neworder_behavior = &db;
+  new_order_behavior = &db;
   modify_order_behavior = &db;
   replace_order_behavior = &db;
   cancel_order_behavior = &db;
   execution_behavior = &db;
 }
+
 void BehaviorManager::reset(AdminContext& ctx){
   reset_to_default();
   ctx.response << "all set to default" << endl;
 }
 
-void BehaviorManager::set_login_to_default(AdminContext& ctx){
-  login_behavior = &db;
-  ctx.response << "set to default\n";
-}
-void BehaviorManager::set_logout_to_default(AdminContext& ctx){
-  logout_behavior = &db;
-  ctx.response << "set to default\n";
-}
-void BehaviorManager::set_neworder_to_default(AdminContext& ctx){
-  neworder_behavior = &db;
-  ctx.response << "set to default\n";
-}
-void BehaviorManager::set_modify_order_to_default(AdminContext& ctx){
-  modify_order_behavior = &db;
-  ctx.response << "set to default\n";
-}
-void BehaviorManager::set_replace_order_to_default(AdminContext& ctx){
-  replace_order_behavior = &db;
-  ctx.response << "set to default\n";
-}
-void BehaviorManager::set_cancel_order_to_default(AdminContext& ctx){
-  cancel_order_behavior = &db;
-  ctx.response << "set to default\n";
-}
-void BehaviorManager::set_execution_to_default(AdminContext& ctx){
-  execution_behavior = &db;
-  ctx.response << "set to default\n";
-  exe_qty = -1;
-}
-
-
-void BehaviorManager::set_login_times(AdminContext& ctx){
-  if (ctx.args.size() != 1){
-    ctx.response << "need a integer parameter > 0" << endl;
+void BehaviorManager::set_to_default(AdminContext& ctx){
+  if (ctx.args.size() != 2){
+    ctx.response << "need two parameters to set to default" << endl;
     return;
   }
+  switch (ctx.args[1]) {
+    case "login":
+      login_behavior = &db;
+      break;
+    case "logout":
+      logout_behavior = &db;
+      break;
+    case "new_order":
+      new_order_behavior = &db;
+      break;
+    case "modify_order":
+      modify_order_behavior = &db;
+      break;
+    case "replace_order":
+      replace_order_behavior = &db;
+      break;
+    case "cancel_order":
+      cancel_order_behavior = &db;
+      break;
+    case "execution":
+      execution_behavior = &db;
+      exe_qty = -1;
+      break;
+    default:
+      ctx.response << "invalid parameters" << endl;
+      return;
+  }
+  ctx.response << ctx.args[1] << "set to default" << endl;
+}
+
+void BehaviorManager::set_count(AdminContext& ctx){
+  if (ctx.args.size() != 3){
+    ctx.response << "need three parameters" << endl;
+    return;
+  }
+  int x;
   try{
-    int x = stoi(ctx.args[0]);
+    x = stoi(ctx.args[2]);
     if (x < 0){
       ctx.response << "need a integer parameter > 0" << endl;
       return;
     }
-    xtb.set_login_times(x);
-    login_behavior = &xtb;
     ctx.response << "login times=" << x << endl;
   }catch(exception& e){
     ctx.response << "failed" << endl;
-    l->write_warning(e.what());
-  }
-}
-void BehaviorManager::set_logout_times(AdminContext& ctx){
-  if (ctx.args.size() != 1){
     ctx.response << "need a integer parameter > 0" << endl;
+    l->write_warning(e.what());
     return;
   }
-  try{
-    int x = stoi(ctx.args[0]);
-    if (x < 0){
-      ctx.response << "need a integer parameter > 0" << endl;
+  switch (ctx.args[1]) {
+    case "login":
+      xtb.set_login_times(x);
+      login_behavior = &xtb;
+      break;
+    case "logout":
+      xtb.set_logout_times(x);
+      logout_behavior = &xtb;
+      break;
+    case "new_order":
+      xtb.set_new_order_times(x);
+      new_order_behavior = &xtb;
+      break;
+    case "modify_order":
+      xtb.set_modify_order_times(x);
+      modify_order_behavior = &xtb;
+      break;
+    case "replace_order":
+      xtb.set_replace_order_times(x);
+      replace_order_behavior = &xtb;
+      break;
+    case "cancel_order":
+      xtb.set_cancel_order_times(x);
+      cancel_order_behavior = &xtb;
+      break;
+    case "execution":
+      xtb.set_execution_times(x);
+      logout_behavior = &xtb;
+      break;
+    default:
+      ctx.response << "invalid parameters" << endl;
       return;
-    }
-    xtb.set_logout_times(x);
-    logout_behavior = &xtb;
-    ctx.response << "logout times=" << x << endl;
-  }catch(exception& e){
-    ctx.response << "failed" << endl;
-    l->write_warning(e.what());
   }
+  ctx.response << ctx.args[1] << " " << ctx.args[2] << " times" << endl;
 }
-void BehaviorManager::set_neworder_times(AdminContext& ctx){
-  if (ctx.args.size() != 1){
-    ctx.response << "need a integer parameter > 0" << endl;
-    return;
-  }
-  try{
-    int x = stoi(ctx.args[0]);
-    if (x < 0){
-      ctx.response << "need a integer parameter > 0" << endl;
-      return;
-    }
-    xtb.set_neworder_times(x);
-    neworder_behavior = &xtb;
-    ctx.response << "neworder times=" << x << endl;
-  }catch(exception& e){
-    ctx.response << "failed" << endl;
-    l->write_warning(e.what());
-  }
-}
-void BehaviorManager::set_modify_order_times(AdminContext& ctx){
-  if (ctx.args.size() != 1){
-    ctx.response << "need a integer parameter > 0" << endl;
-    return;
-  }
-  try{
-    int x = stoi(ctx.args[0]);
-    if (x < 0){
-      ctx.response << "need a integer parameter > 0" << endl;
-      return;
-    }
-    xtb.set_modify_order_times(x);
-    modify_order_behavior = &xtb;
-    ctx.response << "modify_order times=" << x << endl;
-  }catch(exception& e){
-    ctx.response << "failed" << endl;
-    l->write_warning(e.what());
-  }
-}
-void BehaviorManager::set_replace_order_times(AdminContext& ctx){
-  if (ctx.args.size() != 1){
-    ctx.response << "need a integer parameter > 0" << endl;
-    return;
-  }
-  try{
-    int x = stoi(ctx.args[0]);
-    if (x < 0){
-      ctx.response << "need a integer parameter > 0" << endl;
-      return;
-    }
-    xtb.set_logout_times(x);
-    logout_behavior = &xtb;
-    ctx.response << "logout times=" << x << endl;
-  }catch(exception& e){
-    ctx.response << "failed" << endl;
-    l->write_warning(e.what());
-  }
-}
-void BehaviorManager::set_cancel_order_times(AdminContext& ctx){
-  if (ctx.args.size() != 1){
-    ctx.response << "need a integer parameter > 0" << endl;
-    return;
-  }
-  try{
-    int x = stoi(ctx.args[0]);
-    if (x < 0){
-      ctx.response << "need a integer parameter > 0" << endl;
-      return;
-    }
-    xtb.set_cancel_order_times(x);
-    cancel_order_behavior = &xtb;
-    ctx.response << "cancel_order times=" << x << endl;
-  }catch(exception& e){
-    ctx.response << "failed" << endl;
-    l->write_warning(e.what());
-  }
-}
-void BehaviorManager::set_execution_times(AdminContext& ctx){
-  if (ctx.args.size() != 1){
-    ctx.response << "need a integer parameter > 0" << endl;
-    return;
-  }
-  try{
-    int x = stoi(ctx.args[0]);
-    if (x < 0){
-      ctx.response << "need a integer parameter > 0" << endl;
-      return;
-    }
-    xtb.set_execution_times(x);
-    execution_behavior = &xtb;
-    exe_qty = -1;
-    ctx.response << "execution times=" << x << endl;
-  }catch(exception& e){
-    ctx.response << "failed" << endl;
-    l->write_warning(e.what());
-  }
-}
+
 void BehaviorManager::set_execution_qty(AdminContext& ctx){
   if (ctx.args.size() != 1){
     ctx.response << "need a integer qty > 0" << endl;
@@ -248,7 +188,7 @@ void BehaviorManager::set_logout_to_random(AdminContext& ctx){
     l->write_warning(e.what());
   }
 }
-void BehaviorManager::set_neworder_to_random(AdminContext& ctx){
+void BehaviorManager::set_new_order_to_random(AdminContext& ctx){
   if (ctx.args.size() != 1){
     ctx.response << "need a probability parameter(0<=x<=1)" << endl;
     return;
@@ -259,8 +199,8 @@ void BehaviorManager::set_neworder_to_random(AdminContext& ctx){
       ctx.response << "invalid probability(0<=x<=1)" << endl;
       return;
     }
-    rb.set_neworder_prob(prob);
-    neworder_behavior = &rb;
+    rb.set_new_order_prob(prob);
+    new_order_behavior = &rb;
     ctx.response << "set to random, prob=" << prob << endl;
   }catch(exception& e){
     ctx.response << "failed" << endl;
