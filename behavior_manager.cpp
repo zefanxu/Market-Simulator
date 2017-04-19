@@ -85,7 +85,7 @@ void BehaviorManager::set_to_default(AdminContext& ctx){
       ctx.response << "invalid parameters" << endl;
       return;
   }
-  ctx.response << ctx.args[1] << "set to default" << endl;
+  ctx.response << ctx.args[1] << " set to default" << endl;
 }
 
 void BehaviorManager::set_count(AdminContext& ctx){
@@ -133,7 +133,7 @@ void BehaviorManager::set_count(AdminContext& ctx){
   }
   else if (ctx.args[1] == "execution"){
     xtb.set_execution_times(x);
-    logout_behavior = &xtb;
+    execution_behavior = &xtb;
     exe_qty = -1;
   }
   else{
