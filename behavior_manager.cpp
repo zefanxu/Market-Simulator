@@ -7,6 +7,7 @@ BehaviorManager::BehaviorManager(asio::io_service * io_service, evtsim::Logger *
   _admin.init(io_service, logger, admin_port, string("AdminServer"));
   _admin.register_admin("bm set", "[action] [params...]", "", bind(&BehaviorManager::set_action, this, _1));
   _admin.register_admin("bm reset", "", "", bind(&BehaviorManager::reset, this, _1));
+  _admin.register_admin("bm execute", "[qty]", "", bind(&BehaviorManager::set_execution_qty, this, _1));
   reset_to_default();
 }
 
