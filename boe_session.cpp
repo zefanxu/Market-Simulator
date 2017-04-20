@@ -16,6 +16,7 @@ boe_session::~boe_session(){
 
 string boe_session::curr_status(){
   stringstream ss;
+  if (!active_orders.size()) return "[BOE]No active order";
   ss << "[BOE]Active Order(s):" << endl;
   for (const auto & it : active_orders){
     const auto & order = it.second;
