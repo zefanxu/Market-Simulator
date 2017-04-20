@@ -1,5 +1,7 @@
 #include "session.h"
 using namespace evt::boe;
+using namespace evt;
+using namespace std;
 
 boe_session::boe_session(BehaviorManager * bm){
   _behavior = bm;

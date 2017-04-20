@@ -1,5 +1,6 @@
 #include "session.h"
 using namespace evt::ouch;
+using namespace evt;
 using namespace std;
 
 //SoupBinTCP functions
