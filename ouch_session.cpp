@@ -204,7 +204,7 @@ int ouch_session::cancel_all(){
   int num_canceled = 0;
   for (const auto & it : active_orders){
     const auto & order = it.second;
-    if (order.still_alive()){
+    if (order.still_active()){
       construct_order_canceled(order.remaining_qty, CancelReason::SystemCancel, order.token);
       num_canceled++;
     }
