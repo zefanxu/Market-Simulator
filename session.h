@@ -138,6 +138,7 @@ private:
 
   uint64_t get_timestamp();
   virtual std::string curr_status();
+  virtual int cancel_all();
 
   std::unordered_map<std::string, evtsim::Ouch_Order> active_orders;
   std::unordered_map<std::string, evtsim::Ouch_Order> finished_orders;
