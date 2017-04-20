@@ -8,6 +8,7 @@
 #include <time.h>
 #include <regex>
 #include <chrono>
+#include <sstream>
 #include "evtsim_util.h"
 #include "ouch_messages.h"
 #include "boe_messages.h"
@@ -34,6 +35,7 @@ protected:
   virtual void execution_logic()=0;
   virtual void modify_logic()=0;
   virtual void replace_logic()=0;
+  virtual string curr_status()=0;
 
   time_t last_send_heartbeat;
   time_t last_recv_heartbeat;
@@ -76,6 +78,7 @@ private:
   void construct_order_modified(const evtsim::Boe_Order & bo);
 
   uint64_t get_timestamp();
+  virtual string curr_status();
 
   std::unordered_map<std::string, evtsim::Boe_Order> active_orders;
   std::unordered_map<std::string, evtsim::Boe_Order> finished_orders;

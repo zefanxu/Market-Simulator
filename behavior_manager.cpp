@@ -8,7 +8,19 @@ BehaviorManager::BehaviorManager(asio::io_service * io_service, evtsim::Logger *
   _admin.register_admin("bm set", "[action] [params...]", "", bind(&BehaviorManager::set_action, this, _1));
   _admin.register_admin("bm reset", "", "", bind(&BehaviorManager::reset, this, _1));
   _admin.register_admin("bm execute", "[qty]", "", bind(&BehaviorManager::set_execution_qty, this, _1));
+  _admin.register_admin("bm status", "", "", bind(&BehaviorManager::display_status, this, _1));
   reset_to_default();
+}
+
+void BehaviorManager::register_status_function(function<string()> display_status_func){
+  this->display_status_funcs.push_back(display_status_func);
+}
+
+void BehaviorManager::display_status(AdminContext& ctx){
+  if (!display_status_funcs.size()) ctx.response << "No status function registered" << endl;
+  for (const auto& each_func : display_status_funcs){
+    ctx.response << each_func() << endl;
+  }
 }
 
 void BehaviorManager::set_action(AdminContext& ctx){
@@ -64,8 +76,8 @@ void BehaviorManager::set_to_default(AdminContext& ctx){
       exe_qty = -1;
   }
   else{
-      ctx.response << "invalid parameters" << endl;
-      return;
+    ctx.response << "invalid parameters" << endl;
+    return;
   }
   ctx.response << ctx.args[1] << " set to default" << endl;
 }

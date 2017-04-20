@@ -5,6 +5,7 @@
 #include <string>
 #include <random>
 #include <iostream>
+#include <functional>
 
 namespace asio = boost::asio;
 
@@ -121,6 +122,9 @@ private:
 class BehaviorManager{
 public:
   BehaviorManager(asio::io_service * io_service, evtsim::Logger * logger, int admin_port);
+
+  void register_status_function(std::function<string()> display_status_func);
+
   bool login(){return login_behavior->login_behavior();};
   bool logout(){return logout_behavior->logout_behavior();};
   bool new_order(){return new_order_behavior->new_order_behavior();};
@@ -143,11 +147,12 @@ private:
   void set_to_default(AdminContext& ctx);
   void set_count(AdminContext& ctx);
   void set_random(AdminContext& ctx);
-
   void set_execution_qty(AdminContext& ctx);
+  void display_status(AdminContext& ctx);
 
   AdminServer _admin;
   evtsim::Logger * l;
+  vector<std::function<string()>> display_status_funcs;
 
   DefaultBehavior _db;
   RandomBehavior _rb;

@@ -6,12 +6,26 @@ using namespace std;
 
 boe_session::boe_session(BehaviorManager * bm){
   _behavior = bm;
+  bm->register_status_function(bind(&boe_session::curr_status, this));
   init();
 }
 
 boe_session::~boe_session(){
 }
 
+string boe_session::curr_status(){
+  stringstream ss;
+  ss << "[BOE]Active Orders:" << endl;
+  for (const auto & it : active_orders){
+    const auto & order = it.second;
+    ss << "Symbol: " << string(order.symbol, sizeof(order.symbol)) << endl;
+    ss << "Side: " << order.side << " Price: " << order.price << endl;
+    ss << "OrderID: " << order.orderID << endl;
+    ss << "Executed qty: " << order.executed_qty << endl;
+    ss << "Remaining qty: " << order.remaining_qty << endl;
+  }
+  return ss.str();
+}
 
 void boe_session::init(){
   seq_num = 0;
