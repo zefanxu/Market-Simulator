@@ -132,7 +132,7 @@ AdminSession::handle_command(const vector<string>& tokens) {
       cmd.callback(context);
 
       string response = context.response.str();
-      send(response);
+      send(response, true);
       char text[100];
       sprintf(text, "%s fd=%d response len=%d", _name.c_str(), _fd, (int)response.size());
       _logger->write(string(text));
