@@ -17,7 +17,7 @@ void BehaviorManager::register_status_function(function<string()> display_status
   assert(display_status_func);
   this->display_status_funcs.push_back(display_status_func);
 }
-void BehaviorManager::register_status_function(function<int()> cancel_func){
+void BehaviorManager::register_cancel_function(function<int()> cancel_func){
   assert(cancel_func);
   this->cancel_funcs.push_back(cancel_func);
 }
