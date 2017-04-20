@@ -187,7 +187,7 @@ void ouch_session::modify_logic(){
 }
 
 void ouch_session::construct_cancel_rejected(Token t){
-  CancelRejected cr;
+  CancelReject cr;
   cr.timestamp = get_timestamp();
   cr.token = t;
   cr.to_network();
