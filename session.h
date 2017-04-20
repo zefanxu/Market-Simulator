@@ -133,8 +133,8 @@ private:
 
   std::unordered_map<std::string, evtsim::Ouch_Order> active_orders;
   std::unordered_map<std::string, evtsim::Ouch_Order> finished_orders;
-  std::vector<Ouch_CancelOrderReq> pending_cancel;
-  std::vector<Ouch_ModifyOrderReq> pending_modify;
+  std::vector<evtsim::Ouch_CancelOrderReq> pending_cancel;
+  std::vector<evtsim::Ouch_ModifyOrderReq> pending_modify;
   std::vector<evtsim::Ouch_ReplaceOrderReq> pending_replace;
 
   std::chrono::system_clock::time_point start_of_day;
