@@ -321,7 +321,7 @@ void ouch_session::construct_order_rejected(RejectedReason reason, Token t){
   OrderRejected oj;
   oj.token = t;
   oj.timestamp = get_timestamp();
-  oj.reason = reinterpret_cast<char>(reason); //reject reason: Other
+  oj.reason = static_cast<char>(reason);
   oj.to_network();
   auto packet = vector<char>(reinterpret_cast<const char*>(&oj), reinterpret_cast<const char*>(&oj) + sizeof(oj));
   pending_out_messages.push_back(packet);

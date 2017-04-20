@@ -215,37 +215,37 @@ namespace ouch {
   };
 
 
-  BOOST_ENUM_VALUES(RejectedReason, char,
-    (TestMode)('T')
-    (Halted)('H')
-    (ExceededConfiguredSafety)('Z')
-    (InvalidStock)('S')
-    (InvalidDisplayType)('D')
-    (OuchClosed)('C')
-    (RequestedFirmNotAuthorized)('L')
-    (ClearingTypeOutsideOfPermittedTimes)('L')
-    (OrderNotAllowedInTypeOfCross)('R')
-    (InvalidPrice)('X')
-    (InvalidMinQty)('N')
-    (Other)('O')
-    (InvalidMidpointPostOnlyPrice)('W')
+  enum class RejectedReason : char{
+    TestMode = 'T',
+    Halted = 'H',
+    ExceededConfiguredSafety = 'Z',
+    InvalidStock = 'S',
+    InvalidDisplayType = 'D',
+    OuchClosed = 'C',
+    RequestedFirmNotAuthorized = 'L',
+    ClearingTypeOutsideOfPermittedTimes = 'L',
+    OrderNotAllowedInTypeOfCross = 'R',
+    InvalidPrice = 'X',
+    InvalidMinQty = 'N',
+    Other = 'O',
+    InvalidMidpointPostOnlyPrice = 'W',
 
     // PRM Rejected Order Reasons
-    (RejectAllEnabled)('a')
-    (EasyToBorrowReject)('b')
-    (RestrictedSymbolList)('c')
-    (IsoOrderRestriction)('d')
-    (OddLotRestriction)('e')
-    (MidpointRestriction)('f')
-    (PreMarketRestriction)('g')
-    (PostMarketRestriction)('h')
-    (ShortSaleRestriction)('i')
-    (OnOpenRestriction)('j')
-    (OnCloseRestriction)('k')
-    (TwoSidedQuoteReject)('l')
-    (ExceededSharesLimit)('m')
-    (ExceededDollarValue)('n')
-  );
+    RejectAllEnabled = 'a',
+    EasyToBorrowReject = 'b',
+    RestrictedSymbolList = 'c',
+    IsoOrderRestriction = 'd',
+    OddLotRestriction = 'e',
+    MidpointRestriction = 'f',
+    PreMarketRestriction = 'g',
+    PostMarketRestriction = 'h',
+    ShortSaleRestriction = 'i',
+    OnOpenRestriction = 'j',
+    OnCloseRestriction = 'k',
+    TwoSidedQuoteReject = 'l',
+    ExceededSharesLimit = 'm',
+    ExceededDollarValue = 'n',
+  };
 
   struct Token {
     std::string _str_() const{
