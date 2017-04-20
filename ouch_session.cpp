@@ -50,7 +50,7 @@ void ouch_session::handle_packet(char * packet, size_t len){
 //OUCH functions
 string ouch_session::curr_status(){
   stringstream ss;
-  ss << "[OUCH]Active Orders:" << endl;
+  ss << "[OUCH]Active Order(s):" << endl;
   for (const auto & it : active_orders){
     const auto & order = it.second;
     ss << "[OrderID: " << order.orderID << "]" << endl;

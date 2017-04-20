@@ -31,7 +31,7 @@ void BehaviorManager::display_status(AdminContext& ctx){
 void BehaviorManager::cancel_all(AdminContext& ctx){
   if (!cancel_funcs.size()) ctx.response << "No status function registered" << endl;
   for (const auto& each_func : cancel_funcs){
-    ctx.response << each_func() << endl;
+    ctx.response << each_func() << " order(s) canceled" << endl;
   }
   display_status(ctx);
 }
