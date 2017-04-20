@@ -133,7 +133,7 @@ private:
   void construct_order_replaced(const evtsim::Ouch_ReplaceOrderReq & ro, const evtsim::Ouch_Order & new_order);
 
   uint64_t get_timestamp();
-  virtual std::string curr_status(){return std::string();};
+  virtual std::string curr_status();
 
   std::unordered_map<std::string, evtsim::Ouch_Order> active_orders;
   std::unordered_map<std::string, evtsim::Ouch_Order> finished_orders;

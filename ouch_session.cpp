@@ -48,6 +48,20 @@ void ouch_session::handle_packet(char * packet, size_t len){
 }
 
 //OUCH functions
+string ouch_session::curr_status(){
+  stringstream ss;
+  ss << "[OUCH]Active Orders:" << endl;
+  for (const auto & it : active_orders){
+    const auto & order = it.second;
+    ss << "[OrderID: " << order.orderID << "]" << endl;
+    ss << "Symbol: " << string(order.symbol, sizeof(order.symbol)) << endl;
+    ss << "Side: " << order.side << " Price: " << order.price << endl;
+    ss << "Executed qty: " << order.executed_qty << endl;
+    ss << "Remaining qty: " << order.remaining_qty << endl;
+  }
+  return ss.str();
+}
+
 void ouch_session::handle_message(MsgHeader * packet, size_t len){
   Ouch_MsgHeader * ouch_msg_h = reinterpret_cast<Ouch_MsgHeader*>(packet);
   switch (ouch_msg_h->msg_type) {
@@ -267,6 +281,7 @@ uint64_t ouch_session::get_timestamp(){
 
 ouch_session::ouch_session(BehaviorManager * bm){
   _behavior = bm;
+  bm->register_status_function(bind(&ouch_session::curr_status, this));
   init();
 }
 

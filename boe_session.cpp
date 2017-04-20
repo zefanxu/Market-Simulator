@@ -18,9 +18,9 @@ string boe_session::curr_status(){
   ss << "[BOE]Active Orders:" << endl;
   for (const auto & it : active_orders){
     const auto & order = it.second;
+    ss << "[OrderID: " << order.orderID << "]" << endl;
     ss << "Symbol: " << string(order.symbol, sizeof(order.symbol)) << endl;
     ss << "Side: " << order.side << " Price: " << order.price << endl;
-    ss << "OrderID: " << order.orderID << endl;
     ss << "Executed qty: " << order.executed_qty << endl;
     ss << "Remaining qty: " << order.remaining_qty << endl;
   }
