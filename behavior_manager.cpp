@@ -9,11 +9,17 @@ BehaviorManager::BehaviorManager(asio::io_service * io_service, evtsim::Logger *
   _admin.register_admin("bm reset", "", "", bind(&BehaviorManager::reset, this, _1));
   _admin.register_admin("bm execute", "[qty]", "", bind(&BehaviorManager::set_execution_qty, this, _1));
   _admin.register_admin("bm status", "", "", bind(&BehaviorManager::display_status, this, _1));
+  _admin.register_admin("bm cancel_all", "", "", bind(&BehaviorManager::cancel_all, this, _1));
   reset_to_default();
 }
 
 void BehaviorManager::register_status_function(function<string()> display_status_func){
+  assert(display_status_func);
   this->display_status_funcs.push_back(display_status_func);
+}
+void BehaviorManager::register_status_function(function<int()> cancel_func){
+  assert(cancel_func);
+  this->cancel_funcs.push_back(cancel_func);
 }
 
 void BehaviorManager::display_status(AdminContext& ctx){
@@ -21,6 +27,13 @@ void BehaviorManager::display_status(AdminContext& ctx){
   for (const auto& each_func : display_status_funcs){
     ctx.response << each_func() << endl;
   }
+}
+void BehaviorManager::cancel_all(AdminContext& ctx){
+  if (!cancel_funcs.size()) ctx.response << "No status function registered" << endl;
+  for (const auto& each_func : cancel_funcs){
+    ctx.response << each_func() << endl;
+  }
+  display_status(ctx);
 }
 
 void BehaviorManager::set_action(AdminContext& ctx){

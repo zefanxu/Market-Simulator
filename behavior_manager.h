@@ -124,6 +124,7 @@ public:
   BehaviorManager(asio::io_service * io_service, evtsim::Logger * logger, int admin_port);
 
   void register_status_function(std::function<string()> display_status_func);
+  void register_cancel_function(std::function<int()> cancel_func);
 
   bool login(){return login_behavior->login_behavior();};
   bool logout(){return logout_behavior->logout_behavior();};
@@ -141,18 +142,20 @@ public:
 
 private:
   void reset_to_default();
+
   void reset(AdminContext& ctx);
   void set_action(AdminContext& ctx);
-
   void set_to_default(AdminContext& ctx);
   void set_count(AdminContext& ctx);
   void set_random(AdminContext& ctx);
   void set_execution_qty(AdminContext& ctx);
   void display_status(AdminContext& ctx);
+  void cancel_all(AdminContext& ctx);
 
   AdminServer _admin;
   evtsim::Logger * l;
   vector<std::function<string()>> display_status_funcs;
+  vector<std::function<int()>> cancel_funcs;
 
   DefaultBehavior _db;
   RandomBehavior _rb;

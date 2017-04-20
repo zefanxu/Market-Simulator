@@ -35,7 +35,10 @@ protected:
   virtual void execution_logic()=0;
   virtual void modify_logic()=0;
   virtual void replace_logic()=0;
+
+  //admin console callback functions
   virtual string curr_status()=0;
+  virtual int cancel_all()=0;
 
   time_t last_send_heartbeat;
   time_t last_recv_heartbeat;
@@ -79,6 +82,7 @@ private:
 
   uint64_t get_timestamp();
   virtual std::string curr_status();
+  virtual int cancel_all();
 
   std::unordered_map<std::string, evtsim::Boe_Order> active_orders;
   std::unordered_map<std::string, evtsim::Boe_Order> finished_orders;

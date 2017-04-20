@@ -200,6 +200,19 @@ void ouch_session::modify_logic(){
     active_orders.erase(each_token);
 }
 
+int ouch_session::cancel_all(){
+  int num_canceled = 0;
+  for (const auto & it : active_orders){
+    const auto & order = it.second;
+    if (order.still_alive()){
+      construct_order_canceled(order.remaining_qty, CancelReason::SystemCancel, order.token);
+      num_canceled++;
+    }
+  }
+  active_orders.clear();
+  return num_canceled;
+}
+
 void ouch_session::construct_cancel_rejected(Token t){
   CancelReject cr;
   cr.timestamp = get_timestamp();
@@ -234,9 +247,9 @@ void ouch_session::cancel_logic(){
 
 void ouch_session::execution_logic(){
   vector<string> done_tokens;
-  for (auto & order_pair : active_orders){
-    Ouch_Order & each_order = order_pair.second;
-    const string & each_token = order_pair.first;
+  for (auto & it : active_orders){
+    Ouch_Order & each_order = it.second;
+    const string & each_token = it.first;
     if (!_behavior->execution())
       continue;
     if (each_order.expired()){
@@ -282,6 +295,7 @@ uint64_t ouch_session::get_timestamp(){
 ouch_session::ouch_session(BehaviorManager * bm){
   _behavior = bm;
   bm->register_status_function(bind(&ouch_session::curr_status, this));
+  bm->register_cancel_function(bind(&ouch_session::cancel_all, this));
   init();
 }
 

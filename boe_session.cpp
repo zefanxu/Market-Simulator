@@ -7,6 +7,7 @@ using namespace std;
 boe_session::boe_session(BehaviorManager * bm){
   _behavior = bm;
   bm->register_status_function(bind(&boe_session::curr_status, this));
+  bm->register_cancel_function(bind(&boe_session::cancel_all, this));
   init();
 }
 
@@ -180,7 +181,20 @@ void boe_session::cancel_logic(){
   }
   pending_cancel.clear();
   for (const auto & each_token : done_tokens)
-  active_orders.erase(each_token);
+    active_orders.erase(each_token);
+}
+
+int boe_session::cancel_all(){
+  int num_canceled = 0;
+  for (const auto & it : active_orders){
+    const auto & order = it.second;
+    if (order.still_alive()){
+      construct_order_canceled(order.token);
+      num_canceled++;
+    }
+  }
+  active_orders.clear();
+  return num_canceled;
 }
 
 void boe_session::heartbeat_logic(){
