@@ -129,7 +129,7 @@ void boe_session::execution_logic(){
     const string & each_token = order_pair.first;
     if (!_behavior->execution())
       continue;
-    if (each_order.still_live())
+    if (each_order.still_active())
       construct_order_executed(each_order, _behavior->execution_qty());
     else{
       finished_orders[each_token] = each_order;
@@ -188,7 +188,7 @@ int boe_session::cancel_all(){
   int num_canceled = 0;
   for (const auto & it : active_orders){
     const auto & order = it.second;
-    if (order.still_alive()){
+    if (order.still_active()){
       construct_order_canceled(order.token);
       num_canceled++;
     }

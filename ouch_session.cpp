@@ -264,7 +264,7 @@ void ouch_session::execution_logic(){
       done_tokens.push_back(each_token);
       continue;
     }
-    else if (each_order.still_live())
+    else if (each_order.still_active())
       construct_order_executed(each_order);
     else{
       finished_orders[each_token] = each_order;
