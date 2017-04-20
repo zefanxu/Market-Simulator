@@ -44,8 +44,8 @@ public:
   Ouch_Order(evt::ouch::EnterOrder* eo);
   void parse_order(evt::ouch::EnterOrder* eo);
 
-  virtual bool still_active() ;
-  bool expired() const;
+  virtual bool still_active();
+  bool expired();
 
   uint32_t time_in_force;
   char intermarket_sweep_eligibility;
