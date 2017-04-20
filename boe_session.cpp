@@ -186,8 +186,8 @@ void boe_session::cancel_logic(){
 
 int boe_session::cancel_all(){
   int num_canceled = 0;
-  for (const auto & it : active_orders){
-    const auto & order = it.second;
+  for (auto & it : active_orders){
+    auto & order = it.second;
     if (order.still_active()){
       construct_order_canceled(order.token);
       num_canceled++;

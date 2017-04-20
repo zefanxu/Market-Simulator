@@ -29,7 +29,7 @@ Ouch_Order::Ouch_Order(EnterOrder* eo){
   parse_order(eo);
 }
 
-bool Ouch_Order::expired(){
+bool Ouch_Order::expired() {
   if ((time_in_force != TimeInForce::Ioc) and (time_in_force != TimeInForce::Market) and (time_in_force != TimeInForce::System)){
     auto curr_time = time(NULL);
     remain_time_in_force = time_in_force - (curr_time - recv_order_time);
@@ -55,7 +55,7 @@ void Ouch_Order::parse_order(EnterOrder* eo){
   capacity = eo->capacity;
 }
 
-bool Ouch_Order::still_active() const{
+bool Ouch_Order::still_active(){
   if ((remaining_qty <= 0) or expired() or (state == OrderState::Dead)){
     state = OrderState::Dead;
     return false;
