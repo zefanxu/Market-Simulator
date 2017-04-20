@@ -33,7 +33,6 @@ void BehaviorManager::cancel_all(AdminContext& ctx){
   for (const auto& each_func : cancel_funcs){
     ctx.response << each_func() << " order(s) canceled" << endl;
   }
-  display_status(ctx);
 }
 
 void BehaviorManager::set_action(AdminContext& ctx){
