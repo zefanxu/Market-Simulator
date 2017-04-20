@@ -2,6 +2,8 @@
 #include "order.h"
 
 using namespace evt::boe;
+using namespace evtsim;
+using namespace std;
 
 Boe_Order::Boe_Order(NewOrder* no){
   parse_order(no);

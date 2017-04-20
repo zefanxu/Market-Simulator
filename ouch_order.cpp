@@ -2,6 +2,8 @@
 #include "order.h"
 
 using namespace evt::ouch;
+using namespace evtsim;
+using namespace std;
 
 order::order(){
   recv_order_time = time(NULL);
