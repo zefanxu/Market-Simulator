@@ -12,7 +12,7 @@ boe_session::~boe_session(){
 
 void boe_session::init(){
   seq_num = 0;
-  state = session_state::not_logged_in;
+  state = SessionState::NotLoggedIn;
   time_t curr_time = time(NULL);
   last_send_heartbeat = curr_time;
   last_recv_heartbeat = curr_time;
@@ -47,11 +47,11 @@ void boe_session::handle_login_request(MsgHeader* hdr, size_t len){
   LoginRequest * req = reinterpret_cast<LoginRequest*>(hdr);
   if (!_behavior->login())
     construct_login_response(LoginResponseStatus::SessionDisabled, req);
-  else if (state != session_state::not_logged_in)
+  else if (state != SessionState::NotLoggedIn)
     construct_login_response(LoginResponseStatus::SessionInUse, req);
   else{
     construct_login_response(LoginResponseStatus::Accepted, req);
-    state = session_state::logged_in;
+    state = SessionState::LoggedIn;
   }
 }
 
@@ -154,6 +154,10 @@ void boe_session::cancel_logic(){
       construct_cancel_rejected(co.token, Reason::TooLateToCancel);
       continue;
     }
+    else if (!_behavior->cancel_order()){
+      construct_cancel_rejected(co.token, Reason::UnforeseenReason);
+      continue;
+    }
     done_tokens.push_back(co.token._str_());
     construct_order_canceled(co.token);
   }
@@ -164,7 +168,7 @@ void boe_session::cancel_logic(){
 
 void boe_session::heartbeat_logic(){
   double second = difftime(time(NULL), last_send_heartbeat);
-  if (state == session_state::not_logged_in) return;
+  if (state == SessionState::NotLoggedIn) return;
   if (second >= 1){
     last_send_heartbeat = time(NULL);
     ServerHeartbeat h;

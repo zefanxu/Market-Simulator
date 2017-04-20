@@ -1,24 +1,21 @@
 #include "session.h"
 using namespace evt::ouch;
+using namespace std;
+
 //SoupBinTCP functions
 void ouch_session::handle_login_request(MsgHeader * packet, size_t len){
-  if (state == session_state::not_logged_in and _behavior->login()){
-    state = session_state::logged_in;
-    LoginAccepted la;
-    strncpy(la.session, "         0", sizeof(la.session));
-    strncpy(la.seq_num, "                   0", sizeof(la.seq_num));
-    auto packet = vector<char>(reinterpret_cast<const char*>(&la), reinterpret_cast<const char*>(&la) + sizeof(la));
-    pending_out_messages.push_back(packet);
-  }else{
-    LoginRejected lj;
-    lj.reason = 'A';
-    auto packet =  vector<char>(reinterpret_cast<const char*>(&lj), reinterpret_cast<const char*>(&lj) + sizeof(lj));
-    pending_out_messages.push_back(packet);
+  if (state != SessionState::NotLoggedIn)
+    construct_login_rejected(LoginRejectReason::SessionNotAvailable);
+  else if (!_behavior->login())
+    construct_login_rejected(LoginRejectReason::NotAuthorized);
+  else{
+    state = SessionState::LoggedIn;
+    construct_login_accepted();
   }
 }
 
 void ouch_session::handle_logout_request(MsgHeader * packet, size_t len){
-  state = session_state::not_logged_in;
+  state = SessionState::NotLoggedIn;
   return;
 }
 
@@ -73,9 +70,9 @@ void ouch_session::enter_order(Ouch_MsgHeader * msg, size_t len){
   EnterOrder * eo = reinterpret_cast<EnterOrder*>(msg);
   eo->from_network();
   if (eo->qty > MAX_SHARES)
-    construct_order_rejected('Z', eo->token);
-  else if ((state != session_state::logged_in) or !_behavior->new_order())
-    construct_order_rejected('O', eo->token);
+    construct_order_rejected(RejectedReason::ExceededConfiguredSafety, eo->token);
+  else if ((state != SessionState::LoggedIn) or !_behavior->new_order())
+    construct_order_rejected(RejectedReason::Other, eo->token);
   else if((active_orders.find(eo->token._str_()) == active_orders.end()) and
       (finished_orders.find(eo->token._str_()) == finished_orders.end())){
     Ouch_Order new_order = Ouch_Order(eo);
@@ -136,7 +133,7 @@ void ouch_session::replace_logic(){
       continue;
     if (ro.qty > MAX_SHARES or ro.qty <= target_order.executed_qty){
       done_tokens.push_back(t);
-      construct_order_canceled(active_orders[t].remaining_qty, 'Z', ro.existing_token);
+      construct_order_canceled(active_orders[t].remaining_qty, CancelReason::SystemCancel, ro.existing_token);
       continue;
     }
     target_order.token = ro.new_token;
@@ -187,11 +184,22 @@ void ouch_session::modify_logic(){
     active_orders.erase(each_token);
 }
 
+void ouch_session::construct_cancel_rejected(Token t){
+  CancelRejected cr;
+  cr.timestamp = get_timestamp();
+  cr.token = t;
+  cr.to_network();
+  auto packet = vector<char>(reinterpret_cast<const char*>(&cr), reinterpret_cast<const char*>(&cr) + sizeof(cr));
+  pending_out_messages.push_back(packet);
+}
+
 void ouch_session::cancel_logic(){
   vector<string> done_tokens;
   for (const auto & co : pending_cancel){
-      if (active_orders.find(co.token._str_()) == active_orders.end())
+      if (active_orders.find(co.token._str_()) == active_orders.end() or !_behavior->cancel_order()){
+        construct_cancel_rejected(co.token);
         continue;
+      }
       uint32_t curr_qty = active_orders[co.token._str_()].remaining_qty;
       uint32_t dec_qty = curr_qty;
       if (!co.qty)
@@ -201,7 +209,7 @@ void ouch_session::cancel_logic(){
         dec_qty = curr_qty - co.qty;
         active_orders[co.token._str_()].remaining_qty = co.qty;
       }
-      construct_order_canceled(dec_qty, 'U', co.token);
+      construct_order_canceled(dec_qty, CancelReason::UserRequested, co.token);
   }
   pending_cancel.clear();
   for (const auto & each_token : done_tokens)
@@ -216,19 +224,19 @@ void ouch_session::execution_logic(){
     if (!_behavior->execution())
       continue;
     if (each_order.expired()){
-      construct_order_canceled(each_order.remaining_qty, 'T', each_order.token);
+      construct_order_canceled(each_order.remaining_qty, CancelReason::TimeOut, each_order.token);
       done_tokens.push_back(each_token);
       continue;
     }
+    //IOC orders
     if (!each_order.time_in_force){
       if (each_order.remaining_qty)
-        construct_order_canceled(each_order.remaining_qty, 'I', each_order.token);
+        construct_order_canceled(each_order.remaining_qty, CancelReason::IOC, each_order.token);
       done_tokens.push_back(each_token);
       continue;
     }
-    else if (each_order.still_live()){
+    else if (each_order.still_live())
       construct_order_executed(each_order);
-    }
     else{
       finished_orders[each_token] = each_order;
       done_tokens.push_back(each_token);
@@ -240,7 +248,7 @@ void ouch_session::execution_logic(){
 
 void ouch_session::heartbeat_logic(){
   double second = difftime(time(NULL), last_send_heartbeat);
-  if (state == session_state::not_logged_in) return;
+  if (state == SessionState::NotLoggedIn) return;
   if (second >= 1){
     last_send_heartbeat = time(NULL);
     ServerHeartbeat h;
@@ -264,7 +272,7 @@ ouch_session::~ouch_session(){
 }
 
 void ouch_session::init(){
-  state = session_state::not_logged_in;
+  state = SessionState::NotLoggedIn;
   time_t curr_time = time(NULL);
   last_send_heartbeat = curr_time;
   last_recv_heartbeat = curr_time;
@@ -307,22 +315,22 @@ void ouch_session::construct_order_accepted(const Ouch_Order & o){
   pending_out_messages.push_back(packet);
 }
 
-void ouch_session::construct_order_rejected(char reason, Token t){
+void ouch_session::construct_order_rejected(RejectedReason reason, Token t){
   OrderRejected oj;
   oj.token = t;
   oj.timestamp = get_timestamp();
-  oj.reason = reason; //reject reason: Other
+  oj.reason = static_cast<char>(reason); //reject reason: Other
   oj.to_network();
   auto packet = vector<char>(reinterpret_cast<const char*>(&oj), reinterpret_cast<const char*>(&oj) + sizeof(oj));
   pending_out_messages.push_back(packet);
 }
 
-void ouch_session::construct_order_canceled(uint32_t dec_qty, char reason, Token t){
+void ouch_session::construct_order_canceled(uint32_t dec_qty, CancelReason reason, Token t){
   OrderCanceled oc;
   oc.timestamp = get_timestamp();
   oc.token = t;
   oc.decrement_qty = dec_qty;
-  oc.reason = reason;
+  oc.reason = static_cast<char>(reason);
   oc.to_network();
   auto packet = vector<char>(reinterpret_cast<const char*>(&oc), reinterpret_cast<const char*>(&oc) + sizeof(oc));
   pending_out_messages.push_back(packet);
@@ -538,4 +546,26 @@ bool ouch_session::validate_login_request(MsgHeader* msg_h, size_t len){
     return false;
   }
   return true;
+}
+
+void ouch_session::constuct_login_accepted(unsigned int session_num, unsigned int seq_num){
+  LoginAccepted la;
+  //left padded with space
+  memset(la.session, ' ', sizeof(la.session));
+  memset(la.seq_num, ' ', sizeof(la.seq_num));
+  string session_str = to_string(session_num);
+  string seq_str = to_string(seq_num);
+  assert(session_str.size() <= sizeof(la.session));
+  assert(seq_str.size() <= sizeof(la.seq_num));
+  strncpy(la.session + (sizeof(la.session)-session_str.size()), session_str.c_str(), session_str.size());
+  strncpy(la.seq_num + (sizeof(la.seq_num)-seq_str.size()), seq_str.c_str(), seq_str.size());
+  auto packet = vector<char>(reinterpret_cast<const char*>(&la), reinterpret_cast<const char*>(&la) + sizeof(la));
+  pending_out_messages.push_back(packet);
+}
+
+void ouch_session::construct_login_rejected(LoginRejectReason r){
+  LoginRejected lj;
+  lj.reason = static_cast<char>(r);
+  auto packet =  vector<char>(reinterpret_cast<const char*>(&lj), reinterpret_cast<const char*>(&lj) + sizeof(lj));
+  pending_out_messages.push_back(packet);
 }

@@ -82,6 +82,27 @@ namespace ouch {
     TradeCorrection = 'F',
     TradeNow = 'N',
   };
+
+  enum class LoginRejectReason : char {
+    NotAuthorized = 'A',
+    SessionNotAvailable = 'S',
+  };
+
+  enum class CancelReason : char {
+    UserRequested = 'U',
+    IOC = 'I',
+    TimeOut = 'T',
+    Supervisory = 'S',
+    Regulatory = 'D',
+    SelfMatch = 'Q',
+    SystemCancel = 'Z',
+    CrossCanceled = 'C',
+    MarketCollars = 'K',
+    Halted = 'H',
+    OpenProtection = 'X',
+    Closed = 'E',
+  };
+
   inline const char*
   to_string(InboundMsgType e) {
     switch(e) {

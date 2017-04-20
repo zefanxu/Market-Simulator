@@ -5,8 +5,7 @@
 #include "ouch_messages.h"
 #include "boe_messages.h"
 
-using namespace evt;
-
+namespace evtsim{
 class order{
 public:
   order();
@@ -30,20 +29,20 @@ public:
 class Boe_Order : public order{
 public:
   Boe_Order();
-  Boe_Order(boe::NewOrder* no);
-  void parse_order(boe::NewOrder* no);
+  Boe_Order(evt::boe::NewOrder* no);
+  void parse_order(evt::boe::NewOrder* no);
 
   virtual bool still_live();
 
-  boe::Token token;
+  evt::boe::Token token;
   uint64_t price;
 };
 
 class Ouch_Order : public order{
 public:
   Ouch_Order();
-  Ouch_Order(ouch::EnterOrder* eo);
-  void parse_order(ouch::EnterOrder* eo);
+  Ouch_Order(evt::ouch::EnterOrder* eo);
+  void parse_order(evt::ouch::EnterOrder* eo);
 
   virtual bool still_live();
   bool expired();
@@ -52,35 +51,35 @@ public:
   char intermarket_sweep_eligibility;
   int32_t price;
   char cross_type;
-  ouch::Token token;
-  ouch::OrderState state;
+  evt::ouch::Token token;
+  evt::ouch::OrderState state;
 };
 
 class Ouch_CancelOrderReq{
 public:
   Ouch_CancelOrderReq();
-  Ouch_CancelOrderReq(ouch::CancelOrder* co);
-  void parse_cancel_order(ouch::CancelOrder* co);
+  Ouch_CancelOrderReq(evt::ouch::CancelOrder* co);
+  void parse_cancel_order(evt::ouch::CancelOrder* co);
 
-  ouch::Token token;
+  evt::ouch::Token token;
   uint32_t qty;
 };
 
 class Boe_CancelOrderReq{
 public:
   Boe_CancelOrderReq();
-  Boe_CancelOrderReq(boe::CancelOrder* co);
+  Boe_CancelOrderReq(evt::boe::CancelOrder* co);
 
-  boe::Token token;
+  evt::boe::Token token;
 };
 
 class Ouch_ModifyOrderReq{
 public:
   Ouch_ModifyOrderReq();
-  Ouch_ModifyOrderReq(ouch::ModifyOrder* mo);
-  void parse_modify_order(ouch::ModifyOrder* mo);
+  Ouch_ModifyOrderReq(evt::ouch::ModifyOrder* mo);
+  void parse_modify_order(evt::ouch::ModifyOrder* mo);
 
-  ouch::Token token;
+  evt::ouch::Token token;
   uint32_t req_qty;
   char new_side;
 };
@@ -88,11 +87,11 @@ public:
 class Boe_ModifyOrderReq{
 public:
   Boe_ModifyOrderReq();
-  Boe_ModifyOrderReq(boe::ModifyOrder* mo);
-  void parse_modify_order(boe::ModifyOrder* mo);
+  Boe_ModifyOrderReq(evt::boe::ModifyOrder* mo);
+  void parse_modify_order(evt::boe::ModifyOrder* mo);
 
-  boe::Token token;
-  boe::Token orig_token;
+  evt::boe::Token token;
+  evt::boe::Token orig_token;
   char clearing_firm[4];
   uint32_t qty;
   uint64_t price;
@@ -105,11 +104,11 @@ public:
 class Ouch_ReplaceOrderReq{
 public:
   Ouch_ReplaceOrderReq();
-  Ouch_ReplaceOrderReq(ouch::ReplaceOrder* ro);
-  void parse_replace_order(ouch::ReplaceOrder* ro);
+  Ouch_ReplaceOrderReq(evt::ouch::ReplaceOrder* ro);
+  void parse_replace_order(evt::ouch::ReplaceOrder* ro);
 
-  ouch::Token existing_token;
-  ouch::Token new_token;
+  evt::ouch::Token existing_token;
+  evt::ouch::Token new_token;
   uint32_t qty;
   uint32_t price;
   uint32_t time_in_force;
@@ -117,3 +116,4 @@ public:
   char intermarket_sweep_eligibility;
   uint32_t min_qty;
 };
+}
