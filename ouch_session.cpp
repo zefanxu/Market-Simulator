@@ -321,7 +321,7 @@ void ouch_session::construct_order_rejected(RejectedReason reason, Token t){
   OrderRejected oj;
   oj.token = t;
   oj.timestamp = get_timestamp();
-  oj.reason = static_cast<char>(reason); //reject reason: Other
+  oj.reason = reinterpret_cast<char>(reason); //reject reason: Other
   oj.to_network();
   auto packet = vector<char>(reinterpret_cast<const char*>(&oj), reinterpret_cast<const char*>(&oj) + sizeof(oj));
   pending_out_messages.push_back(packet);
@@ -550,7 +550,7 @@ bool ouch_session::validate_login_request(MsgHeader* msg_h, size_t len){
   return true;
 }
 
-void ouch_session::constuct_login_accepted(unsigned int session_num, unsigned int seq_num){
+void ouch_session::construct_login_accepted(unsigned int session_num, unsigned int seq_num){
   LoginAccepted la;
   //left padded with space
   memset(la.session, ' ', sizeof(la.session));
