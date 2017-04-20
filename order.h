@@ -10,7 +10,7 @@ class order{
 public:
   order();
 
-  virtual bool still_active()=0;
+  virtual bool still_active() const =0;
 
   time_t recv_order_time;
   char time_in_force;
@@ -32,7 +32,7 @@ public:
   Boe_Order(evt::boe::NewOrder* no);
   void parse_order(evt::boe::NewOrder* no);
 
-  virtual bool still_active();
+  virtual bool still_active() const;
 
   evt::boe::Token token;
   uint64_t price;
@@ -44,7 +44,7 @@ public:
   Ouch_Order(evt::ouch::EnterOrder* eo);
   void parse_order(evt::ouch::EnterOrder* eo);
 
-  virtual bool still_active();
+  virtual bool still_active() const;
   bool expired();
 
   uint32_t time_in_force;
