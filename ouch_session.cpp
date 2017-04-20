@@ -2,6 +2,7 @@
 using namespace evt::ouch;
 using namespace evt;
 using namespace std;
+using namespace evtsim;
 
 //SoupBinTCP functions
 void ouch_session::handle_login_request(MsgHeader * packet, size_t len){
