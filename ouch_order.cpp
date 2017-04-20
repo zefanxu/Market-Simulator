@@ -55,7 +55,7 @@ void Ouch_Order::parse_order(EnterOrder* eo){
   capacity = eo->capacity;
 }
 
-bool Ouch_Order::still_active(){
+bool Ouch_Order::still_active() const{
   if ((remaining_qty <= 0) or expired() or (state == OrderState::Dead)){
     state = OrderState::Dead;
     return false;

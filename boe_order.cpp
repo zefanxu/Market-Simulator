@@ -27,7 +27,7 @@ void Boe_Order::parse_order(NewOrder* no){
   display = no->display_indicator;
 }
 
-bool Boe_Order::still_active(){
+bool Boe_Order::still_active() const{
   return (remaining_qty > 0 and remaining_qty <= 1000000);
 }
 
