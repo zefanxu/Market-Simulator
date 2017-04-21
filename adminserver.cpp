@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <iomanip>
 #include <boost/bind.hpp>
@@ -6,8 +5,6 @@
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
-
-#include <evt_config.h>
 
 #include "adminserver.h"
 
