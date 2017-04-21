@@ -23,9 +23,7 @@ AdminSession::start() {
   _fd = socket.native_handle();
   bip::tcp::no_delay nd(false);
   socket.set_option(nd);
-  send("version admin-1\n", /*raw*/true);
-  send("auth password\n", /*raw*/true);
-  set_state(SessionState::PendingAuth);
+  set_state(SessionState::Running);
   arm_read();
 }
 
