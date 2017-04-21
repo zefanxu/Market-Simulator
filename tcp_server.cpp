@@ -78,14 +78,14 @@ SoupBinTCPServer::SoupBinTCPServer(unsigned int port, asio::io_service* io_servi
 }
 
 void SoupBinTCPServer::read(boost::system::error_code ec, size_t bytes_received){
-  char * read_pos = buf.c_array();
+  char * read_pos = buf.data();
   size_t packet_len;
   if (ec == asio::error::eof){
     l->write("[OUCH]Connection Closed");
     reconnect();
     return;
   }
-  while (read_pos < buf.c_array() + bytes_received){
+  while (read_pos < buf.data() + bytes_received){
     l->write("[OUCH]RECV: " + ouch::outbound_to_string(reinterpret_cast<const ouch::MsgHeader*>(read_pos)));
     packet_len = big_to_native((reinterpret_cast<const ouch::MsgHeader*>(read_pos))->length) + 2;
     if (packet_len)
@@ -113,14 +113,14 @@ BOEServer::BOEServer(unsigned int port, asio::io_service* io_service, evtsim::Lo
 }
 
 void BOEServer::read(boost::system::error_code ec, size_t bytes_received){
-  char * read_pos = buf.c_array();
+  char * read_pos = buf.data();
   size_t packet_len;
   if (ec == asio::error::eof){
     l->write("[BOE]Connection Closed");
     reconnect();
     return;
   }
-  while (read_pos < buf.c_array() + bytes_received){
+  while (read_pos < buf.data() + bytes_received){
     l->write("[BOE]RECV: " + boe::to_string(reinterpret_cast<const boe::MsgHeader*>(read_pos)));
     packet_len = (reinterpret_cast<const boe::MsgHeader*>(read_pos))->length + 2;
     if (packet_len)
