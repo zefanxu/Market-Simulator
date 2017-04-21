@@ -19,11 +19,6 @@
 #include "ouch_messages.h"
 #include "boe_messages.h"
 
-using namespace std;
-using namespace evt;
-
-using boost::endian::big_to_native;
-using boost::endian::native_to_big;
 
 namespace evt{
   namespace ouch{
@@ -39,13 +34,13 @@ namespace evtsim{
   public:
     Logger();
     ~Logger();
-    void write(string text);
-    void write_warning(string text);
+    void write(std::string text);
+    void write_warning(std::string text);
     bool also_print;
   private:
     ofstream file;
-    string get_time_string();
-    string get_datetime_string();
+    std::string get_time_string();
+    std::string get_datetime_string();
   };
 }
 

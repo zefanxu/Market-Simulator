@@ -1,4 +1,8 @@
 #include "evtsim_util.h"
+using boost::endian::big_to_native;
+using boost::endian::native_to_big;
+using namespace std;
+using namespace evt;
 
 string evtsim::Logger::get_datetime_string(){
   time_t t = time(nullptr);
