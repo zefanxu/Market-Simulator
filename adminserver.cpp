@@ -24,6 +24,7 @@ AdminSession::start() {
   bip::tcp::no_delay nd(false);
   socket.set_option(nd);
   set_state(SessionState::Running);
+  handle_help();
   arm_read();
 }
 
