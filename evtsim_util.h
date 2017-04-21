@@ -38,7 +38,7 @@ namespace evtsim{
     void write_warning(std::string text);
     bool also_print;
   private:
-    ofstream file;
+    std::ofstream file;
     std::string get_time_string();
     std::string get_datetime_string();
   };

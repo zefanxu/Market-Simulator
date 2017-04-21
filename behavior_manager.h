@@ -123,7 +123,10 @@ class BehaviorManager{
 public:
   BehaviorManager(asio::io_service * io_service, evtsim::Logger * logger, int admin_port);
 
-  void register_status_function(std::function<string()> display_status_func);
+  //register session specific functions to display status message
+  void register_status_function(std::function<std::string()> display_status_func);
+  //register session specific functions to cancel all orders
+  //return num of successfully canceled orders
   void register_cancel_function(std::function<int()> cancel_func);
 
   bool login(){return login_behavior->login_behavior();};
@@ -154,8 +157,8 @@ private:
 
   AdminServer _admin;
   evtsim::Logger * l;
-  vector<std::function<string()>> display_status_funcs;
-  vector<std::function<int()>> cancel_funcs;
+  std::vector<std::function<std::string()>> display_status_funcs;
+  std::vector<std::function<int()>> cancel_funcs;
 
   DefaultBehavior _db;
   RandomBehavior _rb;

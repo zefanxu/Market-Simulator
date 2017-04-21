@@ -37,7 +37,7 @@ protected:
   virtual void replace_logic()=0;
 
   //admin console callback functions
-  virtual string curr_status()=0;
+  virtual std::string curr_status()=0;
   virtual int cancel_all()=0;
 
   time_t last_send_heartbeat;

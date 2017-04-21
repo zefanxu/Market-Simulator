@@ -58,14 +58,14 @@ namespace evt {
 
   public:
   AdminServer() : _acceptor(0) {}
-    void init(boost::asio::io_service * iosvc, evtsim::Logger * l, int port, string name);
+    void init(boost::asio::io_service * iosvc, evtsim::Logger * l, int port, std::string name);
 
   public:
     typedef boost::function<void (AdminContext& ctx)> admin_callback;
     typedef std::shared_ptr<AdminSession> AdminSessionRP;
 
   public:
-    void register_admin(string cmd, string args, string help, admin_callback callback);
+    void register_admin(std::string cmd, std::string args, std::string help, admin_callback callback);
 
   private:
     void handle_accept(AdminSessionRP session, const boost::system::error_code& ec);
