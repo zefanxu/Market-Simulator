@@ -35,7 +35,7 @@ protected:
   asio::ip::tcp::acceptor* _acceptor;
   asio::ip::tcp::socket* _socket;
   evtsim::Logger* l;
-  boost::array<char, 4096> buf;
+  std::array<char, 4096> buf;
 };
 
 class SoupBinTCPServer: public TCPServer{
