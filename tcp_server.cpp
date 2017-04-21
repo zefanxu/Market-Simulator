@@ -1,5 +1,8 @@
 #include "tcp_server.h"
 
+using namespace std;
+using namespace evt;
+
 TCPServer::TCPServer(unsigned int port, asio::io_service* io_service, evtsim::Logger * logger, BehaviorManager * behavior){
   if (!behavior or !logger or !io_service)
     throw runtime_error("nullptr");

@@ -146,16 +146,16 @@ public:
 private:
   void reset_to_default();
 
-  void reset(AdminContext& ctx);
-  void set_action(AdminContext& ctx);
-  void set_to_default(AdminContext& ctx);
-  void set_count(AdminContext& ctx);
-  void set_random(AdminContext& ctx);
-  void set_execution_qty(AdminContext& ctx);
-  void display_status(AdminContext& ctx);
-  void cancel_all(AdminContext& ctx);
+  void reset(evt::AdminContext& ctx);
+  void set_action(evt::AdminContext& ctx);
+  void set_to_default(evt::AdminContext& ctx);
+  void set_count(evt::AdminContext& ctx);
+  void set_random(evt::AdminContext& ctx);
+  void set_execution_qty(evt::AdminContext& ctx);
+  void display_status(evt::AdminContext& ctx);
+  void cancel_all(evt::AdminContext& ctx);
 
-  AdminServer _admin;
+  evt::AdminServer _admin;
   evtsim::Logger * l;
   std::vector<std::function<std::string()>> display_status_funcs;
   std::vector<std::function<int()>> cancel_funcs;
